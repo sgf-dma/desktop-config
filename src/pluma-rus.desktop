@@ -1,0 +1,22 @@
+[Desktop Entry]
+Name=Pluma rus
+GenericName=Text Editor for cp1251 encoded files
+GenericName[ru]=Текстовый редактор для файлов в кодировке cp1251
+Comment=Edit text files
+Comment[ru]=Редактор текстовых файлов в кодировке cp1251
+Exec=pluma --encoding WINDOWS-1251 %U
+Terminal=false
+Type=Application
+StartupNotify=true
+MimeType=text/plain;
+Icon=accessories-text-editor
+Categories=GTK;Utility;TextEditor;
+Keywords=text;editor;MATE;tabs;highlighting;code;multiple;files;pluggable;
+X-MATE-DocPath=pluma/pluma.xml
+X-MATE-FullName=pluma Text Editor cp1251
+X-MATE-FullName[ru]=Текстовый редактор pluma cp1251
+X-MATE-Bugzilla-Bugzilla=MATE
+X-MATE-Bugzilla-Product=Pluma
+X-MATE-Bugzilla-Component=general
+X-MATE-Bugzilla-Version=1.8.1
+X-MATE-Bugzilla-ExtraInfoScript=/usr/lib/pluma/pluma-bugreport.sh
