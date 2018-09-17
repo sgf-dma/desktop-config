@@ -1,0 +1,4 @@
+---
+
+user_xkb_dir: "{{ ansible_user_dir + '/.xkb/' }}"
+user_xkb_rules: "{{ user_xkb_dir + 'rules/evdev.sgf' }}"

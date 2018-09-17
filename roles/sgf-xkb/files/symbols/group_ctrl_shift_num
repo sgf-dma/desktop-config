@@ -1,0 +1,12 @@
+xkb_symbols {
+     key <AE02> {
+        type= "PC_CONTROL_SHIFT_LEVEL3",
+        symbols[Group1]= [  2,        at,   ISO_First_Group ],
+        symbols[Group2]= [  2,  quotedbl,   ISO_First_Group ]
+     };
+     key <AE03> {
+        type= "PC_CONTROL_SHIFT_LEVEL3",
+        symbols[Group1]= [  3,  numbersign, ISO_Last_Group ],
+        symbols[Group2]= [  3,  numerosign, ISO_Last_Group ]
+     };
+};

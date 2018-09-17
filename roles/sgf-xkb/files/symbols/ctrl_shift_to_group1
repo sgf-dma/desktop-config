@@ -1,0 +1,7 @@
+xkb_symbols {
+    key <SPCE> {
+        type= "PC_CONTROL_LEVEL2",
+        symbols[Group1]= [       space,             space ],
+        actions[Group1]= [  NoAction(), LockGroup(group=1)]
+    };
+};

@@ -1,0 +1,76 @@
+---
+
+# TODO: Install each config separately. May be just use an ansible list with
+# names of configs to install.
+# TODO: Ansible option for preserving old `-option`-s or resetting them (now).
+
+- name: Create user xkb dir
+  file: 
+    path:  "{{ user_xkb_dir + item }}"
+    state: directory
+  loop:
+    - rules
+    - symbols
+    - types
+
+# FIXME: I should check, that system file is not changed since last time i
+# copied it and patched. On the other hand, i can't just copy it again, because
+# then play will always have `changed` status.
+- name: Copy current evdev rules
+  copy:
+    src:    "/usr/share/X11/xkb/rules/evdev"
+    force:  no
+    dest:   "{{ user_xkb_rules }}"
+
+- name: Copy current evdev rules list
+  copy:
+    src:    "/usr/share/X11/xkb/rules/evdev.lst"
+    force:  no
+    dest:   "{{ user_xkb_rules + '.lst' }}"
+
+- name: Add rules
+  blockinfile:
+    path:   "{{ user_xkb_rules }}"
+    backup: yes
+    insertafter: EOF
+    marker:   // {mark} ANSIBLE MANAGED BLOCK
+    block: |
+      ! option        = symbols   types
+      grp:ctrl_shift_num      = +group_ctrl_shift_num +pc_control_shift_level3
+
+      ! option        = symbols
+      ctrl_shift_to_group1            = +ctrl_shift_to_group1
+
+- name: Install custom symbols
+  copy:
+    src:    "{{ item }}"
+    force:  yes
+    dest:   "{{ user_xkb_dir }}/symbols"
+  with_fileglob:
+    - symbols/*
+
+- name: Install custom symbols
+  copy:
+    src:    "{{ item }}"
+    force:  yes
+    dest:   "{{ user_xkb_dir }}/types"
+  with_fileglob:
+    - types/*
+
+- name: Debug
+  debug:
+    var: item
+  with_fileglob:
+    - symbols/*
+
+- name: Install xkb script
+  template:
+    src:    "xkb.sh"
+    force:  yes
+    mode:   0755
+    dest:   "{{ ansible_user_dir }}"
+
+- name: End
+  debug:
+    msg: Huh
+
