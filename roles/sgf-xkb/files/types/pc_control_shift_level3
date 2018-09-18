@@ -1,0 +1,10 @@
+xkb_types {
+    type "PC_CONTROL_SHIFT_LEVEL3" {
+        modifiers= Control+Shift;
+        map[Shift]= Level2;
+        map[Control+Shift]= Level3;
+        level_name[Level1]= "Base";
+        level_name[Level2]= "Caps";
+        level_name[Level3]= "ControlShift";
+    };
+};
