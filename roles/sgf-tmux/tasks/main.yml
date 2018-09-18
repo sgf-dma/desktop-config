@@ -1,0 +1,9 @@
+---
+# tasks file for sgf-tmux
+
+- name: Install common tmux config
+  template:
+    src:    "tmux-common.conf"
+    force:  yes
+    dest:   "{{ ansible_user_dir }}/.tmux-common.conf"
+
