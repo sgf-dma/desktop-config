@@ -13,3 +13,18 @@
     force:  yes
     dest:   "{{ ansible_user_dir }}/.config/parcellite/"
 
+- name: Modifications to .bashrc
+  blockinfile:
+    path:   "{{ ansible_user_dir + '/.bashrc' }}"
+    backup: yes
+    insertafter: EOF
+    block: |
+      export LANG=en_US.utf8
+      export LC_CTYPE=ru_RU.utf8
+      export LC_COLLATE=ru_RU.utf8
+      export PATH="$PATH:$HOME/bin"
+      umask 027
+
+      eval $(thefuck --alias)
+      eval $(keychain --eval id_rsa)
+
