@@ -4,4 +4,4 @@
   hosts: localhost
   roles:
     - { role: sgf-xkb }
-    - { role: sgf-tmux }
+    - { role: sgf-console }
