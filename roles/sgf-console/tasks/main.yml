@@ -7,3 +7,9 @@
     force:  yes
     dest:   "{{ ansible_user_dir }}/.tmux-common.conf"
 
+- name: Install parcellite config
+  copy:
+    src:    "parcellite/parcelliterc"
+    force:  yes
+    dest:   "{{ ansible_user_dir }}/.config/parcellite/"
+
