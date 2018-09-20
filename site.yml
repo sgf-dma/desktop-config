@@ -4,4 +4,4 @@
   hosts: localhost
   roles:
     - { role: sgf-xkb }
-    - { role: sgf-console }
+    - { role: sgf-console, git_email: sgf.dma@gmail.com, git_name: sgf }

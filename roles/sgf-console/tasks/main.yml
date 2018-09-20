@@ -13,6 +13,12 @@
     force:  yes
     dest:   "{{ ansible_user_dir }}/.config/parcellite/"
 
+- name: Install git config
+  template:
+    src:    "gitconfig"
+    force:  yes
+    dest:   "{{ ansible_user_dir }}/.gitconfig"
+
 - name: Modifications to .bashrc
   blockinfile:
     path:   "{{ ansible_user_dir + '/.bashrc' }}"
