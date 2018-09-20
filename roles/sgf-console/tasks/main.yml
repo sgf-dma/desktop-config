@@ -28,7 +28,7 @@
       export LANG=en_US.utf8
       export LC_CTYPE=ru_RU.utf8
       export LC_COLLATE=ru_RU.utf8
-      export PATH="$PATH:$HOME/bin"
+      export PATH="$HOME/bin:$PATH"
       umask 027
 
       eval $(thefuck --alias)
