@@ -1,2 +1,5 @@
 ---
 # vars file for sgf-tmux
+
+vim_dir:  "{{ ansible_user_dir + '/.vim' }}"
+vim_package_dir:  "{{ vim_dir + '/bundle' }}"

@@ -51,3 +51,8 @@
       eval $(thefuck --alias)
       eval $(keychain --eval id_rsa)
 
+- name: Configure vim
+  import_tasks: vim.yml
+  tags:
+    - 'vim'
+

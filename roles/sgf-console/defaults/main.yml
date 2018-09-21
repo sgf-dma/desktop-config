@@ -1,2 +1,3 @@
 ---
 # defaults file for sgf-tmux
+vim_plugins: []

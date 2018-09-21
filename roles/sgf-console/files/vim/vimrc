@@ -1,0 +1,15 @@
+
+source ~/.vimrc_common
+
+execute pathogen#infect()
+
+set background=dark
+
+colorscheme solarized
+" colorscheme solarized8
+" colorscheme flattened_dark
+
+let g:solarized_diffmode="high"
+let g:table_mode_corner_corner='+'
+let g:table_mode_header_fillchar='='
+let g:vim_markdown_no_extensions_in_markdown = 1

@@ -1,0 +1,34 @@
+---
+
+- name: Create vim directories
+  file:
+    path:   "{{ vim_dir + item }}"
+    state:  directory
+  loop:
+    - '/autoload'
+    - '/bundle'
+
+- name: Install pathogen
+  get_url:
+    url:  'https://tpo.pe/pathogen.vim'
+    dest: "{{ vim_dir + '/autoload/pathogen.vim' }}"
+
+- name: Intall vimrc
+  copy:
+    src:    "{{ item }}"
+    force:  yes
+    dest:   "{{ ansible_user_dir + '/.' + item | basename }}"
+  with_fileglob:
+    - "vim/vimrc*"
+
+- name: Checkout plugins
+  git:
+    repo: "{{ item.repo }}"
+    # Note, yaml block chomping indicator to remove trailing newline.
+    dest: >-
+      {{ vim_package_dir + '/'
+          + item.dest | default(item.repo | basename | splitext | first)
+      }}
+    clone: yes
+  loop: "{{ vim_plugins }}"
+
