@@ -5,3 +5,24 @@
   tags:
     - 'xkb'
 
+- name: Install parcellite config
+  copy:
+    src:    "parcellite/parcelliterc"
+    force:  yes
+    backup: yes
+    dest:   "{{ ansible_user_dir }}/.config/parcellite/"
+
+- name: Install IM config
+  copy:
+    src:    "xinputrc"
+    force:  yes
+    backup: yes
+    dest:   "{{ ansible_user_dir }}/.xinputrc"
+
+- name: Assemble X resources
+  assemble:
+    src:    "{{ role_path }}/files/Xresources"
+    force:  yes
+    backup: yes
+    dest:   "{{ ansible_user_dir }}/.Xresources"
+

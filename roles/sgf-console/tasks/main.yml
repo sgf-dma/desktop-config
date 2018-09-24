@@ -8,33 +8,12 @@
     backup: yes
     dest:   "{{ ansible_user_dir }}/.tmux-common.conf"
 
-- name: Install parcellite config
-  copy:
-    src:    "parcellite/parcelliterc"
-    force:  yes
-    backup: yes
-    dest:   "{{ ansible_user_dir }}/.config/parcellite/"
-
 - name: Install git config
   template:
     src:    "gitconfig"
     force:  yes
     backup: yes
     dest:   "{{ ansible_user_dir }}/.gitconfig"
-
-- name: Install IM config
-  copy:
-    src:    "xinputrc"
-    force:  yes
-    backup: yes
-    dest:   "{{ ansible_user_dir }}/.xinputrc"
-
-- name: Assemble X resources
-  assemble:
-    src:    "{{ role_path }}/files/Xresources"
-    force:  yes
-    backup: yes
-    dest:   "{{ ansible_user_dir }}/.Xresources"
 
 - name: Modifications to .bashrc
   blockinfile:
