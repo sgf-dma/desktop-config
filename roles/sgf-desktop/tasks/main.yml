@@ -1,0 +1,7 @@
+---
+
+- name: Configure xkb layout
+  import_tasks: xkb.yml
+  tags:
+    - 'xkb'
+

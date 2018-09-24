@@ -1,5 +1,3 @@
----
-
 # TODO: Install each config separately. May be just use an ansible list with
 # names of configs to install.
 # TODO: Ansible option for preserving old `-option`-s or resetting them (now).
@@ -47,7 +45,7 @@
     force:  yes
     dest:   "{{ user_xkb_dir }}/symbols"
   with_fileglob:
-    - symbols/*
+    - xkb/symbols/*
 
 - name: Install custom symbols
   copy:
@@ -55,7 +53,7 @@
     force:  yes
     dest:   "{{ user_xkb_dir }}/types"
   with_fileglob:
-    - types/*
+    - xkb/types/*
 
 - name: Debug
   debug:
