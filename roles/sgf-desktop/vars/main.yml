@@ -1,2 +1,4 @@
 ---
 # vars file for sgf-desktop
+
+xmonad_bin: "{{ ansible_user_dir + '/bin/xmonad' }}"
