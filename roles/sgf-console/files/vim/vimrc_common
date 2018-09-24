@@ -1,0 +1,213 @@
+
+let mapleader = ","
+let maplocalleader = "\\"
+
+" Text displaying {{{
+
+set nostartofline
+set linebreak
+set showbreak=+
+set list
+
+set foldmethod=marker
+
+set noequalalways
+set showcmd
+
+set hlsearch
+
+syntax on
+filetype plugin indent on
+
+set sessionoptions-=options
+
+" }}}
+" Text editing. {{{
+
+set textwidth=78
+set autoindent
+set formatoptions+=rln
+set pastetoggle=<F2>
+
+set shiftwidth=4
+set softtabstop=4
+set expandtab
+
+set keymap=russian-jcukenwin
+set iminsert=0
+set imsearch=-1
+
+" }}}
+" Mappings {{{
+
+inoremap jk <esc>
+
+nnoremap H ^
+nnoremap L $
+
+noremap <leader>, ,
+noremap <leader>Y y$
+
+noremap <leader>- ddp
+noremap <leader>_ :move -2<CR>
+
+nnoremap <leader>ev :split +execute\ "normal!\ /vimrc_common\\\r" $MYVIMRC<cr>
+" nnoremap <leader>ev :split +/vimrc_common $MYVIMRC<cr>
+nnoremap <leader>sv :source $MYVIMRC<cr>
+
+nnoremap <space> viw
+inoremap <leader><C-U> <esc>viwUA
+nnoremap <leader><C-U> viwUE
+
+" Noops.
+
+noremap <Up> <nop>
+noremap <Down> <nop>
+noremap <Left> <nop>
+noremap <Right> <nop>
+
+" }}}
+" Quoting and braces. {{{
+
+nnoremap <leader>" viw<esc>a"<esc>hbi"<esc>lel
+nnoremap <leader>' viw<esc>a'<esc>hbi'<esc>lel
+nnoremap <leader>` viw<esc>a`<esc>hbi`<esc>lel
+" First add final quote, because adding leading quote will change the last
+" selected character position from what is remembered by `> , when selection
+" was on single line, and does not change, when selection was multi-line. That
+" means, i can't reliable determine last selected character (after which to
+" add the final quote) in that case. But now i just may fail to move to final
+" quote, if last character of selection is the same quote.
+vnoremap <leader>" <esc>`>a"<esc>`<i"<esc>`>f"
+vnoremap <leader>' <esc>`>a'<esc>`<i'<esc>`>f'
+vnoremap <leader>` <esc>`>a`<esc>`<i`<esc>`>f`
+vnoremap <leader>( <esc>`>a)<esc>`<i(<esc>`>f"
+
+" }}}
+" Operator movements.  {{{
+
+" Names assume haskell syntax.
+" Search for backquote and round bracket on the current line.
+" Parameters.
+onoremap p   i(
+" Inside/around next parameters.
+onoremap in( :<c-u>normal! f(vi(<cr>
+onoremap an( :<c-u>normal! f(va(<cr>
+" Inside/around last parameters.
+onoremap il( :<c-u>normal! F)vi(<cr>
+onoremap al( :<c-u>normal! F)va(<cr>
+
+" Operator.
+onoremap o   i`
+" Inside/around next operator.
+onoremap in` :<c-u>normal! f`vi`<cr>
+onoremap an` :<c-u>normal! f`va`<cr>
+" Inside/around last operator.
+onoremap il` :<c-u>normal! F`vi`<cr>
+onoremap al` :<c-u>normal! F`va`<cr>
+
+" Search for curly and round brackets further in text, not only at the current
+" line.
+" Records.
+onoremap r   i{
+" Inside/around next records.
+onoremap in{ :<c-u>execute ":normal! /{\r:nohlsearch\rvi{"<cr>
+onoremap an{ :<c-u>execute ":normal! /{\r:nohlsearch\rva{"<cr>
+" Inside/around last records.
+onoremap il{ :<c-u>execute ":normal! ?}\r:nohlsearch\rvi{"<cr>
+onoremap al{ :<c-u>execute ":normal! ?}\r:nohlsearch\rva{"<cr>
+
+" List.
+onoremap l   i[
+" Inside/around next list.
+onoremap in[ :<c-u>execute ":normal! /\\[\r:nohlsearch\rvi["<cr>
+onoremap an[ :<c-u>execute ":normal! /\\[\r:nohlsearch\rva["<cr>
+" Inside/around last records.
+onoremap il[ :<c-u>execute ":normal! ?\\]\r:nohlsearch\rvi["<cr>
+onoremap al[ :<c-u>execute ":normal! ?\\]\r:nohlsearch\rva["<cr>
+
+" }}}
+" Status line. {{{
+
+set statusline=%<%2n:\ %f " Buffer number, path to file.
+set statusline+=%h%w%m%r  " Help, preview window, modified and readonly flags.
+set statusline+=%=        " Switch to the right.
+set statusline+=%-14.(%l,%c%V%)\ %P " Line, real and virtual columns numbers, percentage of displayed portion of file.
+
+" }}}
+" File-type settings.           {{{
+
+augroup ft_html
+    autocmd!
+    " Select tag block, create a fold over it and close it.
+    autocmd FileType html nnoremap <buffer> <localleader>f Vatzf
+augroup END
+
+augroup testgroup
+    autocmd!
+    " In case when <Left> is disabled in Insert mode, i may use h ..
+    " autocmd FileType javascript :iabbrev <buffer> iff if ()<c-\><c-o>h
+    "
+    " or even f . But either way i should use <c-\><c-o> instead of just <c-o> to
+    " place cursor right after the opening bracket (the latter will place cursor
+    " before).
+    autocmd FileType javascript :iabbrev <buffer> iff if ()<c-\><c-o>T(
+augroup END
+
+augroup ft_haskell
+    autocmd!
+    " Comments
+    autocmd FileType haskell nnoremap <buffer> <localleader>c I--<esc>
+    autocmd FileType haskell vnoremap <buffer> <localleader>c <esc>`>a-}<esc>`<i{-<esc>
+
+    " Syntax.
+    autocmd FileType haskell :iabbrev <buffer> casee case of<c-o>F 
+    autocmd FileType haskell :iabbrev <buffer> \ \ -><c-o>T\
+    autocmd FileType haskell :iabbrev <buffer> (\ (\->)<c-o>F-
+augroup END
+
+augroup ft_sh
+    autocmd!
+
+    " Comments.
+    autocmd FileType sh      nnoremap <buffer> <localleader>c I#<esc>
+    autocmd FileType sh      vnoremap <buffer> <localleader>c <esc>`<i #<esc>
+augroup END
+
+augroup ft_vim
+    autocmd!
+
+    " Comments.
+    autocmd FileType vim    nnoremap <buffer> <localleader>c I" <esc>
+    autocmd FileType vim    vnoremap <buffer> <localleader>c <esc>`<i"<esc>
+    " Close `augroup`.
+    autocmd FileType vim    :iabbrev <buffer> augroupp augroup<cr>augroup END<c-o>:normal! k<cr>
+    " Close `augroup` and clear all mappings.
+    autocmd FileType vim    :iabbrev <buffer> augroupn augroup<cr>autocmd!<cr>augroup END<c-o>:normal! 2k<cr>
+augroup END
+
+augroup ft_md
+    autocmd!
+
+    " Inside this section heading.
+    autocmd FileType markdown onoremap <buffer> ih :<c-u>execute "normal! ?^\\(-\\\|=\\)\\1\\+\r:nohlsearch\rkvg_"<cr>
+    " Around this section heading.
+    autocmd FileType markdown onoremap <buffer> ah :<c-u>execute "normal! ?^\\(-\\\|=\\)\\1\\+\r:nohlsearch\rg_vk0"<cr>
+augroup END
+
+" }}}
+" Abbrevations. {{{
+
+iabbrev adn and
+iabbrev waht what
+iabbrev tehn then
+
+" Emails and signatures.
+iabbrev @@ sgf.dma@gmail.com
+iabbrev ssig --<cr>    Dmitriy Matrosov<cr>sgf.dma@gmail.com
+onoremap in@ :<c-u>execute ":normal! /[^ ]\\+@[^ ]\\+\r:nohlsearch\rvE"<cr>
+onoremap il@ :<c-u>execute ":normal! ?[^ ]\\+@[^ ]\\+\r:nohlsearch\rvE"<cr>
+
+" }}}
+
+
