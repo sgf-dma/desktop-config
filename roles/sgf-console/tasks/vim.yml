@@ -13,6 +13,7 @@
     url:  'https://tpo.pe/pathogen.vim'
     dest: "{{ vim_dir + '/autoload/pathogen.vim' }}"
 
+# FIXME: `.vimrc` references some plugins, which may not be there..
 - name: Intall vimrc
   copy:
     src:    "{{ item }}"
