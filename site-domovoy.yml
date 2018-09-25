@@ -12,4 +12,5 @@
       vars:
         git_email: domovoy@bh-desktop
         git_name: domovoy
+        tmux_prefix: 'C-a'
 

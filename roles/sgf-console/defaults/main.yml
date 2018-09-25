@@ -1,4 +1,6 @@
 ---
+
+tmux_prefix: 'C-b'
 vim_plugins:
   - repo: 'https://github.com/altercation/vim-colors-solarized.git'
   - repo: 'https://github.com/tpope/vim-fugitive.git'
