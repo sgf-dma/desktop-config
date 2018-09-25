@@ -7,6 +7,8 @@
     force:  yes
     backup: yes
     dest:   "{{ ansible_user_dir }}/.tmux-common.conf"
+  tags:
+    - 'tmux'
 
 - name: Install git config
   template:
@@ -14,6 +16,8 @@
     force:  yes
     backup: yes
     dest:   "{{ ansible_user_dir }}/.gitconfig"
+  tags:
+    - 'git'
 
 - name: Modifications to .bashrc
   blockinfile:
@@ -29,6 +33,8 @@
 
       eval $(thefuck --alias)
       eval $(keychain --eval id_rsa)
+  tags:
+    - 'shell'
 
 - name: Configure vim
   import_tasks: vim.yml

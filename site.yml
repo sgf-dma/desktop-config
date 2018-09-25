@@ -8,10 +8,4 @@
       vars:
         git_email: sgf.dma@gmail.com
         git_name: sgf
-        vim_plugins:
-          - repo: 'https://github.com/altercation/vim-colors-solarized.git'
-          - repo: 'https://github.com/tpope/vim-fugitive.git'
-          - repo: 'https://github.com/plasticboy/vim-markdown.git'
-          - repo: 'https://github.com/tpope/vim-sensible.git'
-          - repo: 'https://github.com/dhruvasagar/vim-table-mode.git'
 
