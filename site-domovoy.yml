@@ -1,0 +1,15 @@
+---
+
+- name: Install xkb configs
+  hosts: localhost
+  roles:
+    - role: sgf-desktop
+      vars:
+        xkb_clear_options: false
+        im_enabled: false
+        xmonad_branch: domovoy-master
+    - role: sgf-console
+      vars:
+        git_email: domovoy@bh-desktop
+        git_name: domovoy
+
