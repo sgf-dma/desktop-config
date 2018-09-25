@@ -1,0 +1,18 @@
+---
+
+- name: Install IM config
+  copy:
+    src:    "xinputrc"
+    force:  yes
+    backup: yes
+    dest:   "{{ ansible_user_dir }}/.xinputrc"
+  tags:
+    - 'im'
+
+- name: Set up ibus config in dconf
+  dconf:
+    key: "{{ '/desktop/ibus/' + item.key }}"
+    value: "{{ item.value }}"
+    state: present
+  loop: "{{ ibus_dconf }}"
+
