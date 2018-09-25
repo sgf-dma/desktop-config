@@ -1,0 +1,15 @@
+---
+
+- name: Install common tmux config
+  template:
+    src:    "tmux-common.conf"
+    force:  yes
+    backup: yes
+    dest:   "{{ ansible_user_dir }}/.tmux-common.conf"
+
+- name: Install main tmux config
+  copy:
+    src:    "files/tmux.conf"
+    force:  no
+    dest:   "{{ ansible_user_dir }}/.tmux.conf"
+
