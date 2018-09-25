@@ -2,3 +2,14 @@
 # vars file for sgf-desktop
 
 xmonad_bin: "{{ ansible_user_dir + '/bin/xmonad' }}"
+
+ibus_dconf:
+  - key: "general/use-system-keyboard-layout"
+    value: "true"
+  - key: "general/hotkey/triggers"
+    value: "['<Control>space']"
+  - key: "panel/use-custom-font"
+    value: "true"
+  - key: "panel/custom-font"
+    value: "'DejaVu Serif 17'"
+

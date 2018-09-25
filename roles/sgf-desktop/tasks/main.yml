@@ -5,6 +5,11 @@
   tags:
     - 'xkb'
 
+- name: Install IM config
+  import_tasks: im.yml
+  tags:
+    - 'im'
+
 - name: Install parcellite config
   copy:
     src:    "parcellite/parcelliterc"
@@ -13,15 +18,6 @@
     dest:   "{{ ansible_user_dir }}/.config/parcellite/"
   tags:
     - 'copy_paste'
-
-- name: Install IM config
-  copy:
-    src:    "xinputrc"
-    force:  yes
-    backup: yes
-    dest:   "{{ ansible_user_dir }}/.xinputrc"
-  tags:
-    - 'im'
 
 - name: Assemble X resources
   assemble:
