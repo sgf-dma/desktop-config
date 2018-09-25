@@ -9,6 +9,8 @@
   tags:
     - 'im'
 
+# FIXME: Several ibus options are required for xkb config to work (if ibus is
+# running). Particularly, `use-system-keyboard-layout`..
 - name: Set up ibus config in dconf
   dconf:
     key: "{{ '/desktop/ibus/' + item.key }}"
