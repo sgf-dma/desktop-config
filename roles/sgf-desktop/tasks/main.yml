@@ -22,6 +22,7 @@
 
 # FIXME: This color setup require further setup vim setup. Particularly, it
 # requires vim solarized plugin to be installed.
+# FIXME: `solarized: false` does not disable already enabled solarized.
 - name: Assemble X resources
   assemble:
     src:    "{{ role_path }}/files/Xresources"
