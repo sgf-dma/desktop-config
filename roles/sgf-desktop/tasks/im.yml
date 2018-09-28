@@ -1,7 +1,7 @@
 ---
 
 - name: Install IM config
-  copy:
+  template:
     src:    "xinputrc"
     force:  yes
     backup: yes

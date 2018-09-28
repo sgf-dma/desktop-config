@@ -55,20 +55,11 @@
   with_fileglob:
     - xkb/types/*
 
-- name: Debug
-  debug:
-    var: item
-  with_fileglob:
-    - symbols/*
-
 - name: Install xkb script
   template:
     src:    "xkb.sh"
     force:  yes
+    backup: yes
     mode:   0755
     dest:   "{{ ansible_user_dir }}"
-
-- name: End
-  debug:
-    msg: Huh
 

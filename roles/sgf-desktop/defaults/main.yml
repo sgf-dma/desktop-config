@@ -1,4 +1,13 @@
 ---
 
+xkb_mods: true
+xkb_clear_options: true
+
 user_xkb_dir: "{{ ansible_user_dir + '/.xkb/' }}"
 user_xkb_rules: "{{ user_xkb_dir + 'rules/evdev.sgf' }}"
+
+im_enabled: true
+
+solarized: true
+
+xmonad_branch: master

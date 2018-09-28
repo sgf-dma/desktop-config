@@ -1,0 +1,6 @@
+# Installed by ansible.
+{% if im_enabled %}
+run_im ibus
+{% else %}
+run_im none
+{% endif %}

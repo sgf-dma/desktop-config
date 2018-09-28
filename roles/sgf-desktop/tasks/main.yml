@@ -2,6 +2,7 @@
 
 - name: Configure xkb layout
   import_tasks: xkb.yml
+  when: xkb_mods
   tags:
     - 'xkb'
 
@@ -27,6 +28,7 @@
     force:  yes
     backup: yes
     dest:   "{{ ansible_user_dir }}/.Xresources"
+  when: solarized
   tags:
     - 'colors'
 
@@ -35,7 +37,7 @@
       git:
         repo: 'https://github.com/sgf-dma/sgf-xmonad-config.git'
         dest: "{{ ansible_user_dir + '/sgf-xmonad-config' }}"
-        version: master
+        version: "{{ xmonad_branch }}"
         clone: yes
       register: xmonad_updated
 
