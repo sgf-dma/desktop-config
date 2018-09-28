@@ -14,13 +14,19 @@
     dest: "{{ vim_dir + '/autoload/pathogen.vim' }}"
 
 # FIXME: `.vimrc` references some plugins, which may not be there..
-- name: Intall vimrc
+- name: Intall common vimrc
   copy:
     src:    "{{ item }}"
     force:  yes
     dest:   "{{ ansible_user_dir + '/.' + item | basename }}"
   with_fileglob:
     - "vim/vimrc*"
+
+- name: Intall main vimrc
+  template:
+    src:    "vim/vimrc"
+    force:  yes
+    dest:   "{{ ansible_user_dir + '/.vimrc' }}"
 
 - name: Checkout plugins
   git:

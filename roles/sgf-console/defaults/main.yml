@@ -8,3 +8,4 @@ vim_plugins:
   - repo: 'https://github.com/tpope/vim-sensible.git'
   - repo: 'https://github.com/dhruvasagar/vim-table-mode.git'
 
+vim_disable_arrow_keys: true
