@@ -12,5 +12,6 @@
       vars:
         git_email: domovoy@bh-desktop
         git_name: domovoy
+        vim_disable_arrow_keys: false
         tmux_prefix: 'C-a'
 

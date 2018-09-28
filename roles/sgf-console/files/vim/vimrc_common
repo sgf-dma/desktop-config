@@ -59,13 +59,6 @@ nnoremap <space> viw
 inoremap <leader><C-U> <esc>viwUA
 nnoremap <leader><C-U> viwUE
 
-" Noops.
-
-noremap <Up> <nop>
-noremap <Down> <nop>
-noremap <Left> <nop>
-noremap <Right> <nop>
-
 " }}}
 " Quoting and braces. {{{
 
