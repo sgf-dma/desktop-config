@@ -3,20 +3,31 @@ source ~/.vimrc_common
 
 execute pathogen#infect()
 
-set background=dark
+{% if vim_solarized != 'disabled' %}
 
-colorscheme solarized
-" colorscheme solarized8
-" colorscheme flattened_dark
+{#- `xterm_solarized` is defined in `sgf-desktop` role -#}
+{% if xterm_solarized == 'disabled' %}
+{% raw %}" Degrade to 256 colros.
+{% endraw %}
+let g:solarized_termcolors=256
+{% endif %}
+
+{% if vim_solarized == 'dark' %}
+set background=dark
+{% elif vim_solarized == 'light' %}
+set background=light
+{% endif %}
 
 let g:solarized_diffmode="high"
+
+colorscheme solarized
+{% endif %}
+
 let g:table_mode_corner_corner='+'
 let g:table_mode_header_fillchar='='
 let g:vim_markdown_no_extensions_in_markdown = 1
 
 {% if vim_disable_arrow_keys %}
-" Noops.
-
 noremap <Up> <nop>
 noremap <Down> <nop>
 noremap <Left> <nop>

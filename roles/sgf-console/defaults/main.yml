@@ -11,3 +11,4 @@ vim_plugins:
   - repo: 'https://github.com/dhruvasagar/vim-table-mode.git'
 
 vim_disable_arrow_keys: true
+vim_solarized: 'dark'
