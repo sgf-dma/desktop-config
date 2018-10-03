@@ -10,8 +10,6 @@ user_x_resources: "{{ ansible_user_dir + '/.Xresources.d' }}"
 
 im_enabled: true
 
-# FIXME: Rename to colors.
-solarized: true
 # See templates/Xresources/solarized.res for allowed values. Or any other
 # value to disable.
 xterm_solarized: 'dark'
