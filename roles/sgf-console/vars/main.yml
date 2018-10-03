@@ -3,3 +3,6 @@
 
 vim_dir:  "{{ ansible_user_dir + '/.vim' }}"
 vim_package_dir:  "{{ vim_dir + '/bundle' }}"
+
+tmux_plugin_dir: "{{ ansible_user_dir + '/.tmux/plugins' }}"
+tmux_conf:  "{{ ansible_user_dir + '/.tmux.conf' }}"

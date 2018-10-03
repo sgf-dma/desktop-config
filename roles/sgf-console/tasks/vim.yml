@@ -21,12 +21,22 @@
     dest:   "{{ ansible_user_dir + '/.' + item | basename }}"
   with_fileglob:
     - "vim/vimrc*"
+  tags:
+    - 'vim_config'
+
+- name: Debug xterm solarized
+  debug:
+    var: xterm_solarized
+  tags:
+    - 'vim_config'
 
 - name: Intall main vimrc
   template:
     src:    "vim/vimrc"
     force:  yes
     dest:   "{{ ansible_user_dir + '/.vimrc' }}"
+  tags:
+    - 'vim_config'
 
 - name: Checkout plugins
   git:

@@ -20,17 +20,30 @@
   tags:
     - 'copy_paste'
 
-# FIXME: This color setup require further setup vim setup. Particularly, it
-# requires vim solarized plugin to be installed.
-- name: Assemble X resources
-  assemble:
-    src:    "{{ role_path }}/files/Xresources"
-    force:  yes
-    backup: yes
-    dest:   "{{ ansible_user_dir }}/.Xresources"
-  when: solarized
+- block:
+    - name: Create X resources directory
+      file:
+        state:  directory
+        dest:   "{{ user_x_resources }}"
+    - name: Install X resources
+      template:
+        src:    "{{ item }}"
+        dest:   "{{ user_x_resources + '/' + item | basename }}"
+        force:  yes
+      with_fileglob:
+        - "templates/Xresources/*.res"
+    # FIXME: This color setup require further setup vim setup. Particularly, it
+    # requires vim solarized plugin to be installed.
+    - name: Assemble X resources
+      assemble:
+        src:    "{{ user_x_resources }}"
+        force:  yes
+        backup: yes
+        dest:   "{{ ansible_user_dir }}/.Xresources"
+
   tags:
     - 'colors'
+
 
 - block:
     - name: Install xmonad
