@@ -3,9 +3,9 @@
 - name: Install xkb configs
   hosts: localhost
   roles:
-    - role: sgf-desktop
     - role: sgf-console
       vars:
         git_email: sgf.dma@gmail.com
         git_name: sgf
+    - role: sgf-desktop
 
