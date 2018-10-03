@@ -1,6 +1,13 @@
 ---
 # tasks file for sgf-tmux
 
+- name: Load
+  import_tasks: load.yml
+
+- name: Debug
+  debug:
+    var: colors
+
 - name: Install common tmux config
   import_tasks: tmux.yml
   tags:

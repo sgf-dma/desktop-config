@@ -24,12 +24,6 @@
   tags:
     - 'vim_config'
 
-- name: Debug xterm solarized
-  debug:
-    var: xterm_solarized
-  tags:
-    - 'vim_config'
-
 - name: Intall main vimrc
   template:
     src:    "vim/vimrc"

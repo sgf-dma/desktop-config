@@ -1,7 +1,6 @@
 ---
 
 tmux_prefix: 'C-b'
-tmux_solarized: '256'
 
 vim_plugins:
   - repo: 'https://github.com/altercation/vim-colors-solarized.git'
@@ -11,4 +10,7 @@ vim_plugins:
   - repo: 'https://github.com/dhruvasagar/vim-table-mode.git'
 
 vim_disable_arrow_keys: true
-vim_solarized: 'dark'
+
+console_colors:
+  vim:  'solarized-dark'
+  tmux: 'solarized-dark'

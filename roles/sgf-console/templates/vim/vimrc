@@ -3,18 +3,18 @@ source ~/.vimrc_common
 
 execute pathogen#infect()
 
-{% if vim_solarized != 'disabled' %}
+{% if colors.vim != 'disabled' %}
 
-{#- `xterm_solarized` is defined in `sgf-desktop` role -#}
-{% if xterm_solarized == 'disabled' %}
+{#- `colors.xterm` is defined in `sgf-desktop` role -#}
+{% if colors.xterm == 'disabled' %}
 {% raw %}" Degrade to 256 colros.
 {% endraw %}
 let g:solarized_termcolors=256
 {% endif %}
 
-{% if vim_solarized == 'dark' %}
+{% if colors.vim == 'solarized-dark' %}
 set background=dark
-{% elif vim_solarized == 'light' %}
+{% elif colors.vim == 'solarized-light' %}
 set background=light
 {% endif %}
 

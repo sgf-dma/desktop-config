@@ -10,8 +10,9 @@ user_x_resources: "{{ ansible_user_dir + '/.Xresources.d' }}"
 
 im_enabled: true
 
+xmonad_branch: master
+
 # See templates/Xresources/solarized.res for allowed values. Or any other
 # value to disable.
-xterm_solarized: 'dark'
-
-xmonad_branch: master
+desktop_colors:
+  xterm: 'solarized-dark'

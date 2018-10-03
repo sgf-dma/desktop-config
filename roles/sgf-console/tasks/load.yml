@@ -1,0 +1,7 @@
+---
+
+# FIXME: Add `colors.all` to set them all at once.
+- name: Merge colors
+  set_fact:
+    colors: "{{ console_colors | combine(colors | default({})) }}"
+

@@ -1,0 +1,5 @@
+
+- name: Merge console and desktop colors
+  set_fact:
+    colors: "{{ console_colors | combine(desktop_colors, colors | default({})) }}"
+
