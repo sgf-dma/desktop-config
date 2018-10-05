@@ -7,15 +7,24 @@ execute pathogen#infect()
 
 {#- `colors.xterm` is defined in `sgf-desktop` role -#}
 {% if colors.xterm == 'disabled' %}
+
 {% raw %}" Degrade to 256 colros.
 {% endraw %}
 let g:solarized_termcolors=256
+set background={{ colors.vim | replace ('solarized-', '', 1) }}
+
+{% else %}
+
+{#- Vim backgrounds change their meaning, when terminal _also_ uses solarized
+colorscheme: `dark` now means use solarized colorscheme _matching_ with
+terminal, and `light` means use solarized colorscheme _inverse_ to your
+terminal. -#}
+{% if colors.vim == colors.xterm %}
+set background=dark
+{% else %}
+set background=light
 {% endif %}
 
-{% if colors.vim == 'solarized-dark' %}
-set background=dark
-{% elif colors.vim == 'solarized-light' %}
-set background=light
 {% endif %}
 
 let g:solarized_diffmode="high"
