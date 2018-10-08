@@ -28,10 +28,17 @@
         # FIXME: Hardcoded `tmux_plugin_dir` .
         line:   "run '~/.tmux/plugins/tpm/tpm'"
 
-- name: Install solarized colors plugin
-  git:
-    repo:   'https://github.com/seebi/tmux-colors-solarized'
-    clone:  yes
-    dest:   "{{ tmux_plugin_dir + '/tmux-colors-solarized' }}"
+- block:
+    - name: Install solarized colors plugin
+      git:
+        repo:   'https://github.com/seebi/tmux-colors-solarized'
+        clone:  yes
+        dest:   "{{ tmux_plugin_dir + '/tmux-colors-solarized' }}"
+    - name: Install additional colorschemes
+      copy:
+        src:    "{{ item }}"
+        dest:   "{{ tmux_plugin_dir + '/tmux-colors-solarized' }}"
+      with_fileglob:
+        - "tmux-colors/*"
   when: colors.tmux != 'disabled'
 
