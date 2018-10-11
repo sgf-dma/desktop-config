@@ -1,5 +1,5 @@
 
-- name: Merge console and desktop colors
-  set_fact:
-    colors: "{{ console_colors | combine(desktop_colors, colors | default({})) }}"
-
+- name: Merge console colors
+  import_tasks: roles/sgf-console/tasks/load.yml
+- name: Merge desktop colors
+  import_tasks: roles/sgf-desktop/tasks/load.yml

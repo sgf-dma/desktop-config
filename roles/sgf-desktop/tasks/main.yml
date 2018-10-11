@@ -1,5 +1,10 @@
 ---
 
+- name: Load
+  import_tasks: load.yml
+  tags:
+    - 'load'
+
 - name: Configure xkb layout
   import_tasks: xkb.yml
   when: xkb_mods

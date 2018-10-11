@@ -6,3 +6,11 @@ vim_package_dir:  "{{ vim_dir + '/bundle' }}"
 
 tmux_plugin_dir: "{{ ansible_user_dir + '/.tmux/plugins' }}"
 tmux_conf:  "{{ ansible_user_dir + '/.tmux.conf' }}"
+
+# Default console colors for initialize `colors` dictionary. Set `all_colors`
+# to overwrite them all at once or set particular dictionary key to desired
+# color in `colors` dictionary.
+console_colors:
+  vim:  'disabled'
+  tmux: 'disabled'
+

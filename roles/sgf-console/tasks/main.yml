@@ -3,10 +3,8 @@
 
 - name: Load
   import_tasks: load.yml
-
-- name: Debug
-  debug:
-    var: colors
+  tags:
+    - 'load'
 
 - name: Install common tmux config
   import_tasks: tmux.yml

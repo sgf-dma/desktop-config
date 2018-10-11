@@ -12,7 +12,14 @@ im_enabled: true
 
 xmonad_branch: master
 
-# See templates/Xresources/solarized.res for allowed values. Or any other
-# value to disable.
-desktop_colors:
-  xterm: 'solarized-dark'
+# This dictionary is used by several roles (e.g. `sgf-console` and
+# `sgf-desktop`). This role initializes only part of its keys from
+# `desktop_colors` dictionary. To overwrite particular keys, set them in
+# parent task.
+colors: {}
+
+# Default for _all_ `colors` dictionary keys (overwriting role default value).
+# But particular `colors` key set explicitly in parent task will overwrite
+# this value. This variable used by several roles (e.g. `sgf-console` and
+# `sgf-desktop`).
+# all_colors: 'disabled'
