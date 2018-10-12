@@ -6,6 +6,8 @@
     force:  yes
     backup: yes
     dest:   "{{ ansible_user_dir }}/.tmux-common.conf"
+  tags:
+    - 'colors_config'
 
 - name: Install main tmux config
   copy:
@@ -29,16 +31,18 @@
         line:   "run '~/.tmux/plugins/tpm/tpm'"
 
 - block:
-    - name: Install solarized colors plugin
+    - name: Install tmux solarized colors plugin
       git:
         repo:   'https://github.com/seebi/tmux-colors-solarized'
         clone:  yes
         dest:   "{{ tmux_plugin_dir + '/tmux-colors-solarized' }}"
-    - name: Install additional colorschemes
+    - name: Install additional tmux colorschemes
       copy:
         src:    "{{ item }}"
         dest:   "{{ tmux_plugin_dir + '/tmux-colors-solarized' }}"
       with_fileglob:
         - "tmux-colors/*"
+      tags:
+        - 'colors_config'
   when: colors.tmux != 'disabled'
 

@@ -5,11 +5,14 @@
   import_tasks: load.yml
   tags:
     - 'load'
+    - 'colors'
+    - 'colors_config'
 
 - name: Install common tmux config
   import_tasks: tmux.yml
   tags:
     - 'tmux'
+    - 'colors'
 
 - name: Install git config
   template:
@@ -41,4 +44,5 @@
   import_tasks: vim.yml
   tags:
     - 'vim'
+    - 'colors'
 
