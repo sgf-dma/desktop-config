@@ -1,6 +1,6 @@
 ---
 
-- name: Install xkb configs
+- name: Configure home directory
   hosts: localhost
   vars:
     all_colors: 'solarized-dark'
