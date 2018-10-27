@@ -1,7 +1,6 @@
 ---
 
 tmux_prefix: 'C-b'
-tmux_solarized: '256'
 
 vim_plugins:
   - repo: 'https://github.com/altercation/vim-colors-solarized.git'
@@ -11,4 +10,15 @@ vim_plugins:
   - repo: 'https://github.com/dhruvasagar/vim-table-mode.git'
 
 vim_disable_arrow_keys: true
-vim_solarized: 'dark'
+
+# This dictionary is used by several roles (e.g. `sgf-console` and
+# `sgf-desktop`). This role initializes only part of its keys from
+# `console_colors` dictionary. To overwrite particular keys, set them in
+# parent task.
+colors: {}
+
+# Default for _all_ `colors` dictionary keys (overwriting role default value).
+# But particular `colors` key set explicitly in parent task will overwrite
+# this value. This variable used by several roles (e.g. `sgf-console` and
+# `sgf-desktop`).
+# all_colors: 'disabled'

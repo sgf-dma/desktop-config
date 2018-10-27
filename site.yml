@@ -1,7 +1,12 @@
 ---
 
-- name: Install xkb configs
+- name: Configure home directory
   hosts: localhost
+  vars:
+    all_colors: 'solarized-dark'
+  pre_tasks:
+    - name: Load variables
+      import_tasks: load.yml
   roles:
     - role: sgf-console
       vars:

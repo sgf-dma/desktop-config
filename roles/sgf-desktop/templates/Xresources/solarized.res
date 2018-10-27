@@ -1,5 +1,5 @@
 
-{% if xterm_solarized == 'dark' %}
+{% if colors.xterm == 'solarized-dark' %}
 
 ! Solarized dark.
 
@@ -28,7 +28,7 @@ XTerm*color13: #6c71c4
 XTerm*color14: #93a1a1
 XTerm*color15: #fdf6e3
 
-{% elif xterm_solarized == 'light' %}
+{% elif colors.xterm == 'solarized-light' %}
 
 ! Solarized light.
 

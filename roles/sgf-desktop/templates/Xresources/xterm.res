@@ -5,3 +5,4 @@ xterm*initialFont: 5
 !*VT100.utf8Fonts.font: -misc-fixed-medium-r-normal--18-120-100-100-c-90-iso10646-1
 !xterm*utf8Fonts.font: -misc-fixed-medium-r-normal--18-120-100-100-c-90-iso10646-1
 
+XTerm*termName: xterm-256color

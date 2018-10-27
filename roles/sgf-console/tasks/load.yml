@@ -1,0 +1,14 @@
+---
+
+# This tasks may be used as pre-tasks in main play.
+
+- name: Merge console colors
+  set_fact:
+    colors: >
+      {{ {item.key : all_colors | default(item.value)} | combine(colors) }}
+  with_dict: "{{ console_colors }}"
+
+- name: Loaded console colors are..
+  debug:
+    var: colors
+

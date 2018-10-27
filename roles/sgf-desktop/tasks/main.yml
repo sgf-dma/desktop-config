@@ -1,5 +1,12 @@
 ---
 
+- name: Load
+  import_tasks: load.yml
+  tags:
+    - 'load'
+    - 'colors'
+    - 'colors_config'
+
 - name: Configure xkb layout
   import_tasks: xkb.yml
   when: xkb_mods
@@ -40,9 +47,9 @@
         force:  yes
         backup: yes
         dest:   "{{ ansible_user_dir }}/.Xresources"
-
   tags:
     - 'colors'
+    - 'colors_config'
 
 
 - block:

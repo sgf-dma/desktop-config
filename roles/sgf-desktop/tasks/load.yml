@@ -1,0 +1,13 @@
+---
+
+# This tasks may be used as pre-tasks in main play.
+
+- name: Merge desktop colors
+  set_fact:
+    colors: >
+      {{ {item.key : all_colors | default(item.value)} | combine(colors) }}
+  with_dict: "{{ desktop_colors }}"
+
+- name: Loaded desktop colors are..
+  debug:
+    var: colors
