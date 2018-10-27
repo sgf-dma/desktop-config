@@ -2,15 +2,15 @@
 
 - name: Install xkb configs
   hosts: localhost
+  vars:
+    all_colors: 'solarized-dark'
   pre_tasks:
-    - name: Merge colors
+    - name: Load variables
       import_tasks: load.yml
   roles:
     - role: sgf-console
       vars:
         git_email: sgf.dma@gmail.com
         git_name: sgf
-        colors:
-          hui: nahui
     - role: sgf-desktop
 
