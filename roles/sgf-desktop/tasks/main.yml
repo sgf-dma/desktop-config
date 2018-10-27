@@ -53,7 +53,7 @@
 
 
 - block:
-    - name: Install xmonad
+    - name: Clone xmonad
       git:
         repo: 'https://github.com/sgf-dma/sgf-xmonad-config.git'
         dest: "{{ ansible_user_dir + '/sgf-xmonad-config' }}"

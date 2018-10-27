@@ -19,3 +19,7 @@ ibus_dconf:
 desktop_colors:
   xterm: 'disabled'
 
+desktop_im_pkgs:
+  - 'python-apt'
+  - 'python-psutil'
+  - 'hello'

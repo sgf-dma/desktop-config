@@ -1,20 +1,39 @@
 ---
 
-- name: Install IM config
-  template:
-    src:    "xinputrc"
-    force:  yes
-    backup: yes
-    dest:   "{{ ansible_user_dir }}/.xinputrc"
-  tags:
-    - 'im'
+#- block:
+#    - name: Obtain package info
+#      package_facts:
+#        manager: 'apt'
 
-# FIXME: Several ibus options are required for xkb config to work (if ibus is
-# running). Particularly, `use-system-keyboard-layout`..
-- name: Set up ibus config in dconf
-  dconf:
-    key: "{{ '/desktop/ibus/' + item.key }}"
-    value: "{{ item.value }}"
-    state: present
-  loop: "{{ ibus_dconf }}"
+- block:
+    - name: Check required im packages
+      apt:
+        name: "{{ desktop_im_pkgs }}"
+        state: present
+      ignore_errors: yes
+      register: apt_status
+    - name: Install im packages
+      apt:
+        name: "{{ desktop_im_pkgs }}"
+        state: present
+      when: apt_status.failed
+      become: yes
+
+- block:
+    - name: Install IM config
+      template:
+        src:    "xinputrc"
+        force:  yes
+        backup: yes
+        dest:   "{{ ansible_user_dir }}/.xinputrc"
+    # FIXME: Several ibus options are required for xkb config to work (if ibus
+    # is running). Particularly, `use-system-keyboard-layout`..
+    - name: Set up ibus config in dconf
+      dconf:
+        key: "{{ '/desktop/ibus/' + item.key }}"
+        value: "{{ item.value }}"
+        state: present
+      loop: "{{ ibus_dconf }}"
+  tags:
+    - 'im_config'
 
