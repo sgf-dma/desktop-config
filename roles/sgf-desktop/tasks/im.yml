@@ -1,23 +1,48 @@
 ---
 
-#- block:
-#    - name: Obtain package info
-#      package_facts:
-#        manager: 'apt'
-
+# `python-apt` required for `apt` and `package_facts` ansible modules.
 - block:
-    - name: Check required im packages
+    - name: Check required python-apt package
       apt:
-        name: "{{ desktop_im_pkgs }}"
+        name: 'python-apt'
         state: present
       ignore_errors: yes
       register: apt_status
-    - name: Install im packages
+    - name: Install python-apt packages
       apt:
-        name: "{{ desktop_im_pkgs }}"
+        name: python-apt
         state: present
       when: apt_status.failed
       become: yes
+  tags:
+    - 'debug'
+
+- block:
+    - name: Obtain package status
+      package_facts:
+        manager: apt
+
+    - name: Debug
+      set_fact:
+        install_im_pkgs: "{{ install_im_pkgs + [item] }}"
+      when: ansible_facts.packages[item] is not defined
+      loop: "{{ required_im_pkgs }}"
+    - name: Install required packages
+      apt:
+        name: "{{ install_im_pkgs }}"
+        state: present
+      when: install_im_pkgs | length > 0
+      become: yes
+
+      #    - name: Install im packages
+      #      apt:
+      #        name: "{{ item }}"
+      #        state: present
+      #      become: yes
+      #      when: item in pkg_status
+      #      loop: "{{ required_im_pkgs }}"
+  tags:
+    - 'debug'
 
 - block:
     - name: Install IM config
