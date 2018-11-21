@@ -1,6 +1,7 @@
 ---
 
 tmux_prefix: 'C-b'
+tmux_prefix_key: "{{ tmux_prefix }}"
 
 vim_plugins:
   - repo: 'https://github.com/altercation/vim-colors-solarized.git'
