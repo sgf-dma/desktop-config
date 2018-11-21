@@ -15,6 +15,7 @@
         git_name: domovoy
         vim_disable_arrow_keys: false
         tmux_prefix: 'C-a'
+        tmux_prefix_key: 'a'
     - role: sgf-desktop
       vars:
         xkb_clear_options: false
