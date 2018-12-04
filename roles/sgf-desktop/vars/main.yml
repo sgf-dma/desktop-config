@@ -19,9 +19,23 @@ ibus_dconf:
 desktop_colors:
   xterm: 'disabled'
 
+# List of build or runtime dependencies.
 required_im_pkgs:
   - 'python-apt'
   - 'python-psutil'
 
+xmonad_required_pkgs:
+  - 'git'
+  - 'make'
+  - 'libgmp-dev'
+  - 'libx11-dev'
+  - 'libxrandr-dev'
+  - 'libxft-dev'
+  - 'libxinerama-dev'
+  - 'libxpm-dev'
+  - 'libiw-dev'
+
 # List of packages to install.
 install_im_pkgs: []
+xmonad_install_pkgs: []
+

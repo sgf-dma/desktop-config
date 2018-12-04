@@ -6,6 +6,24 @@
     - 'load'
     - 'colors'
     - 'colors_config'
+    - 'debug'
+
+# `python-apt` required for `apt` and `package_facts` ansible modules.
+- block:
+    - name: Check required python-apt package
+      apt:
+        name: 'python-apt'
+        state: present
+      ignore_errors: yes
+      register: apt_status
+    - name: Install python-apt package
+      apt:
+        name: python-apt
+        state: present
+      when: apt_status.failed
+      become: yes
+  tags:
+    - 'debug'
 
 - name: Configure xkb layout
   import_tasks: xkb.yml
@@ -51,6 +69,28 @@
     - 'colors'
     - 'colors_config'
 
+
+- block:
+    - name: Obtain package status
+      package_facts:
+        manager: apt
+
+    - name: Build list of xmonad dependencies to install
+      set_fact:
+        xmonad_install_pkgs: "{{ xmonad_install_pkgs + [item] }}"
+      when: ansible_facts.packages[item] is not defined
+      loop: "{{ xmonad_required_pkgs }}"
+    - name: Install xmonad deps
+      debug:
+        var: xmonad_install_pkgs
+    - name: Install required packages
+      apt:
+        name: "{{ xmonad_install_pkgs }}"
+        state: present
+      when: xmonad_install_pkgs | length > 0
+      become: yes
+  tags:
+    - 'debug'
 
 - block:
     - name: Clone xmonad
