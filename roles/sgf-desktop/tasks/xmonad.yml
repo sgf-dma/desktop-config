@@ -1,0 +1,43 @@
+---
+
+- block:
+    - name: Define xmonad dependencies to install
+      set_fact:
+        xmonad_install_pkgs: "{{ xmonad_install_pkgs + [item] }}"
+      when: ansible_facts.packages[item] is not defined
+      loop: "{{ xmonad_required_pkgs }}"
+    - name: Required xmonad dependencies to be installed
+      debug:
+        var: xmonad_install_pkgs
+  tags:
+    - 'load'
+    - 'xmonad_deps'
+
+- block:
+    - name: Install xmonad deps
+      debug:
+        var: xmonad_install_pkgs
+    - name: Install required packages
+      apt:
+        name: "{{ xmonad_install_pkgs }}"
+        state: present
+      when: xmonad_install_pkgs | length > 0
+      become: yes
+  tags:
+    - 'xmonad_deps'
+
+- block:
+    - name: Clone xmonad
+      git:
+        repo: 'https://github.com/sgf-dma/sgf-xmonad-config.git'
+        dest: "{{ ansible_user_dir + '/sgf-xmonad-config' }}"
+        version: "{{ xmonad_branch }}"
+        clone: yes
+      register: xmonad_updated
+
+    - name: Build xmonad
+      make:
+        chdir: "{{ ansible_user_dir + '/sgf-xmonad-config' }}"
+        target: install
+      when: xmonad_bin is not exists or xmonad_updated.changed
+
