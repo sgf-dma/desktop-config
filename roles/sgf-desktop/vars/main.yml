@@ -38,3 +38,5 @@ xmonad_required_pkgs:
 install_im_pkgs: []
 xmonad_install_pkgs: []
 
+haskell_stack_installer: "{{ ansible_user_dir + '/install_stack.sh' }}"
+

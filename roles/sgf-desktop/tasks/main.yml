@@ -5,12 +5,13 @@
       import_tasks: load.yml
   tags:
     - 'load'
+    - 'deps'
     - 'colors'
     - 'colors_config'
     - 'xkb'
     - 'im'
     - 'xmonad'
-    - 'deps'
+    - 'xmonad_deps'
     - 'debug'
 
 - name: Configure xkb layout

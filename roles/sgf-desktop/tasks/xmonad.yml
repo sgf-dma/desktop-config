@@ -23,6 +23,19 @@
     - 'xmonad_deps'
 
 - block:
+    - name: Get stack installer
+      get_url:
+        url:  'https://get.haskellstack.org/'
+        dest: "{{ haskell_stack_installer }}"
+        mode: '0750'
+    - name: Run stack installer
+      command: "{{ haskell_stack_installer }}"
+      args:
+        creates: '/usr/local/bin/stack'
+  tags:
+    - 'xmonad_deps'
+
+- block:
     - name: Clone xmonad
       git:
         repo: 'https://github.com/sgf-dma/sgf-xmonad-config.git'
