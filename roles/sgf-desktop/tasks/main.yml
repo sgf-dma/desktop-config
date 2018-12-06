@@ -12,6 +12,8 @@
     - 'im'
     - 'xmonad'
     - 'xmonad_deps'
+    - 'desktop'
+    - 'desktop_deps'
     - 'debug'
 
 - name: Configure xkb layout
@@ -62,4 +64,10 @@
   import_tasks: xmonad.yml
   tags:
     - 'xmonad'
+    - 'gui'
+
+- name: Install desktop packages
+  import_tasks: gui.yml
+  tags:
+    - 'gui'
 

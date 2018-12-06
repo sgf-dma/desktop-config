@@ -34,9 +34,14 @@ xmonad_required_pkgs:
   - 'libxpm-dev'
   - 'libiw-dev'
 
+desktop_required_pkgs:
+  - 'xserver-xorg'
+  - 'xinit'
+
 # List of packages to install.
 install_im_pkgs: []
 xmonad_install_pkgs: []
+desktop_install_pkgs: []
 
 haskell_stack_installer: "{{ ansible_user_dir + '/install_stack.sh' }}"
 
