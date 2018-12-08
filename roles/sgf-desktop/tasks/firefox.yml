@@ -1,0 +1,84 @@
+---
+
+- name: Create directory for user .desktop entries
+  file:
+    path:   "{{ user_desktop_entries }}"
+    mode:   0755
+    state:  directory
+
+- block:
+    - name: Copy firefox system .desktop entry files
+      copy:
+        src:    "{{ system_desktop_entries + '/' + item }}"
+        dest:   "{{ user_desktop_entries + '/' + item }}"
+        mode:   0644
+        force:  "{{ force_overwrite }}"
+        backup: yes
+      loop:
+        - 'firefox-esr.desktop'
+        - 'iceweasel.desktop'
+    # Because `backrefs` is used in this task, if regexp does not match, file
+    # will be left unmodified.
+    - name: Hardcode profile name for system firefox
+      lineinfile:
+        dest:   "{{ user_desktop_entries + '/firefox-esr.desktop' }}"
+        backup: yes
+        line: >
+          {{ 'Exec=\2 --new-instance -P '
+                + firefoxDefault_profile
+                + ' %u'
+          }}
+        regexp: "(^#+|^)Exec=([^ ]+).*"
+        backrefs: yes
+        state:  present
+    - name: Hide iceweasel .desktop entry
+      lineinfile:
+        dest:   "{{ user_desktop_entries + '/iceweasel.desktop' }}"
+        backup: yes
+        line:   'NoDisplay=true'
+        regexp: "(^#+|^)NoDisplay="
+        state:  present
+  tags:
+    - 'firefox_set_profile'
+
+# Now, because i hardcode profile names for system and 52 ESR firefox
+# launches, i shouldn't notice any difference between auto-starting with last
+# profile or not. But in case i run some other firefox version without
+# hardcoded profile name to avoid breaking last used profile i may still want
+# to disable auto-start.
+- name: Disable profile auto start for now
+  lineinfile:
+    dest:   "{{ firefox_profiles_ini }}"
+    backup: yes
+    line:   'StartWithLastProfile=0'
+    regexp: "(^#+|^)StartWithLastProfile="
+    state:  present
+
+- block:
+    - name: Create directory for storing firefox 52 ESR
+      file:
+        path:   "{{ firefox52esr_dir }}"
+        mode:   0755
+        state:  directory
+    - name: Download firefox 52 ESR
+      get_url:
+        url:  "{{ firefox52esr_url }}"
+        dest: "{{ user_opt_dir + '/firefox-52.9.0esr.tar.bz2' }}"
+        force:  "{{ force_overwrite }}"
+    - name: Unpack firefox 52 ESR
+      unarchive:
+        src:      "{{ user_opt_dir + '/firefox-52.9.0esr.tar.bz2' }}"
+        dest:     "{{ firefox52esr_dir }}"
+        remote_src: yes
+        creates: >-
+          {{ force_overwrite | ternary('/nonexistent-H5T6f', firefox52esr_bin)
+          }}
+    - name: Copy firefox 52 ESR desktop entry
+      template:
+        src:    "firefox/firefox-52esr.desktop"
+        dest:   "{{ user_desktop_entries + '/firefox-52esr.desktop' }}"
+        force:  yes
+        backup: yes
+  tags:
+    - 'firefox52esr'
+

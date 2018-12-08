@@ -51,3 +51,16 @@ desktop_install_pkgs: []
 haskell_stack_installer: "{{ ansible_user_dir + '/install_stack.sh' }}"
 haskell_stack_bin_path: "{{ ansible_user_dir + '/bin' }}"
 
+# Where to store local to user .desktop files.
+user_desktop_entries: "{{ ansible_user_dir + '/.local/share/applications' }}"
+system_desktop_entries: '/usr/share/applications'
+
+firefox_profiles_ini: "{{ ansible_user_dir + '/.mozilla/firefox/profiles.ini' }}"
+
+firefox52esr_url: >
+  {{ 'https://ftp.mozilla.org/pub/firefox/releases/52.9.0esr/linux-x86_64/'
+        + firefox52esr_lang | replace('_', '-')
+        + '/firefox-52.9.0esr.tar.bz2'
+  }}
+firefox52esr_bin: "{{ firefox52esr_dir + '/firefox/firefox' }}"
+

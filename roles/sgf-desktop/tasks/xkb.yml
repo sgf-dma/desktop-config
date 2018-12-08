@@ -47,7 +47,7 @@
   with_fileglob:
     - xkb/symbols/*
 
-- name: Install custom symbols
+- name: Install custom types
   copy:
     src:    "{{ item }}"
     force:  yes

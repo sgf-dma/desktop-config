@@ -68,3 +68,9 @@
   tags:
     - 'gui'
 
+- block:
+    - name: Firefox fixes
+      import_tasks: firefox.yml
+  tags:
+    - 'firefox'
+
