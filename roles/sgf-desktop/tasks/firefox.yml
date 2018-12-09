@@ -17,12 +17,17 @@
       loop:
         - 'firefox-esr.desktop'
         - 'iceweasel.desktop'
+      register: firefox_default_copied
     # Because `backrefs` is used in this task, if regexp does not match, file
     # will be left unmodified.
     - name: Hardcode profile name for system firefox
       lineinfile:
         dest:   "{{ user_desktop_entries + '/firefox-esr.desktop' }}"
-        backup: yes
+        backup: >-
+          {{ not firefox_default_copied.results
+              | selectattr('item', 'equalto', 'firefox-esr.desktop')
+              | map(attribute='changed') | first
+          }}
         line: >
           {{ 'Exec=\2 --new-instance -P '
                 + firefoxDefault_profile
@@ -34,7 +39,11 @@
     - name: Hide iceweasel .desktop entry
       lineinfile:
         dest:   "{{ user_desktop_entries + '/iceweasel.desktop' }}"
-        backup: yes
+        backup: >-
+          {{ not firefox_default_copied.results
+              | selectattr('item', 'equalto', 'iceweasel.desktop')
+              | map(attribute='changed') | first
+          }}
         line:   'NoDisplay=true'
         regexp: "(^#+|^)NoDisplay="
         state:  present
