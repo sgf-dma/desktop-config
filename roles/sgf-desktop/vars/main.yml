@@ -55,8 +55,17 @@ haskell_stack_bin_path: "{{ ansible_user_dir + '/bin' }}"
 user_desktop_entries: "{{ ansible_user_dir + '/.local/share/applications' }}"
 system_desktop_entries: '/usr/share/applications'
 
+# Firefox desktop entries (which names to overwrite). Note, that i should
+# overwrite _all_ entries, otherwise one left intact may break some profile.
+firefox_desktop_names:
+  - 'firefox.desktop'
+  - 'firefox-esr.desktop'
+  - 'iceweasel.desktop'
+
+# Path to firfox `profiles.ini` .
 firefox_profiles_ini: "{{ ansible_user_dir + '/.mozilla/firefox/profiles.ini' }}"
 
+# URL where to download firefox 52 ESR.
 firefox52esr_url: >
   {{ 'https://ftp.mozilla.org/pub/firefox/releases/52.9.0esr/linux-x86_64/'
         + firefox52esr_lang | replace('_', '-')

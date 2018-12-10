@@ -7,25 +7,30 @@
     state:  directory
 
 - block:
-    - name: Copy firefox system .desktop entry files
+    - name: Stat firefox .desktop files
+      stat:
+        path: "{{ system_desktop_entries + '/' + item }}"
+      loop: "{{ firefox_desktop_names }}"
+      register: firefox_desktop_files
+    - name: Copy firefox system .desktop files
       copy:
-        src:    "{{ system_desktop_entries + '/' + item }}"
-        dest:   "{{ user_desktop_entries + '/' + item }}"
+        src:    "{{ item.stat.path }}"
+        dest:   "{{ user_desktop_entries + '/' + item.stat.path | basename }}"
         mode:   0644
         force:  "{{ force_overwrite }}"
         backup: yes
-      loop:
-        - 'firefox-esr.desktop'
-        - 'iceweasel.desktop'
+        remote_src: yes
+      when: item.stat.exists
+      loop: "{{ firefox_desktop_files.results }}"
       register: firefox_default_copied
     # Because `backrefs` is used in this task, if regexp does not match, file
     # will be left unmodified.
     - name: Hardcode profile name for system firefox
       lineinfile:
-        dest:   "{{ user_desktop_entries + '/firefox-esr.desktop' }}"
+        dest:   "{{ user_desktop_entries + '/' + item.stat.path | basename }}"
         backup: >-
           {{ not firefox_default_copied.results
-              | selectattr('item', 'equalto', 'firefox-esr.desktop')
+              | selectattr('item.item', 'equalto', item.item)
               | map(attribute='changed') | first
           }}
         line: >
@@ -36,6 +41,12 @@
         regexp: "(^#+|^)Exec=([^ ]+).*"
         backrefs: yes
         state:  present
+      when: item.stat.exists
+      loop: "{{ firefox_desktop_files.results }}"
+  tags:
+    - 'debug'
+
+- block:
     - name: Hide iceweasel .desktop entry
       lineinfile:
         dest:   "{{ user_desktop_entries + '/iceweasel.desktop' }}"
