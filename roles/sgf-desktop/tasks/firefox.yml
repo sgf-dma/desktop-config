@@ -11,10 +11,6 @@
         path: "{{ user_desktop_entries + '/' + item }}"
       loop: "{{ firefox_desktop_names }}"
       register: user_firefox_desktop_files_stats
-  tags:
-    - 'debug'
-
-- block:
     - name: Define firefox desktop files
       set_fact:
         firefox_desktop_files: >
@@ -33,11 +29,12 @@
             | zip(user_firefox_desktop_files_stats.results)
             | list
         }}
-    - name: Print
+    - name: Show firefox .desktop files
       debug:
         var: firefox_desktop_files
   tags:
-    - 'debug'
+    - 'load'
+    - 'firefox_set_profile'
 
 - block:
     - name: Create directory for user .desktop entries
@@ -55,9 +52,10 @@
         remote_src: yes
       when: item.sys_exists
       loop: "{{ firefox_desktop_files }}"
+    # Hardcode profile name into _all_ found .desktop entries.
     # Because `backrefs` is used in this task, if regexp does not match, file
     # will be left unmodified.
-    - name: Hardcode profile name for system firefox
+    - name: Hardcode profile name for all found firefox .desktop files
       lineinfile:
         dest:   "{{ item.user_path }}"
         backup: "{{ item.user_exists }}"
@@ -72,21 +70,19 @@
         state:  present
       when: item.sys_exists or item.user_exists
       loop: "{{ firefox_desktop_files }}"
-  tags:
-    - 'debug'
-
-- block:
-    - name: Hide iceweasel .desktop entry
-      lineinfile:
-        dest:   "{{ user_desktop_entries + '/iceweasel.desktop' }}"
-        backup: >-
-          {{ not firefox_default_copied.results
-              | selectattr('item', 'equalto', 'iceweasel.desktop')
-              | map(attribute='changed') | first
-          }}
-        line:   'NoDisplay=true'
-        regexp: "(^#+|^)NoDisplay="
-        state:  present
+      # I probably, shouldn't disable any .desktop entries. It's better to
+      # hardcode profile name to all of them.
+  #    - name: Hide iceweasel .desktop entry
+  #      lineinfile:
+  #        dest:   "{{ user_desktop_entries + '/iceweasel.desktop' }}"
+  #        backup: >-
+  #          {{ not firefox_default_copied.results
+  #              | selectattr('item', 'equalto', 'iceweasel.desktop')
+  #              | map(attribute='changed') | first
+  #          }}
+  #        line:   'NoDisplay=true'
+  #        regexp: "(^#+|^)NoDisplay="
+  #        state:  present
   tags:
     - 'firefox_set_profile'
 
