@@ -1,48 +1,77 @@
 ---
 
-- name: Create directory for user .desktop entries
-  file:
-    path:   "{{ user_desktop_entries }}"
-    mode:   0755
-    state:  directory
-
 - block:
-    - name: Stat firefox .desktop files
+    - name: Stat system firefox .desktop files
       stat:
         path: "{{ system_desktop_entries + '/' + item }}"
       loop: "{{ firefox_desktop_names }}"
-      register: firefox_desktop_files
+      register: system_firefox_desktop_files_stats
+    - name: Stat user firefox .desktop files
+      stat:
+        path: "{{ user_desktop_entries + '/' + item }}"
+      loop: "{{ firefox_desktop_names }}"
+      register: user_firefox_desktop_files_stats
+  tags:
+    - 'debug'
+
+- block:
+    - name: Define firefox desktop files
+      set_fact:
+        firefox_desktop_files: >
+          {{ firefox_desktop_files +
+              [ { 'name': item.0.item
+                , 'sys_path'    : item.0.stat.exists | ternary(item.0.stat.path, '')
+                , 'sys_exists'  : item.0.stat.exists
+                , 'user_path'   : item.1.stat.exists
+                    | ternary(item.1.stat.path, user_desktop_entries + '/' + item.1.item)
+                , 'user_exists' : item.1.stat.exists
+                }
+              ]
+          }}
+      loop: >
+        {{ system_firefox_desktop_files_stats.results
+            | zip(user_firefox_desktop_files_stats.results)
+            | list
+        }}
+    - name: Print
+      debug:
+        var: firefox_desktop_files
+  tags:
+    - 'debug'
+
+- block:
+    - name: Create directory for user .desktop entries
+      file:
+        path:   "{{ user_desktop_entries }}"
+        mode:   0755
+        state:  directory
     - name: Copy firefox system .desktop files
       copy:
-        src:    "{{ item.stat.path }}"
-        dest:   "{{ user_desktop_entries + '/' + item.stat.path | basename }}"
+        src:    "{{ item.sys_path }}"
+        dest:   "{{ item.user_path }}"
         mode:   0644
         force:  "{{ force_overwrite }}"
         backup: yes
         remote_src: yes
-      when: item.stat.exists
-      loop: "{{ firefox_desktop_files.results }}"
-      register: firefox_default_copied
+      when: item.sys_exists
+      loop: "{{ firefox_desktop_files }}"
     # Because `backrefs` is used in this task, if regexp does not match, file
     # will be left unmodified.
     - name: Hardcode profile name for system firefox
       lineinfile:
-        dest:   "{{ user_desktop_entries + '/' + item.stat.path | basename }}"
-        backup: >-
-          {{ not firefox_default_copied.results
-              | selectattr('item.item', 'equalto', item.item)
-              | map(attribute='changed') | first
-          }}
+        dest:   "{{ item.user_path }}"
+        backup: "{{ item.user_exists }}"
+        #          {{ not firefox_default_copied.results
+        #              | selectattr('item.item', 'equalto', item.item)
+        #              | map(attribute='changed') | first
+        #          }}
         line: >
-          {{ 'Exec=\2 --new-instance -P '
-                + firefoxDefault_profile
-                + ' %u'
-          }}
+          {{ 'Exec=\2 --new-instance -P ' + firefoxDefault_profile + ' %u' }}
         regexp: "(^#+|^)Exec=([^ ]+).*"
         backrefs: yes
         state:  present
-      when: item.stat.exists
-      loop: "{{ firefox_desktop_files.results }}"
+      when: item.sys_exists or item.user_exists
+      loop: "{{ firefox_desktop_files }}"
   tags:
     - 'debug'
 

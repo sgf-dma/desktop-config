@@ -14,6 +14,12 @@ xmonad_branch: master
 
 user_opt_dir: "{{ ansible_user_dir + '/opt' }}"
 
+# Firefox .desktop entry names (which to overwrite). Note, that i should
+# overwrite _all_ entries, otherwise ones left intact may break profile.
+firefox_desktop_names:
+  - 'firefox.desktop'
+  - 'firefox-esr.desktop'
+  - 'iceweasel.desktop'
 # Language of firefox 52.9.0esr to use.
 firefox52esr_lang: 'en_US'
 # Directory, where to unpack firefox ESR 52.
