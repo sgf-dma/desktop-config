@@ -1,0 +1,17 @@
+---
+
+- name: Configure home directory
+  hosts: localhost
+  vars:
+    all_colors: 'solarized-dark'
+    firefox52esr_lang: 'ru_RU'
+  pre_tasks:
+    - name: Load variables
+      import_tasks: load.yml
+  roles:
+    - role: sgf-console
+      vars:
+        git_email: sgf.dma@gmail.com
+        git_name: sgf
+    - role: sgf-desktop
+
