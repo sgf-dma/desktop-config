@@ -69,6 +69,7 @@
         regexp: "(^#+|^)Exec=([^ ]+).*"
         backrefs: yes
         state:  present
+      register: firefox_desktop_changed
       when: item.sys_exists or item.user_exists
       loop: "{{ firefox_desktop_files }}"
       # I probably, shouldn't disable any .desktop entries. It's better to
@@ -84,6 +85,19 @@
   #        line:   'NoDisplay=true'
   #        regexp: "(^#+|^)NoDisplay="
   #        state:  present
+    # Note:
+    # -`force_overwrite` will trigger changed status of profile hardcoding
+    # task (above) and, thus, will trigger this task too.
+    # - i assume, that hardcoding is run for all desktop files copied to local
+    # user directory, thus it's enough to check hardcoding task changed
+    # status.
+    - name: Update user's mime info cache
+      command: update-desktop-database "{{ user_desktop_entries }}"
+      when: >
+        firefox_desktop_changed is defined
+        and firefox_desktop_changed.results
+              | selectattr('changed', 'equalto', true) | list
+              | length > 0
   tags:
     - 'firefox_set_profile'
 
