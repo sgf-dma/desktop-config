@@ -50,15 +50,7 @@
         path:   "{{ ansible_user_dir + '/.bashrc' }}"
         backup: yes
         insertafter: EOF
-        block: |
-          export LANG=en_US.utf8
-          export LC_CTYPE=ru_RU.utf8
-          export LC_COLLATE=ru_RU.utf8
-          export PATH="$HOME/bin:$PATH"
-          umask 027
-
-          eval $(thefuck --alias)
-          eval $(keychain --eval id_rsa)
+        block: "{{ lookup('file', 'files/bashrc') }}"
   tags:
     - 'shell'
 
