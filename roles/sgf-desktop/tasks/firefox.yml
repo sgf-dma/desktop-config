@@ -110,13 +110,15 @@
         url:  "{{ firefox52esr_url }}"
         dest: "{{ user_opt_dir + '/firefox-52.9.0esr.tar.bz2' }}"
         force:  "{{ force_overwrite }}"
+      register: firefox52esr_download
     - name: Unpack firefox 52 ESR
       unarchive:
         src:      "{{ user_opt_dir + '/firefox-52.9.0esr.tar.bz2' }}"
         dest:     "{{ firefox52esr_dir }}"
         remote_src: yes
         creates: >-
-          {{ force_overwrite | ternary('/nonexistent-H5T6f', firefox52esr_bin)
+          {{ ( force_overwrite or firefox52esr_download.changed )
+              | ternary('/nonexistent-H5T6f', firefox52esr_bin)
           }}
     - name: Copy firefox 52 ESR desktop entry
       template:
