@@ -36,6 +36,7 @@
     - 'load'
     - 'firefox_set_profile'
 
+# FIXME: Use `desktop-file-install` for installing desktop files?
 - block:
     - name: Create directory for user .desktop entries
       file:
@@ -120,6 +121,11 @@
           {{ ( force_overwrite or firefox52esr_download.changed )
               | ternary('/nonexistent-H5T6f', firefox52esr_bin)
           }}
+    - name: Create symlink to firefox 52 ESR binary
+      file:
+        path:   "{{ ansible_user_dir + '/bin/firefox-52esr' }}"
+        state:  link
+        src:    "{{ firefox52esr_bin }}"
     - name: Copy firefox 52 ESR desktop entry
       template:
         src:    "firefox/firefox-52esr.desktop"
