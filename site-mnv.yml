@@ -4,7 +4,7 @@
   hosts: localhost
   vars:
     all_colors: 'solarized-dark'
-    firefox52esr_lang: 'ru_RU'
+    firefox52esr_lang: 'ru'
   pre_tasks:
     - name: Load variables
       import_tasks: load.yml
