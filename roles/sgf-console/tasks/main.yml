@@ -24,8 +24,16 @@
     - 'vim'
     - 'git'
 
-- name: Install common tmux config
-  import_tasks: tmux.yml
+- block:
+    - name: Install tmux
+      apt:
+        name: 'tmux'
+        state: present
+      become: yes
+      when: ansible_facts.packages['tmux'] is not defined
+    - name: Install common tmux config
+      import_tasks: tmux.yml
+  when: tmux_enable
   tags:
     - 'tmux'
     - 'colors'

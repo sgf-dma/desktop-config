@@ -1,5 +1,6 @@
 ---
 
+tmux_enable: true
 tmux_prefix: 'C-b'
 tmux_prefix_key: "{{ tmux_prefix }}"
 
