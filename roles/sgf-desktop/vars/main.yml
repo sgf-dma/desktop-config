@@ -21,7 +21,6 @@ desktop_colors:
 
 # List of build or runtime dependencies.
 required_im_pkgs:
-  - 'python-apt'
   - 'python-psutil'
 
 xmonad_required_pkgs:

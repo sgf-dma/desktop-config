@@ -13,16 +13,12 @@
     - 'load'
     - 'xmonad_deps'
 
-- block:
-    - name: Install xmonad deps
-      debug:
-        var: xmonad_install_pkgs
-    - name: Install required packages
-      apt:
-        name: "{{ xmonad_install_pkgs }}"
-        state: present
-      when: xmonad_install_pkgs | length > 0
-      become: yes
+- name: Install required xmonad packages
+  apt:
+    name: "{{ xmonad_install_pkgs }}"
+    state: present
+  when: xmonad_install_pkgs | length > 0
+  become: yes
   tags:
     - 'xmonad_deps'
 

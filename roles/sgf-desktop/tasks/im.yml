@@ -1,25 +1,6 @@
 ---
 
-# `python-apt` required for `apt` and `package_facts` ansible modules.
 - block:
-    - name: Check required python-apt package
-      apt:
-        name: 'python-apt'
-        state: present
-      ignore_errors: yes
-      register: apt_status
-    - name: Install python-apt packages
-      apt:
-        name: python-apt
-        state: present
-      when: apt_status.failed
-      become: yes
-
-- block:
-    - name: Obtain package status
-      package_facts:
-        manager: apt
-
     - name: Debug
       set_fact:
         install_im_pkgs: "{{ install_im_pkgs + [item] }}"
@@ -29,16 +10,8 @@
       apt:
         name: "{{ install_im_pkgs }}"
         state: present
-      when: install_im_pkgs | length > 0
       become: yes
-
-      #    - name: Install im packages
-      #      apt:
-      #        name: "{{ item }}"
-      #        state: present
-      #      become: yes
-      #      when: item in pkg_status
-      #      loop: "{{ required_im_pkgs }}"
+      when: install_im_pkgs | length > 0
 
 - block:
     - name: Install IM config
