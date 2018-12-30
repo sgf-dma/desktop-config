@@ -8,8 +8,7 @@
     - name: Load variables
       import_tasks: load.yml
       tags:
-        - 'console'
-        - 'desktop'
+        - 'always'
   roles:
     - role: sgf-console
       vars:

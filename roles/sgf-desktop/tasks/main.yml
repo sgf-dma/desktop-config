@@ -4,17 +4,7 @@
     - name: Load
       import_tasks: load.yml
   tags:
-    - 'load'
-    - 'deps'
-    - 'colors'
-    - 'colors_config'
-    - 'xkb'
-    - 'im'
-    - 'xmonad'
-    - 'xmonad_deps'
-    - 'desktop'
-    - 'desktop_deps'
-    - 'debug'
+    - 'always'
 
 - name: Configure xkb layout
   import_tasks: xkb.yml

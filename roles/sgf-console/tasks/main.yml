@@ -4,9 +4,7 @@
 - name: Load
   import_tasks: load.yml
   tags:
-    - 'load'
-    - 'colors'
-    - 'colors_config'
+    - 'always'
 
 - name: Install common tmux config
   import_tasks: tmux.yml

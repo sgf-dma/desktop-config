@@ -54,3 +54,5 @@ galaxy_info:
 
 dependencies:
   - role: sgf-apt
+    tags:
+      - 'always'
