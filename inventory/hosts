@@ -1,6 +1,5 @@
 ---
 all:
   hosts:
-    localhost:
     xmonad8:
     xmonad9:
