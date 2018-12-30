@@ -55,8 +55,16 @@
   tags:
     - 'shell'
 
-- name: Configure vim
-  import_tasks: vim.yml
+- block:
+    - name: Install vim
+      apt:
+        name: 'vim'
+        state: present
+      become: yes
+      when: ansible_facts.packages['vim'] is not defined
+    - name: Configure vim
+      import_tasks: vim.yml
+  when: vim_enable
   tags:
     - 'vim'
     - 'colors'
