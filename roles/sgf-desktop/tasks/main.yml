@@ -1,11 +1,10 @@
 ---
 
-- name: Load
-  import_tasks: load.yml
+- block:
+    - name: Load
+      import_tasks: load.yml
   tags:
-    - 'load'
-    - 'colors'
-    - 'colors_config'
+    - 'always'
 
 - name: Configure xkb layout
   import_tasks: xkb.yml
@@ -18,12 +17,19 @@
   tags:
     - 'im'
 
-- name: Install parcellite config
-  copy:
-    src:    "parcellite/parcelliterc"
-    force:  yes
-    backup: yes
-    dest:   "{{ ansible_user_dir }}/.config/parcellite/"
+- block:
+    - name: Install parcellite
+      apt:
+        name: parcellite
+        state: present
+      become: yes
+      when: ansible_facts.packages['parcellite'] is not defined
+    - name: Install parcellite config
+      copy:
+        src:    "parcellite/parcelliterc"
+        force:  yes
+        backup: yes
+        dest:   "{{ ansible_user_dir }}/.config/parcellite/"
   tags:
     - 'copy_paste'
 
@@ -51,21 +57,14 @@
     - 'colors'
     - 'colors_config'
 
-
-- block:
-    - name: Install xmonad
-      git:
-        repo: 'https://github.com/sgf-dma/sgf-xmonad-config.git'
-        dest: "{{ ansible_user_dir + '/sgf-xmonad-config' }}"
-        version: "{{ xmonad_branch }}"
-        clone: yes
-      register: xmonad_updated
-
-    - name: Build xmonad
-      make:
-        chdir: "{{ ansible_user_dir + '/sgf-xmonad-config' }}"
-        target: install
-      when: xmonad_bin is not exists or xmonad_updated.changed
+- name: Install xmonad
+  import_tasks: xmonad.yml
   tags:
     - 'xmonad'
+    - 'gui'
+
+- name: Install desktop packages
+  import_tasks: gui.yml
+  tags:
+    - 'gui'
 

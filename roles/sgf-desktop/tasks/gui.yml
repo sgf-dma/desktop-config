@@ -1,0 +1,24 @@
+---
+
+- block:
+    - name: Define desktop dependencies to install
+      set_fact:
+        desktop_install_pkgs: "{{ desktop_install_pkgs + [item] }}"
+      when: ansible_facts.packages[item] is not defined
+      loop: "{{ desktop_required_pkgs }}"
+    - name: Required desktop dependencies to be installed
+      debug:
+        var: desktop_install_pkgs
+  tags:
+    - 'load'
+    - 'desktop_deps'
+
+- name: Install required desktop packages
+  apt:
+    name: "{{ desktop_install_pkgs }}"
+    state: present
+  when: desktop_install_pkgs | length > 0
+  become: yes
+  tags:
+    - 'desktop_deps'
+

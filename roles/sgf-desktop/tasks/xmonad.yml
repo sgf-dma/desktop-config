@@ -1,0 +1,56 @@
+---
+
+- block:
+    - name: Define xmonad dependencies to install
+      set_fact:
+        xmonad_install_pkgs: "{{ xmonad_install_pkgs + [item] }}"
+      when: ansible_facts.packages[item] is not defined
+      loop: "{{ xmonad_required_pkgs }}"
+    - name: Required xmonad dependencies to be installed
+      debug:
+        var: xmonad_install_pkgs
+  tags:
+    - 'load'
+    - 'xmonad_deps'
+
+- name: Install required xmonad packages
+  apt:
+    name: "{{ xmonad_install_pkgs }}"
+    state: present
+  when: xmonad_install_pkgs | length > 0
+  become: yes
+  tags:
+    - 'xmonad_deps'
+
+- block:
+    - name: Get stack installer
+      get_url:
+        url:  'https://get.haskellstack.org/'
+        dest: "{{ haskell_stack_installer }}"
+        mode: '0750'
+    - name: Run stack installer
+      command: "{{ haskell_stack_installer }} -d {{ haskell_stack_bin_path }} -f"
+      args:
+        creates: "{{ haskell_stack_bin_path + '/stack' }}"
+  tags:
+    - 'xmonad_deps'
+
+- block:
+    - name: Clone xmonad
+      git:
+        repo: 'https://github.com/sgf-dma/sgf-xmonad-config.git'
+        dest: "{{ ansible_user_dir + '/sgf-xmonad-config' }}"
+        version: "{{ xmonad_branch }}"
+        clone: yes
+      register: xmonad_updated
+
+    - name: Stat xmonad binary
+      stat:
+        path: "{{ xmonad_bin }}"
+      register: xmonad_bin_stats
+    - name: Build xmonad
+      make:
+        chdir: "{{ ansible_user_dir + '/sgf-xmonad-config' }}"
+        target: install
+      when: not xmonad_bin_stats.stat.exists or xmonad_updated.changed
+

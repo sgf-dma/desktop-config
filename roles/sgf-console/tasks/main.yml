@@ -4,44 +4,74 @@
 - name: Load
   import_tasks: load.yml
   tags:
-    - 'load'
-    - 'colors'
-    - 'colors_config'
+    - 'always'
 
-- name: Install common tmux config
-  import_tasks: tmux.yml
+- block:
+    - name: Install git
+      apt:
+        name: 'git'
+        state: present
+      become: yes
+      when: ansible_facts.packages['git'] is not defined
+    - name: Install git config
+      template:
+        src:    "gitconfig"
+        force:  yes
+        backup: yes
+        dest:   "{{ ansible_user_dir }}/.gitconfig"
+  tags:
+    - 'tmux'
+    - 'vim'
+    - 'git'
+
+- block:
+    - name: Install tmux
+      apt:
+        name: 'tmux'
+        state: present
+      become: yes
+      when: ansible_facts.packages['tmux'] is not defined
+    - name: Install common tmux config
+      import_tasks: tmux.yml
+  when: tmux_enable
   tags:
     - 'tmux'
     - 'colors'
 
-- name: Install git config
-  template:
-    src:    "gitconfig"
-    force:  yes
-    backup: yes
-    dest:   "{{ ansible_user_dir }}/.gitconfig"
-  tags:
-    - 'git'
+- block:
+    - name: Install bashrc dependencies
+      apt:
+        name: keychain
+        state: present
+      become: yes
+      when: ansible_facts.packages['keychain'] is not defined
+    - name: Modifications to .bashrc
+      blockinfile:
+        path:   "{{ ansible_user_dir + '/.bashrc' }}"
+        backup: yes
+        insertafter: EOF
+        block: |
+          export LANG=en_US.utf8
+          export LC_CTYPE=ru_RU.utf8
+          export LC_COLLATE=ru_RU.utf8
+          export PATH="$HOME/bin:$PATH"
+          umask 027
 
-- name: Modifications to .bashrc
-  blockinfile:
-    path:   "{{ ansible_user_dir + '/.bashrc' }}"
-    backup: yes
-    insertafter: EOF
-    block: |
-      export LANG=en_US.utf8
-      export LC_CTYPE=ru_RU.utf8
-      export LC_COLLATE=ru_RU.utf8
-      export PATH="$HOME/bin:$PATH"
-      umask 027
-
-      eval $(thefuck --alias)
-      eval $(keychain --eval id_rsa)
+          eval $(thefuck --alias)
+          eval $(keychain --eval id_rsa)
   tags:
     - 'shell'
 
-- name: Configure vim
-  import_tasks: vim.yml
+- block:
+    - name: Install vim
+      apt:
+        name: 'vim'
+        state: present
+      become: yes
+      when: ansible_facts.packages['vim'] is not defined
+    - name: Configure vim
+      import_tasks: vim.yml
+  when: vim_enable
   tags:
     - 'vim'
     - 'colors'

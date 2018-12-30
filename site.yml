@@ -1,16 +1,22 @@
 ---
 
 - name: Configure home directory
-  hosts: localhost
+  hosts: all:localhost
   vars:
     all_colors: 'solarized-dark'
   pre_tasks:
     - name: Load variables
       import_tasks: load.yml
+      tags:
+        - 'always'
   roles:
     - role: sgf-console
       vars:
         git_email: sgf.dma@gmail.com
         git_name: sgf
+      tags:
+        - 'console'
     - role: sgf-desktop
+      tags:
+        - 'desktop'
 

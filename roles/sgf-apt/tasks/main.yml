@@ -1,0 +1,30 @@
+---
+
+# This role requires `sudo` to work without password. I.e. if role is running
+# on remote server, i need to add something, like
+#
+#   user     ALL=(root:root) NOPASSWD: ALL
+#
+# to `/etc/sudoers`.
+- block:
+    # `python-apt` required for `apt` and `package_facts` ansible modules.
+    - name: Check required python-apt package
+      apt:
+        name: 'python-apt'
+        state: present
+      ignore_errors: yes
+      register: apt_status
+    - name: Install python-apt package
+      apt:
+        name: python-apt
+        state: present
+      when: apt_status.failed
+      become: yes
+
+    - name: Obtain package status
+      package_facts:
+        manager: apt
+      no_log: true
+  tags:
+    - 'apt'
+
