@@ -44,9 +44,13 @@
         clone: yes
       register: xmonad_updated
 
+    - name: Stat xmonad binary
+      stat:
+        path: "{{ xmonad_bin }}"
+      register: xmonad_bin_stats
     - name: Build xmonad
       make:
         chdir: "{{ ansible_user_dir + '/sgf-xmonad-config' }}"
         target: install
-      when: xmonad_bin is not exists or xmonad_updated.changed
+      when: not xmonad_bin_stats.stat.exists or xmonad_updated.changed
 
