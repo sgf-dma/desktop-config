@@ -24,7 +24,6 @@ required_im_pkgs:
   - 'python-psutil'
 
 xmonad_required_pkgs:
-  - 'git'
   - 'make'
   - 'libgmp-dev'
   - 'libx11-dev'
@@ -33,10 +32,16 @@ xmonad_required_pkgs:
   - 'libxinerama-dev'
   - 'libxpm-dev'
   - 'libiw-dev'
+  - 'trayer'
+  - 'feh'
+  - 'xterm'
+  - 'gmrun'
+  - 'xdotool'
 
 desktop_required_pkgs:
   - 'xserver-xorg'
   - 'xinit'
+  - 'x11-xserver-utils'
 
 # List of packages to install.
 install_im_pkgs: []
