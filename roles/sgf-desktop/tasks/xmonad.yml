@@ -29,9 +29,9 @@
         dest: "{{ haskell_stack_installer }}"
         mode: '0750'
     - name: Run stack installer
-      command: "{{ haskell_stack_installer }} -f"
+      command: "{{ haskell_stack_installer }} -d {{ haskell_stack_bin_path }} -f"
       args:
-        creates: '/usr/local/bin/stack'
+        creates: "{{ haskell_stack_bin_path + '/stack' }}"
   tags:
     - 'xmonad_deps'
 

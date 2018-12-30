@@ -49,4 +49,5 @@ xmonad_install_pkgs: []
 desktop_install_pkgs: []
 
 haskell_stack_installer: "{{ ansible_user_dir + '/install_stack.sh' }}"
+haskell_stack_bin_path: "{{ ansible_user_dir + '/bin' }}"
 
