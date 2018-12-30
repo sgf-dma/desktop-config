@@ -17,12 +17,19 @@
   tags:
     - 'im'
 
-- name: Install parcellite config
-  copy:
-    src:    "parcellite/parcelliterc"
-    force:  yes
-    backup: yes
-    dest:   "{{ ansible_user_dir }}/.config/parcellite/"
+- block:
+    - name: Install parcellite
+      apt:
+        name: parcellite
+        state: present
+      become: yes
+      when: ansible_facts.packages['parcellite'] is not defined
+    - name: Install parcellite config
+      copy:
+        src:    "parcellite/parcelliterc"
+        force:  yes
+        backup: yes
+        dest:   "{{ ansible_user_dir }}/.config/parcellite/"
   tags:
     - 'copy_paste'
 
