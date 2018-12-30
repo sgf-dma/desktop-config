@@ -7,10 +7,17 @@
   pre_tasks:
     - name: Load variables
       import_tasks: load.yml
+      tags:
+        - 'console'
+        - 'desktop'
   roles:
     - role: sgf-console
       vars:
         git_email: sgf.dma@gmail.com
         git_name: sgf
+      tags:
+        - 'console'
     - role: sgf-desktop
+      tags:
+        - 'desktop'
 
