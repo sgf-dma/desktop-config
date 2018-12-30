@@ -6,20 +6,29 @@
   tags:
     - 'always'
 
+- block:
+    - name: Install git
+      apt:
+        name: 'git'
+        state: present
+      become: yes
+      when: ansible_facts.packages['git'] is not defined
+    - name: Install git config
+      template:
+        src:    "gitconfig"
+        force:  yes
+        backup: yes
+        dest:   "{{ ansible_user_dir }}/.gitconfig"
+  tags:
+    - 'tmux'
+    - 'vim'
+    - 'git'
+
 - name: Install common tmux config
   import_tasks: tmux.yml
   tags:
     - 'tmux'
     - 'colors'
-
-- name: Install git config
-  template:
-    src:    "gitconfig"
-    force:  yes
-    backup: yes
-    dest:   "{{ ansible_user_dir }}/.gitconfig"
-  tags:
-    - 'git'
 
 - name: Modifications to .bashrc
   blockinfile:
