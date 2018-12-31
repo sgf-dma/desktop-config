@@ -34,7 +34,7 @@
         var: firefox_desktop_files
   tags:
     - 'load'
-    - 'firefox_set_profile'
+    - 'firefox_profile_hardcode'
 
 # FIXME: Use `desktop-file-install` for installing desktop files?
 - block:
@@ -99,7 +99,7 @@
               | selectattr('changed', 'equalto', true) | list
               | length > 0
   tags:
-    - 'firefox_set_profile'
+    - 'firefox_profile_hardcode'
 
 # Now, because i hardcode profile names for system and 52 ESR firefox
 # launches, i shouldn't notice any difference between auto-starting with last
