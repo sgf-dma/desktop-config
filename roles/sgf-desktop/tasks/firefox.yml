@@ -193,27 +193,25 @@
         dest: "{{ item }}"
         mode: 0755
       loop: "{{ mimeapps_list_files }}"
-    # Note, that used marker _must_ match with marker in template installed,
-    # when no `mimeapps.list` file is present.
-    - name: Set firefox default version (desktop file) (start of file)
-      blockinfile:
-        insertbefore: 'BOF'
+    # There're two sections in `mimeapps.list` file: `Default Applications`
+    # and `Added Associations`. And `gvfs-mime` during setting default
+    # application also adds application to the `Added Associations` section.
+    # And to avoid false match i may use, that value in `Added Associations`
+    # is a semicolon separated list (and `gvfs-mime` adds semicolon always,
+    # even if there's only one item in the list).
+    - name: Set firefox default for http handler
+      lineinfile:
+        insertafter: 'Default Applications'
+        regexp: '(^#+|^)x-scheme-handler/http=[^;]+$'
+        line: "x-scheme-handler/http={{ firefox_default_desktop }}"
         path: "{{ item }}"
-        marker: "# {mark} ANSIBLE MANAGED BLOCK START"
-        block: |
-          [Default Applications]
-          x-scheme-handler/http={{ firefox_default_desktop }}
-          x-scheme-handler/https={{ firefox_default_desktop }}
       loop: "{{ mimeapps_list_files }}"
-    - name: Set firefox default version (desktop file) (end of file)
-      blockinfile:
-        insertafter: 'EOF'
+    - name: Set firefox default for https handler
+      lineinfile:
+        insertafter: 'Default Applications'
+        regexp: '(^#+|^)x-scheme-handler/https=[^;]+$'
+        line: "x-scheme-handler/https={{ firefox_default_desktop }}"
         path: "{{ item }}"
-        marker: "# {mark} ANSIBLE MANAGED BLOCK END"
-        block: |
-          [Default Applications]
-          x-scheme-handler/http={{ firefox_default_desktop }}
-          x-scheme-handler/https={{ firefox_default_desktop }}
       loop: "{{ mimeapps_list_files }}"
   tags:
     - 'firefox_set_default'
