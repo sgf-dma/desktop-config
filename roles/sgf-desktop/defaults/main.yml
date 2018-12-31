@@ -20,7 +20,9 @@ firefox_desktop_names:
   - 'firefox.desktop'
   - 'firefox-esr.desktop'
   - 'iceweasel.desktop'
-# Language of firefox 52.9.0esr to use.
+# Language of firefox 52.9.0esr to use. Note, that these are _not_ locale
+# language codes. E.g. for russian version, i should use just `ru`.. Check the
+# download link to ensure the code is correct.
 firefox52esr_lang: 'en_US'
 # Directory, where to unpack firefox ESR 52.
 firefox52esr_dir: "{{ user_opt_dir + '/firefox-52esr' }}"
