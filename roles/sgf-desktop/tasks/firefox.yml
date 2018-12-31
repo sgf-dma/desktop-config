@@ -106,13 +106,26 @@
 # profile or not. But in case i run some other firefox version without
 # hardcoded profile name to avoid breaking last used profile i may still want
 # to disable auto-start.
-- name: Disable profile auto start for now
-  lineinfile:
-    dest:   "{{ firefox_profiles_ini }}"
-    backup: yes
-    line:   'StartWithLastProfile=0'
-    regexp: "(^#+|^)StartWithLastProfile="
-    state:  present
+- block:
+    - name: Create firefox profile directory
+      file:
+        path: "{{ firefox_profile_dir }}"
+        mode:   0755
+        state: 'directory'
+    - name: Create empty firefox profiles.ini, if it does not exist
+      copy:
+        src:  "{{ 'files/firefox/' + firefox_profiles_ini | basename }}"
+        dest: "{{ firefox_profiles_ini }}"
+        force: no
+    - name: Disable profile auto start for now
+      lineinfile:
+        dest:   "{{ firefox_profiles_ini }}"
+        backup: yes
+        line:   'StartWithLastProfile=0'
+        regexp: "(^#+|^)StartWithLastProfile="
+        state:  present
+  tags:
+    - 'firefox_profile_noauto'
 
 - block:
     - name: Create directory for storing firefox 52 ESR

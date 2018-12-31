@@ -61,7 +61,8 @@ user_desktop_entries: "{{ ansible_user_dir + '/.local/share/applications' }}"
 firefox_desktop_files: []
 
 # Path to firfox `profiles.ini` .
-firefox_profiles_ini: "{{ ansible_user_dir + '/.mozilla/firefox/profiles.ini' }}"
+firefox_profile_dir: "{{ ansible_user_dir + '/.mozilla/firefox' }}"
+firefox_profiles_ini: "{{ firefox_profile_dir + '/profiles.ini' }}"
 
 # URL where to download firefox 52 ESR.
 firefox52esr_url: >
