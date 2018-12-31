@@ -187,20 +187,33 @@
         - 'xdg-utils'
     - name: Create mimeapps.list file, if it doesn't exist
       template:
-        force: no
+        force: "{{ force_overwrite }}"
+        backup: yes
         src: 'firefox/mimeapps.list'
         dest: "{{ item }}"
         mode: 0755
       loop: "{{ mimeapps_list_files }}"
     # Note, that used marker _must_ match with marker in template installed,
     # when no `mimeapps.list` file is present.
-    - name: Set firefox default desktop file (application)
+    - name: Set firefox default version (desktop file) (start of file)
       blockinfile:
         insertbefore: 'BOF'
         path: "{{ item }}"
+        marker: "# {mark} ANSIBLE MANAGED BLOCK START"
         block: |
           [Default Applications]
           x-scheme-handler/http={{ firefox_default_desktop }}
+          x-scheme-handler/https={{ firefox_default_desktop }}
+      loop: "{{ mimeapps_list_files }}"
+    - name: Set firefox default version (desktop file) (end of file)
+      blockinfile:
+        insertafter: 'EOF'
+        path: "{{ item }}"
+        marker: "# {mark} ANSIBLE MANAGED BLOCK END"
+        block: |
+          [Default Applications]
+          x-scheme-handler/http={{ firefox_default_desktop }}
+          x-scheme-handler/https={{ firefox_default_desktop }}
       loop: "{{ mimeapps_list_files }}"
   tags:
     - 'firefox_set_default'

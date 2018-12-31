@@ -1,4 +1,10 @@
-# BEGIN ANSIBLE MANAGED BLOCK
+# BEGIN ANSIBLE MANAGED BLOCK START
 [Default Applications]
 x-scheme-handler/http={{ firefox_default_desktop }}
-# END ANSIBLE MANAGED BLOCK
+x-scheme-handler/https={{ firefox_default_desktop }}
+# END ANSIBLE MANAGED BLOCK START
+# BEGIN ANSIBLE MANAGED BLOCK END
+[Default Applications]
+x-scheme-handler/http={{ firefox_default_desktop }}
+x-scheme-handler/https={{ firefox_default_desktop }}
+# END ANSIBLE MANAGED BLOCK END
