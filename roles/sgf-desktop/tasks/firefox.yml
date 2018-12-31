@@ -125,7 +125,7 @@
         path: "{{ firefox_profile_dir }}"
         mode:   0755
         state: 'directory'
-    - name: Create empty firefox profiles.ini, if it does not exist
+    - name: Create empty firefox profiles.ini, if it doesn't exist
       copy:
         src:  "{{ 'files/firefox/' + firefox_profiles_ini | basename }}"
         dest: "{{ firefox_profiles_ini }}"
@@ -174,4 +174,34 @@
         backup: yes
   tags:
     - 'firefox52esr'
+
+- block:
+    - name: Install mime utils
+      apt:
+        name: "{{ item }}"
+        state: present
+      become: yes
+      when: ansible_facts.packages[item] is not defined
+      loop:
+        - 'gvfs-bin'
+        - 'xdg-utils'
+    - name: Create mimeapps.list file, if it doesn't exist
+      template:
+        force: no
+        src: 'firefox/mimeapps.list'
+        dest: "{{ item }}"
+        mode: 0755
+      loop: "{{ mimeapps_list_files }}"
+    # Note, that used marker _must_ match with marker in template installed,
+    # when no `mimeapps.list` file is present.
+    - name: Set firefox default desktop file (application)
+      blockinfile:
+        insertbefore: 'BOF'
+        path: "{{ item }}"
+        block: |
+          [Default Applications]
+          x-scheme-handler/http={{ firefox_default_desktop }}
+      loop: "{{ mimeapps_list_files }}"
+  tags:
+    - 'firefox_set_default'
 

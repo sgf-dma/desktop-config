@@ -28,6 +28,8 @@ firefox52esr_dir: "{{ user_opt_dir + '/firefox-52esr' }}"
 firefox52esr_profile: 'default-52esr'
 # Profile name to use with system default firefox.
 firefoxDefault_profile: 'default'
+# Which firefox to use as default browser.
+firefox_default_desktop: 'firefox-52esr.desktop'
 
 # Overwrite files normally left untoched. Set this only _once_ for overwriting
 # previous possible incorrect configuration, because setting this permanently

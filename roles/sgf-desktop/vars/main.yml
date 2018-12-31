@@ -72,3 +72,15 @@ firefox52esr_url: >
   }}
 firefox52esr_bin: "{{ firefox52esr_dir + '/firefox/firefox' }}"
 
+# Locations of file `mimeapps.list`, where default desktop file is specified.
+# Note, that `xdg-mime` and `gvfs-mime` sets default desktop application in
+# different files: `xdg-mime` sets it in
+# `~/.local/share/applications/mimeapps.list` , but `gvfs-mime` in
+# `~/.config/mimeapps.list`. On Debian 8 these utils also read only
+# corresponding file (i.e. one, where they set). On Debian 9 they read both
+# files and the `~/.config/mimeapps.list` has higher precedence. But still
+# set in different files..
+mimeapps_list_files:
+  - "{{ ansible_user_dir + '/.config/mimeapps.list' }}"
+  - "{{ ansible_user_dir + '/.local/share/applications/mimeapps.list' }}"
+
