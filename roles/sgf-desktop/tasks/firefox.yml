@@ -1,5 +1,12 @@
 ---
 
+- name: Install OS firefox
+  apt:
+    name: 'firefox-esr'
+    state: present
+  become: yes
+  when: ansible_facts.packages['firefox-esr'] is not defined
+
 - block:
     - name: Stat system firefox .desktop files
       stat:
@@ -38,6 +45,12 @@
 
 # FIXME: Use `desktop-file-install` for installing desktop files?
 - block:
+    - name: Install desktop file utils
+      apt:
+        name: 'desktop-file-utils'
+        state: present
+      become: yes
+      when: ansible_facts.packages['desktop-file-utils'] is not defined
     - name: Create directory for user .desktop entries
       file:
         path:   "{{ user_desktop_entries }}"
