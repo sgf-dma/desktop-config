@@ -30,6 +30,7 @@ xmonad_required_pkgs:
   - 'libxrandr-dev'
   - 'libxft-dev'
   - 'libxinerama-dev'
+  - 'libxss-dev'
   - 'libxpm-dev'
   - 'libiw-dev'
   - 'trayer'
