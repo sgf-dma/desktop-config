@@ -1,0 +1,64 @@
+
+# FIXME: This is a copy of a block installing firefox 52 esr. May i create a
+# role from this?
+- block:
+    - name: Download anki
+      get_url:
+        url:  "{{ anki_url }}"
+        dest: "{{ user_opt_dir + '/anki.tar.bz2' }}"
+        force:  "{{ force_overwrite }}"
+      register: anki_download
+    - name: Unpack anki
+      unarchive:
+        src:      "{{ user_opt_dir + '/anki.tar.bz2' }}"
+        remote_src: yes
+        dest:     "{{ anki_unpack_dir }}"
+        creates: >-
+          {{ ( force_overwrite or anki_download.changed )
+              | ternary('/nonexistent-H5T6f', anki_bin)
+          }}
+    - name: Create symlink to anki
+      file:
+        path:   "{{ ansible_user_dir + '/bin/anki' }}"
+        state:  link
+        src:    "{{ anki_bin }}"
+    - name: Write correct path to anki desktop entry.
+      lineinfile:
+        dest:   "{{ anki_dir + '/anki.desktop' }}"
+        backup: yes
+        line:   >
+          {{ 'Exec=' + anki_bin + '\2' }}
+        regexp: "(^#+|^)Exec=[^ ]+(.*)$"
+        backrefs: yes
+        state:  present
+    - name: Copy anki desktop entry
+      copy:
+        src:    "{{ anki_dir + '/anki.desktop' }}"
+        remote_src: yes
+        dest:   "{{ user_desktop_entries + '/anki.desktop' }}"
+        force:  yes
+        backup: yes
+
+# FIXME: Make this into role too?
+- block:
+    - name: Define anki dependencies to install
+      set_fact:
+        anki_install_pkgs: "{{ anki_install_pkgs + [item] }}"
+      when: ansible_facts.packages[item] is not defined
+      loop: "{{ anki_required_pkgs }}"
+    - name: Required desktop dependencies to be installed
+      debug:
+        var: anki_install_pkgs
+  tags:
+    - 'load'
+    - 'anki_deps'
+
+- name: Install required anki packages
+  apt:
+    name: "{{ anki_install_pkgs }}"
+    state: present
+  when: anki_install_pkgs | length > 0
+  become: yes
+  tags:
+    - 'anki_deps'
+

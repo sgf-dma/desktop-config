@@ -74,3 +74,8 @@
   tags:
     - 'firefox'
 
+- name: Install anki
+  import_tasks: anki.yml
+  tags:
+    - 'anki'
+
