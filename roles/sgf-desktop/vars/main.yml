@@ -30,6 +30,7 @@ xmonad_required_pkgs:
   - 'libxrandr-dev'
   - 'libxft-dev'
   - 'libxinerama-dev'
+  - 'libxss-dev'
   - 'libxpm-dev'
   - 'libiw-dev'
   - 'trayer'
@@ -37,6 +38,7 @@ xmonad_required_pkgs:
   - 'xterm'
   - 'gmrun'
   - 'xdotool'
+  - 'network-manager-gnome'
 
 desktop_required_pkgs:
   - 'xserver-xorg'
@@ -50,4 +52,37 @@ desktop_install_pkgs: []
 
 haskell_stack_installer: "{{ ansible_user_dir + '/install_stack.sh' }}"
 haskell_stack_bin_path: "{{ ansible_user_dir + '/bin' }}"
+
+# Where system .desktop files are stored.
+system_desktop_entries: '/usr/share/applications'
+
+# Where to store local to user .desktop files.
+user_desktop_entries: "{{ ansible_user_dir + '/.local/share/applications' }}"
+
+# List of system and user firefox .desktop files found.
+firefox_desktop_files: []
+
+# Path to firfox `profiles.ini` .
+firefox_profile_dir: "{{ ansible_user_dir + '/.mozilla/firefox' }}"
+firefox_profiles_ini: "{{ firefox_profile_dir + '/profiles.ini' }}"
+
+# URL where to download firefox 52 ESR.
+firefox52esr_url: >
+  {{ 'https://ftp.mozilla.org/pub/firefox/releases/52.9.0esr/linux-x86_64/'
+        + firefox52esr_lang | replace('_', '-')
+        + '/firefox-52.9.0esr.tar.bz2'
+  }}
+firefox52esr_bin: "{{ firefox52esr_dir + '/firefox/firefox' }}"
+
+# Locations of file `mimeapps.list`, where default desktop file is specified.
+# Note, that `xdg-mime` and `gvfs-mime` sets default desktop application in
+# different files: `xdg-mime` sets it in
+# `~/.local/share/applications/mimeapps.list` , but `gvfs-mime` in
+# `~/.config/mimeapps.list`. On Debian 8 these utils also read only
+# corresponding file (i.e. one, where they set). On Debian 9 they read both
+# files and the `~/.config/mimeapps.list` has higher precedence. But still
+# set in different files..
+mimeapps_list_files:
+  - "{{ ansible_user_dir + '/.config/mimeapps.list' }}"
+  - "{{ ansible_user_dir + '/.local/share/applications/mimeapps.list' }}"
 

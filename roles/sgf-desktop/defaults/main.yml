@@ -12,6 +12,32 @@ im_enabled: true
 
 xmonad_branch: master
 
+user_opt_dir: "{{ ansible_user_dir + '/opt' }}"
+
+# Firefox .desktop entry names (which to overwrite). Note, that i should
+# overwrite _all_ entries, otherwise ones left intact may break profile.
+firefox_desktop_names:
+  - 'firefox.desktop'
+  - 'firefox-esr.desktop'
+  - 'iceweasel.desktop'
+# Language of firefox 52.9.0esr to use. Note, that these are _not_ locale
+# language codes. E.g. for russian version, i should use just `ru`.. Check the
+# download link to ensure the code is correct.
+firefox52esr_lang: 'en_US'
+# Directory, where to unpack firefox ESR 52.
+firefox52esr_dir: "{{ user_opt_dir + '/firefox-52esr' }}"
+# Profile name to use with firefox ESR 52.
+firefox52esr_profile: 'default-52esr'
+# Profile name to use with system default firefox.
+firefoxDefault_profile: 'default'
+# Which firefox to use as default browser.
+firefox_default_desktop: 'firefox-52esr.desktop'
+
+# Overwrite files normally left untoched. Set this only _once_ for overwriting
+# previous possible incorrect configuration, because setting this permanently
+# will result in _always changed_ status of playbook run.
+force_overwrite: no
+
 # This dictionary is used by several roles (e.g. `sgf-console` and
 # `sgf-desktop`). This role initializes only part of its keys from
 # `desktop_colors` dictionary. To overwrite particular keys, set them in

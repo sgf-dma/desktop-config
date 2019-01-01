@@ -1,0 +1,14 @@
+[Desktop Entry]
+Name=Firefox 52 ESR (OLD)
+Comment=Old Firefox ESR (52.9.0)
+GenericName=Web Browser
+X-GNOME-FullName=Old Firefox ESR Web Browser
+Exec={{ firefox52esr_bin }} --new-instance -P {{ firefox52esr_profile }} %u
+Terminal=false
+X-MultipleArgs=false
+Type=Application
+Icon=firefox-esr
+Categories=Network;WebBrowser;
+MimeType=text/html;text/xml;application/xhtml+xml;application/xml;application/vnd.mozilla.xul+xml;application/rss+xml;application/rdf+xml;image/gif;image/jpeg;image/png;x-scheme-handler/http;x-scheme-handler/https;
+StartupWMClass=Firefox-esr
+StartupNotify=true

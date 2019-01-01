@@ -1,0 +1,16 @@
+prependPATH() {
+    # See https://unix.stackexchange.com/questions/14895/duplicate-entries-in-path-a-problem .
+    case ":$PATH:" in
+      *":$1:"*) :;; # already there
+      *) echo PATH="${1:+$1:}$PATH";; # or PATH="$PATH:$new_entry"
+    esac
+}
+
+export LANG=en_US.utf8
+export LC_CTYPE=ru_RU.utf8
+export LC_COLLATE=ru_RU.utf8
+prependPATH "$HOME/bin"
+umask 027
+
+eval $(thefuck --alias)
+eval $(keychain --eval id_rsa)

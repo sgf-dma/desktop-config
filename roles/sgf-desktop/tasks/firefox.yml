@@ -1,0 +1,218 @@
+---
+
+- name: Install OS firefox
+  apt:
+    name: 'firefox-esr'
+    state: present
+  become: yes
+  when: ansible_facts.packages['firefox-esr'] is not defined
+
+- block:
+    - name: Stat system firefox .desktop files
+      stat:
+        path: "{{ system_desktop_entries + '/' + item }}"
+      loop: "{{ firefox_desktop_names }}"
+      register: system_firefox_desktop_files_stats
+    - name: Stat user firefox .desktop files
+      stat:
+        path: "{{ user_desktop_entries + '/' + item }}"
+      loop: "{{ firefox_desktop_names }}"
+      register: user_firefox_desktop_files_stats
+    - name: Define firefox desktop files
+      set_fact:
+        firefox_desktop_files: >
+          {{ firefox_desktop_files +
+              [ { 'name': item.0.item
+                , 'sys_path'    : item.0.stat.exists | ternary(item.0.stat.path, '')
+                , 'sys_exists'  : item.0.stat.exists
+                , 'user_path'   : item.1.stat.exists
+                    | ternary(item.1.stat.path, user_desktop_entries + '/' + item.1.item)
+                , 'user_exists' : item.1.stat.exists
+                }
+              ]
+          }}
+      loop: >
+        {{ system_firefox_desktop_files_stats.results
+            | zip(user_firefox_desktop_files_stats.results)
+            | list
+        }}
+    - name: Show firefox .desktop files
+      debug:
+        var: firefox_desktop_files
+  tags:
+    - 'load'
+    - 'firefox_profile_hardcode'
+
+# FIXME: Use `desktop-file-install` for installing desktop files?
+- block:
+    - name: Install desktop file utils
+      apt:
+        name: 'desktop-file-utils'
+        state: present
+      become: yes
+      when: ansible_facts.packages['desktop-file-utils'] is not defined
+    - name: Create directory for user .desktop entries
+      file:
+        path:   "{{ user_desktop_entries }}"
+        mode:   0755
+        state:  directory
+    - name: Copy firefox system .desktop files
+      copy:
+        src:    "{{ item.sys_path }}"
+        dest:   "{{ item.user_path }}"
+        mode:   0644
+        force:  "{{ force_overwrite }}"
+        backup: yes
+        remote_src: yes
+      when: item.sys_exists
+      loop: "{{ firefox_desktop_files }}"
+    # Hardcode profile name into _all_ found .desktop entries.
+    # Because `backrefs` is used in this task, if regexp does not match, file
+    # will be left unmodified.
+    - name: Hardcode profile name for all found firefox .desktop files
+      lineinfile:
+        dest:   "{{ item.user_path }}"
+        backup: "{{ item.user_exists }}"
+        #          {{ not firefox_default_copied.results
+        #              | selectattr('item.item', 'equalto', item.item)
+        #              | map(attribute='changed') | first
+        #          }}
+        line: >
+          {{ 'Exec=\2 --new-instance -P ' + firefoxDefault_profile + ' %u' }}
+        regexp: "(^#+|^)Exec=([^ ]+).*"
+        backrefs: yes
+        state:  present
+      register: firefox_desktop_changed
+      when: item.sys_exists or item.user_exists
+      loop: "{{ firefox_desktop_files }}"
+      # I probably, shouldn't disable any .desktop entries. It's better to
+      # hardcode profile name to all of them.
+  #    - name: Hide iceweasel .desktop entry
+  #      lineinfile:
+  #        dest:   "{{ user_desktop_entries + '/iceweasel.desktop' }}"
+  #        backup: >-
+  #          {{ not firefox_default_copied.results
+  #              | selectattr('item', 'equalto', 'iceweasel.desktop')
+  #              | map(attribute='changed') | first
+  #          }}
+  #        line:   'NoDisplay=true'
+  #        regexp: "(^#+|^)NoDisplay="
+  #        state:  present
+    # Note:
+    # -`force_overwrite` will trigger changed status of profile hardcoding
+    # task (above) and, thus, will trigger this task too.
+    # - i assume, that hardcoding is run for all desktop files copied to local
+    # user directory, thus it's enough to check hardcoding task changed
+    # status.
+    - name: Update user's mime info cache
+      command: update-desktop-database "{{ user_desktop_entries }}"
+      when: >
+        firefox_desktop_changed is defined
+        and firefox_desktop_changed.results
+              | selectattr('changed', 'equalto', true) | list
+              | length > 0
+  tags:
+    - 'firefox_profile_hardcode'
+
+# Now, because i hardcode profile names for system and 52 ESR firefox
+# launches, i shouldn't notice any difference between auto-starting with last
+# profile or not. But in case i run some other firefox version without
+# hardcoded profile name to avoid breaking last used profile i may still want
+# to disable auto-start.
+- block:
+    - name: Create firefox profile directory
+      file:
+        path: "{{ firefox_profile_dir }}"
+        mode:   0755
+        state: 'directory'
+    - name: Create empty firefox profiles.ini, if it doesn't exist
+      copy:
+        src:  "{{ 'files/firefox/' + firefox_profiles_ini | basename }}"
+        dest: "{{ firefox_profiles_ini }}"
+        force: no
+    - name: Disable profile auto start for now
+      lineinfile:
+        dest:   "{{ firefox_profiles_ini }}"
+        backup: yes
+        line:   'StartWithLastProfile=0'
+        regexp: "(^#+|^)StartWithLastProfile="
+        state:  present
+  tags:
+    - 'firefox_profile_noauto'
+
+- block:
+    - name: Create directory for storing firefox 52 ESR
+      file:
+        path:   "{{ firefox52esr_dir }}"
+        mode:   0755
+        state:  directory
+    - name: Download firefox 52 ESR
+      get_url:
+        url:  "{{ firefox52esr_url }}"
+        dest: "{{ user_opt_dir + '/firefox-52.9.0esr.tar.bz2' }}"
+        force:  "{{ force_overwrite }}"
+      register: firefox52esr_download
+    - name: Unpack firefox 52 ESR
+      unarchive:
+        src:      "{{ user_opt_dir + '/firefox-52.9.0esr.tar.bz2' }}"
+        dest:     "{{ firefox52esr_dir }}"
+        remote_src: yes
+        creates: >-
+          {{ ( force_overwrite or firefox52esr_download.changed )
+              | ternary('/nonexistent-H5T6f', firefox52esr_bin)
+          }}
+    - name: Create symlink to firefox 52 ESR binary
+      file:
+        path:   "{{ ansible_user_dir + '/bin/firefox-52esr' }}"
+        state:  link
+        src:    "{{ firefox52esr_bin }}"
+    - name: Copy firefox 52 ESR desktop entry
+      template:
+        src:    "firefox/firefox-52esr.desktop"
+        dest:   "{{ user_desktop_entries + '/firefox-52esr.desktop' }}"
+        force:  yes
+        backup: yes
+  tags:
+    - 'firefox52esr'
+
+- block:
+    - name: Install mime utils
+      apt:
+        name: "{{ item }}"
+        state: present
+      become: yes
+      when: ansible_facts.packages[item] is not defined
+      loop:
+        - 'gvfs-bin'
+        - 'xdg-utils'
+    - name: Create mimeapps.list file, if it doesn't exist
+      template:
+        force: "{{ force_overwrite }}"
+        backup: yes
+        src: 'firefox/mimeapps.list'
+        dest: "{{ item }}"
+        mode: 0755
+      loop: "{{ mimeapps_list_files }}"
+    # There're two sections in `mimeapps.list` file: `Default Applications`
+    # and `Added Associations`. And `gvfs-mime` during setting default
+    # application also adds application to the `Added Associations` section.
+    # And to avoid false match i may use, that value in `Added Associations`
+    # is a semicolon separated list (and `gvfs-mime` adds semicolon always,
+    # even if there's only one item in the list).
+    - name: Set firefox default for http handler
+      lineinfile:
+        insertafter: 'Default Applications'
+        regexp: '(^#+|^)x-scheme-handler/http=[^;]+$'
+        line: "x-scheme-handler/http={{ firefox_default_desktop }}"
+        path: "{{ item }}"
+      loop: "{{ mimeapps_list_files }}"
+    - name: Set firefox default for https handler
+      lineinfile:
+        insertafter: 'Default Applications'
+        regexp: '(^#+|^)x-scheme-handler/https=[^;]+$'
+        line: "x-scheme-handler/https={{ firefox_default_desktop }}"
+        path: "{{ item }}"
+      loop: "{{ mimeapps_list_files }}"
+  tags:
+    - 'firefox_set_default'
+
