@@ -28,8 +28,8 @@
         dest:   "{{ anki_dir + '/anki.desktop' }}"
         backup: yes
         line:   >
-          {{ 'Exec=' + anki_bin + '\2' }}
-        regexp: "(^#+|^)Exec=[^ ]+(.*)$"
+          {{ 'Exec=env ANKI_NOHIGHDPI=1 ' + anki_bin + ' \2' }}
+        regexp: '(^#+|^)Exec=[^ ]+ (?:[^ ]+ ){0,2}(.*)$'
         backrefs: yes
         state:  present
     - name: Copy anki desktop entry
