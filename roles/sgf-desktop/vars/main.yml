@@ -38,6 +38,7 @@ xmonad_required_pkgs:
   - 'xterm'
   - 'gmrun'
   - 'xdotool'
+  - 'network-manager-gnome'
 
 desktop_required_pkgs:
   - 'xserver-xorg'
