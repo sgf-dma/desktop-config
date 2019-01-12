@@ -1,0 +1,75 @@
+
+# FIXME: This is a copy of a block installing firefox 52 esr. May i create a
+# role from this?
+- block:
+    - name: Download anki
+      get_url:
+        url:  "{{ anki_url }}"
+        dest: "{{ user_opt_dir + '/anki.tar.bz2' }}"
+        force:  "{{ force_overwrite }}"
+      register: anki_download
+    - name: Unpack anki
+      unarchive:
+        src:      "{{ user_opt_dir + '/anki.tar.bz2' }}"
+        remote_src: yes
+        dest:     "{{ anki_unpack_dir }}"
+        creates: >-
+          {{ ( force_overwrite or anki_download.changed )
+              | ternary('/nonexistent-H5T6f', anki_bin)
+          }}
+    - name: Copy anki wrapper script to ~/bin
+      copy:
+        src:    "anki/anki"
+        force:  yes
+        mode:   0755
+        dest:   "{{ ansible_user_dir + '/bin/anki' }}"
+    # Here i use the fact, that `backrefs` changes `lineinfile` module
+    # behavior: when enabled, `lineinfile` will _never_ add lines, only change
+    # existing lines matched with `regexp`. Thus, when line is _already_
+    # fixed, the `regexp` _may not_ match - the module will do nothing in that
+    # case (unlike regular behavior, where `regexp` must match with _both_
+    # previous and edited versions of a file). So, here `regexp` matches
+    # _only_ original version of file (i.e. one, which i need to edit).
+    - name: Write correct path to anki desktop entry.
+      lineinfile:
+        dest:   "{{ anki_desktop }}"
+        backup: yes
+        line:   >
+          {{ 'Exec=env ANKI_NOHIGHDPI=1 ' + anki_bin + ' \2' }}
+        regexp: "(^#+|^)Exec=[^ ]+ (?!ANKI_NOHIGHDPI=1)(.*)$"
+        # Or i may use regexp below, which will match both original and edited
+        # versions of file..
+        #regexp: '(^#+|^)Exec=[^ ]+ (?:[^ ]+ ){0,2}(.*)$'
+        backrefs: yes
+        state:  present
+    - name: Copy anki desktop entry
+      copy:
+        src:    "{{ anki_desktop }}"
+        remote_src: yes
+        dest:   "{{ user_desktop_entries + '/anki.desktop' }}"
+        force:  yes
+        backup: yes
+
+# FIXME: Make this into role too?
+- block:
+    - name: Define anki dependencies to install
+      set_fact:
+        anki_install_pkgs: "{{ anki_install_pkgs + [item] }}"
+      when: ansible_facts.packages[item] is not defined
+      loop: "{{ anki_required_pkgs }}"
+    - name: Required desktop dependencies to be installed
+      debug:
+        var: anki_install_pkgs
+  tags:
+    - 'load'
+    - 'anki_deps'
+
+- name: Install required anki packages
+  apt:
+    name: "{{ anki_install_pkgs }}"
+    state: present
+  when: anki_install_pkgs | length > 0
+  become: yes
+  tags:
+    - 'anki_deps'
+

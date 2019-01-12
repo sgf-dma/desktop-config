@@ -74,3 +74,9 @@
   tags:
     - 'firefox'
 
+- name: Install anki
+  import_tasks: anki.yml
+  when: ansible_distribution_major_version | int == 9
+  tags:
+    - 'anki'
+

@@ -74,6 +74,19 @@ firefox52esr_url: >
   }}
 firefox52esr_bin: "{{ firefox52esr_dir + '/firefox/firefox' }}"
 
+anki_url: 'https://apps.ankiweb.net/downloads/current/anki-2.1.7-linux-amd64.tar.bz2'
+# FIXME: Guess this directories?
+anki_unpack_dir: "{{ user_opt_dir }}"
+anki_dir: "{{ user_opt_dir + '/anki-2.1.7-linux-amd64' }}"
+
+anki_bin: "{{ anki_dir + '/bin/anki' }}"
+anki_desktop: "{{ anki_dir + '/anki.desktop' }}"
+# Packages to install. This list is built automatically.
+anki_install_pkgs: []
+anki_required_pkgs:
+  - 'libnss3'
+
+
 # Locations of file `mimeapps.list`, where default desktop file is specified.
 # Note, that `xdg-mime` and `gvfs-mime` sets default desktop application in
 # different files: `xdg-mime` sets it in
