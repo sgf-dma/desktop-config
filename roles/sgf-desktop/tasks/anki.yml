@@ -23,13 +23,23 @@
         force:  yes
         mode:   0755
         dest:   "{{ ansible_user_dir + '/bin/anki' }}"
+    # Here i use the fact, that `backrefs` changes `lineinfile` module
+    # behavior: when enabled, `lineinfile` will _never_ add lines, only change
+    # existing lines matched with `regexp`. Thus, when line is _already_
+    # fixed, the `regexp` _may not_ match - the module will do nothing in that
+    # case (unlike regular behavior, where `regexp` must match with _both_
+    # previous and edited versions of a file). So, here `regexp` matches
+    # _only_ original version of file (i.e. one, which i need to edit).
     - name: Write correct path to anki desktop entry.
       lineinfile:
         dest:   "{{ anki_dir + '/anki.desktop' }}"
         backup: yes
         line:   >
           {{ 'Exec=env ANKI_NOHIGHDPI=1 ' + anki_bin + ' \2' }}
-        regexp: '(^#+|^)Exec=[^ ]+ (?:[^ ]+ ){0,2}(.*)$'
+        regexp: "(^#+|^)Exec=[^ ]+ (?!ANKI_NOHIGHDPI=1)(.*)$"
+        # Or i may use regexp below, which will match both original and edited
+        # versions of file..
+        #regexp: '(^#+|^)Exec=[^ ]+ (?:[^ ]+ ){0,2}(.*)$'
         backrefs: yes
         state:  present
     - name: Copy anki desktop entry
