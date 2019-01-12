@@ -32,7 +32,7 @@
     # _only_ original version of file (i.e. one, which i need to edit).
     - name: Write correct path to anki desktop entry.
       lineinfile:
-        dest:   "{{ anki_dir + '/anki.desktop' }}"
+        dest:   "{{ anki_desktop }}"
         backup: yes
         line:   >
           {{ 'Exec=env ANKI_NOHIGHDPI=1 ' + anki_bin + ' \2' }}
@@ -44,7 +44,7 @@
         state:  present
     - name: Copy anki desktop entry
       copy:
-        src:    "{{ anki_dir + '/anki.desktop' }}"
+        src:    "{{ anki_desktop }}"
         remote_src: yes
         dest:   "{{ user_desktop_entries + '/anki.desktop' }}"
         force:  yes

@@ -80,6 +80,7 @@ anki_unpack_dir: "{{ user_opt_dir }}"
 anki_dir: "{{ user_opt_dir + '/anki-2.1.7-linux-amd64' }}"
 
 anki_bin: "{{ anki_dir + '/bin/anki' }}"
+anki_desktop: "{{ anki_dir + '/anki.desktop' }}"
 # Packages to install. This list is built automatically.
 anki_install_pkgs: []
 anki_required_pkgs:
