@@ -17,11 +17,12 @@
           {{ ( force_overwrite or anki_download.changed )
               | ternary('/nonexistent-H5T6f', anki_bin)
           }}
-    - name: Create symlink to anki
-      file:
-        path:   "{{ ansible_user_dir + '/bin/anki' }}"
-        state:  link
-        src:    "{{ anki_bin }}"
+    - name: Copy anki wrapper script to ~/bin
+      copy:
+        src:    "anki/anki"
+        force:  yes
+        mode:   0755
+        dest:   "{{ ansible_user_dir + '/bin/anki' }}"
     - name: Write correct path to anki desktop entry.
       lineinfile:
         dest:   "{{ anki_dir + '/anki.desktop' }}"
