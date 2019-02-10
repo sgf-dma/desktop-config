@@ -1,0 +1,6 @@
+---
+# defaults file for roles/sgf-system
+
+# If PC is notebook, i usually want to disable wake on lan, because it'll
+# drain battery even in hibernate.
+disable_wol: "{{ _sys_notebook | ternary(true, false) }}"
