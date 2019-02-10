@@ -4,6 +4,7 @@
   hosts: all:localhost
   vars:
     all_colors: 'solarized-dark'
+    notebook: true
   pre_tasks:
     - name: Load variables
       import_tasks: load.yml
@@ -19,4 +20,7 @@
     - role: sgf-desktop
       tags:
         - 'desktop'
+    - role: sgf-system
+      tags:
+        - 'system'
 
