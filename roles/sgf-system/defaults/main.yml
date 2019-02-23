@@ -2,5 +2,13 @@
 # defaults file for roles/sgf-system
 
 # If PC is notebook, i usually want to disable wake on lan, because it'll
-# drain battery even in hibernate.
+# drain battery even in hibernate. This is global setting, which will be
+# applied _only_ to ethernet interfaces. Ethernet interfaces are correctly
+# recognized _only_, if they use new naming scheme (starting with `en`).
+# Alternatively, i may overwrite guessed value below.
 disable_wol: "{{ _sys_notebook | ternary(true, false) }}"
+
+# To force some options on particular interface, i may overwrite guessed
+# values. For now, this is useful only for forcing disabling wake on lan on
+# some interfaces.
+interface_links: {}

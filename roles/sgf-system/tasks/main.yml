@@ -4,16 +4,18 @@
 - block:
     - name: Define interfaces
       set_fact:
-        interface_links: >
-          {{ [{ 'interface' : item
-              , 'file'        : '/etc/systemd/network/50-' + item + '.link'
-              }] + interface_links
+        _interface_links: >
+          {{  [ { 'interface'   : item
+                , 'file'        : '/etc/systemd/network/50-' + item + '.link'
+                , 'disable_wol' : disable_wol and item[0:2] == 'en'
+                } | combine(interface_links[item] | default({}))
+              ] + _interface_links
           }}
       when: ansible_facts[item]['macaddress'] is defined
       loop: "{{ ansible_facts['interfaces'] }}"
     - name: Show interfaces
       debug:
-        var: interface_links
+        var: _interface_links
 
 - block:
     # Template expects variable `interface` containing interface name.
@@ -27,7 +29,7 @@
         group:  'root'
       vars:
         interface: "{{ item.interface }}"
-      loop: "{{ interface_links }}"
+      loop: "{{ _interface_links }}"
       become: yes
       notify:
         - reload systemd
@@ -40,7 +42,8 @@
         regexp: "(^#+|^)WakeOnLan=.*$"
         insertafter: '^\[Link\]$'
         state: present
-      loop: "{{ interface_links }}"
+      when: item.disable_wol
+      loop: "{{ _interface_links }}"
       become: yes
       notify:
         - reload systemd

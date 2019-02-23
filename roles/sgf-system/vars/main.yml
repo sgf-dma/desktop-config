@@ -5,4 +5,4 @@
 # nothing).
 _sys_notebook: "{{ notebook | default(false) }}"
 
-interface_links: []
+_interface_links: []
