@@ -2,21 +2,46 @@
 # tasks file for roles/sgf-system
 
 - block:
-    # Disable wake on lan on ethernet network interfaces. Their names should
-    # start with `en` in new naming policy.
-    # FIXME: Creating link file for interfaces effectively _disables_
-    # `99-default.link` for that interface. That means, if i want to still
-    # apply default link file, i should add its content there too..
-    - name: Disable wake on lan on ehternet interface
-      template:
-        src:  "disable_wol.link"
-        dest: "/etc/systemd/network/{{ '50-' + interface + '-disable_wol.link' }}"
-      when: ansible_facts[interface]['macaddress'] is defined
-            and interface[0:2] == 'en'
+    - name: Define interfaces
+      set_fact:
+        interface_links: >
+          {{ [{ 'interface' : item
+              , 'file'        : '/etc/systemd/network/50-' + item + '.link'
+              }] + interface_links
+          }}
+      when: ansible_facts[item]['macaddress'] is defined
       loop: "{{ ansible_facts['interfaces'] }}"
-      loop_control:
-        loop_var: interface
+    - name: Show interfaces
+      debug:
+        var: interface_links
+
+- block:
+    # Template expects variable `interface` containing interface name.
+    - name: Generate per-interface link file based on default.link
+      template:
+        src:  'interface.link'
+        dest: "{{ item.file }}"
+        force: no
+        mode:   0644
+        owner:  'root'
+        group:  'root'
+      vars:
+        interface: "{{ item.interface }}"
+      loop: "{{ interface_links }}"
       become: yes
       notify:
         - reload systemd
-  when: disable_wol
+
+    - name: Disable wake on lan
+      lineinfile:
+        dest: "{{ item.file }}"
+        backup: yes
+        line: 'WakeOnLan=off'
+        regexp: "(^#+|^)WakeOnLan=.*$"
+        insertafter: '^\[Link\]$'
+        state: present
+      loop: "{{ interface_links }}"
+      become: yes
+      notify:
+        - reload systemd
+

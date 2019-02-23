@@ -4,3 +4,5 @@
 # Value of global `notebook` variable for use in this role (with default, if
 # nothing).
 _sys_notebook: "{{ notebook | default(false) }}"
+
+interface_links: []
