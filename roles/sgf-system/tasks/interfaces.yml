@@ -6,7 +6,8 @@
         _interface_links: >
           {{  [ { 'interface'   : item
                 , 'file'        : '/etc/systemd/network/50-' + item + '.link'
-                , 'disable_wol' : disable_wol and item[0:2] == 'en'
+                , 'disable_wol' : disable_wol
+                                  and ( item[0:2] == 'en' or item[0:3] == 'eth' )
                 } | combine(interface_links[item] | default({}))
               ] + _interface_links
           }}
