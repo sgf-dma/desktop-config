@@ -6,6 +6,13 @@
   tags:
     - 'always'
 
+- name: Create user dist directory exists
+  file:
+    path: "{{ user_dist_dir }}"
+    state: directory
+  tags:
+    - 'always'
+
 - name: Configure xkb layout
   include_tasks:
     file: xkb.yml

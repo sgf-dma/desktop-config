@@ -8,6 +8,27 @@
   when: ansible_facts.packages['firefox-esr'] is not defined
 
 - block:
+    - name: firefox | Define firefox versions
+      set_fact:
+        firefox_versions: >-
+          {{ firefox_versions + 
+              [ { 'archive' : item.url  | basename
+                , 'profile' : item.name | regex_replace('^firefox', 'default')
+                } | combine(item,
+                      { 'dir'     : user_opt_dir + '/' + item.name
+                      , 'desktop' : item.name + '.desktop'
+                      }
+                    )
+              ]
+          }}
+      loop: "{{ firefox2 }}"
+    - name: huy
+      debug:
+        var: firefox_versions
+  tags:
+    - firefox_install
+
+- block:
     - name: firefox | Stat system .desktop files
       stat:
         path: "{{ system_desktop_entries + '/' + item }}"
@@ -140,40 +161,17 @@
   tags:
     - 'firefox_profile_noauto'
 
-- block:
-    - name: firefox | Create directory for storing 52 ESR
-      file:
-        path:   "{{ firefox52esr_dir }}"
-        mode:   0755
-        state:  directory
-    - name: firefox | Download 52 ESR
-      get_url:
-        url:  "{{ firefox52esr_url }}"
-        dest: "{{ user_opt_dir + '/firefox-52.9.0esr.tar.bz2' }}"
-        force:  "{{ force_overwrite }}"
-      register: firefox52esr_download
-    - name: firefox | Unpack 52 ESR
-      unarchive:
-        src:      "{{ user_opt_dir + '/firefox-52.9.0esr.tar.bz2' }}"
-        dest:     "{{ firefox52esr_dir }}"
-        remote_src: yes
-        creates: >-
-          {{ ( force_overwrite or firefox52esr_download.changed )
-              | ternary('/nonexistent-H5T6f', firefox52esr_bin)
-          }}
-    - name: firefox | Create symlink to 52 ESR binary
-      file:
-        path:   "{{ ansible_user_dir + '/bin/firefox-52esr' }}"
-        state:  link
-        src:    "{{ firefox52esr_bin }}"
-    - name: firefox | Copy 52 ESR desktop entry
-      template:
-        src:    "firefox/firefox-52esr.desktop"
-        dest:   "{{ user_desktop_entries + '/firefox-52esr.desktop' }}"
-        force:  yes
-        backup: yes
+- name: Install specific firefox versions
+  include_tasks:
+    file: firefox_versions.yml
+    apply:
+      tags:
+        - 'firefox_install'
+  loop: "{{ firefox_versions }}"
+  loop_control:
+    loop_var: 'cur_firefox'
   tags:
-    - 'firefox52esr'
+    - 'firefox_install'
 
 - block:
     - name: firefox | Install mime utils

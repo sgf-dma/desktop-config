@@ -75,6 +75,11 @@ firefox52esr_url: >
   }}
 firefox52esr_bin: "{{ firefox52esr_dir + '/firefox/firefox' }}"
 
+# List of dicts, describing firefox versions to install.
+firefox_versions: []
+firefox2_bin: "{{ cur_firefox.dir + '/firefox/firefox' }}"
+firefox2_archive: "{{ user_dist_dir + '/' + cur_firefox.archive }}"
+
 anki_url: 'https://apps.ankiweb.net/downloads/current/anki-2.1.7-linux-amd64.tar.bz2'
 # FIXME: Guess this directories?
 anki_unpack_dir: "{{ user_opt_dir }}"
@@ -100,3 +105,4 @@ mimeapps_list_files:
   - "{{ ansible_user_dir + '/.config/mimeapps.list' }}"
   - "{{ ansible_user_dir + '/.local/share/applications/mimeapps.list' }}"
 
+file_does_not_exist: '/nonexistent-H5T6f'

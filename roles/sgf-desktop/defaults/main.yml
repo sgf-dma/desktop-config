@@ -26,14 +26,32 @@ firefox_desktop_names:
 # language codes. E.g. for russian version, i should use just `ru`.. Check the
 # download link to ensure the code is correct.
 firefox52esr_lang: 'en_US'
-# Directory, where to unpack firefox ESR 52.
-firefox52esr_dir: "{{ user_opt_dir + '/firefox-52esr' }}"
-# Profile name to use with firefox ESR 52.
-firefox52esr_profile: 'default-52esr'
 # Profile name to use with system default firefox.
 firefoxDefault_profile: 'default'
-# Which firefox to use as default browser.
+# Which firefox to use as default browser (default mime handler for urls,
+# etc).
 firefox_default_desktop: 'firefox-52esr.desktop'
+
+# Firefox version to install.
+#   - 'name' is unique name (required). It's used to derive directory, where
+#   to unpack (i.e. install), and .desktop file name. Also, when deriving
+#   'profile' name (if omitted), starting 'firefox-' prefix in 'name' will be
+#   replaced with word 'default'. I.e. 'name' structure "firefox-X", where X
+#   is some reference to firefox version, is assumed (though, not required).
+#   - 'url' is download url (required).
+#   - 'archive' is name under which to save downloaded archive. If omitted,
+#   it'll be derived from last component of url.
+#   - 'profile' is profile name to hardcode into .desktop file. If omitted,
+#   it'll be derived from 'name' (see above about 'name').
+#   - 'comment' is description used in desktop entry in 'Comment' and
+#   'X-GNOME-FullName' fields.
+firefox2: []
+
+# Defintion of firefox 52 ESR version.
+firefox_ver_52esr:
+  name: 'firefox-52esr'
+  url: 'https://ftp.mozilla.org/pub/firefox/releases/52.9.0esr/linux-x86_64/en-US/firefox-52.9.0esr.tar.bz2'
+  comment: 'Firefox 52 ESR'
 
 # Overwrite files normally left untoched. Set this only _once_ for overwriting
 # previous possible incorrect configuration, because setting this permanently
@@ -51,3 +69,6 @@ colors: {}
 # this value. This variable used by several roles (e.g. `sgf-console` and
 # `sgf-desktop`).
 # all_colors: 'disabled'
+
+# Directory where to download and save locally installed programs and files.
+user_dist_dir: "{{ ansible_user_dir + '/opt/dist' }}"

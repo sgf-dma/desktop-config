@@ -1,0 +1,38 @@
+---
+
+- block:
+    - name: firefox_versions | Report version
+      debug:
+        msg: "{{ 'Installing firefox version: ' + cur_firefox.name }}"
+    - name: firefox_versions | Create install directory
+      file:
+        path:   "{{ cur_firefox.dir }}"
+        mode:   0755
+        state:  directory
+    - name: firefox_versions | Download
+      get_url:
+        url:  "{{ cur_firefox.url }}"
+        dest: "{{ firefox2_archive }}"
+        force:  "{{ force_overwrite }}"
+      register: cur_firefox_download
+    - name: firefox_versions | Unpack
+      unarchive:
+        src:      "{{ firefox2_archive }}"
+        dest:     "{{ cur_firefox.dir }}"
+        remote_src: yes
+        creates: >-
+          {{ ( force_overwrite or cur_firefox_download.changed )
+              | ternary(file_does_not_exist, firefox2_bin)
+          }}
+    - name: firefox_versions | Create symlink to firefox binary
+      file:
+        path:   "{{ ansible_user_dir + '/bin/' + cur_firefox.name }}"
+        state:  link
+        src:    "{{ firefox2_bin }}"
+    - name: firefox_versions | Copy desktop entry
+      template:
+        src:    'firefox/firefox.desktop'
+        dest:   "{{ user_desktop_entries + '/' + cur_firefox.desktop }}"
+        force:  yes
+        backup: yes
+
