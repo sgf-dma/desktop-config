@@ -1,0 +1,11 @@
+$TTL 1
+@               IN      SOA     local.       root.local. (
+                     2018010300         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                              1         ; Negative Cache TTL
+)
+@               IN      NS      local.
+local           IN      CNAME   .
+*.local         IN      CNAME   .
