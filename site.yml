@@ -25,17 +25,7 @@
       tags:
         - 'system'
 
-    - role: pdns_recursor-ansible
-      vars:
-        pdns_rec_config_lua_file_content: >
-          rpzFile("/etc/powerdns/rpz.db", {})
-        pdns_rec_config:
-          allow-from:
-            - "127.0.0.1/8"
-          local-address:
-            - "127.0.0.1"
-          pdns-distributes-queries: false
-          reuseport: true
+    - role: sgf-system
       tags:
         - 'system'
 

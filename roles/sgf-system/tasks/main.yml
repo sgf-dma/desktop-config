@@ -5,3 +5,20 @@
   import_tasks: interfaces.yml
   tags:
     - 'network'
+
+- block:
+  - name: Copy RPZ for recursor
+    copy:
+      src: 'rpz.db'
+      dest: "{{ rpz_dest }}"
+      mode: 644
+      force: no
+    notify: restart PowerDNS Recursor
+
+  - name: Set RPZ permissions
+    file:
+      path: "{{ rpz_dest }}"
+      mode: 0644
+
+  become: yes
+
