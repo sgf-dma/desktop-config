@@ -48,3 +48,14 @@
       notify:
         - reload systemd
 
+    - name: Remove disable wake on lan line for others
+      lineinfile:
+        dest: "{{ item.file }}"
+        backup: yes
+        regexp: "(^#+|^)WakeOnLan=.*$"
+        state: absent
+      when: not item.disable_wol
+      loop: "{{ _interface_links }}"
+      become: yes
+      notify:
+        - reload systemd
