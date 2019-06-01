@@ -1,0 +1,7 @@
+---
+# handlers file for roles/sgf-system
+
+- name: reload systemd
+  systemd:
+    daemon-reload: yes
+  become: yes

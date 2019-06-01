@@ -1,0 +1,10 @@
+---
+# vars file for roles/sgf-system
+
+# Value of global `notebook` variable for use in this role (with default, if
+# nothing).
+_sys_notebook: "{{ notebook | default(false) }}"
+
+# Internal structure for storing interface information. Note, that unlike
+# `interface_links` this is a _list_, not a dictionary.
+_interface_links: []

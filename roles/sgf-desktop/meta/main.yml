@@ -56,3 +56,4 @@ dependencies:
   - role: sgf-apt
     tags:
       - 'always'
+      - 'apt'
