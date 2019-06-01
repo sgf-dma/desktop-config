@@ -89,3 +89,12 @@
       become: yes
       notify:
         - reload systemd
+
+- block:
+    - name: Copy Network Manager configs
+      copy:
+        src: "{{ item }}"
+        dest: '/etc/NetworkManager/conf.d'
+      become: yes
+      with_fileglob:
+        - "files/NetworkManager/*"
