@@ -23,3 +23,5 @@ pdns_rec_config:
     - "127.0.0.1"
   pdns-distributes-queries: false
   reuseport: true
+  forward-zones-recurse: >
+    {{ dns_forwarder is defined | ternary('.=' + dns_forwarder | default(omit), none) }}
