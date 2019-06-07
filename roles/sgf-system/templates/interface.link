@@ -1,7 +1,7 @@
 [Match]
 {# `interface` is usually a loop variable, so multiple link files for each
    interface are generated from this single template -#}
-MACAddress={{ interface.phy_macaddress | default(ansible_facts[interface.name]['macaddress']) }}
+MACAddress={{ interface.phy_macaddress | default(ansible_facts[interface.name]['macaddress'], true) }}
 
 {# Included template file /must/ be in role directory. This is restriction of
   jinja2. See https://github.com/ansible/ansible/issues/7106 .
