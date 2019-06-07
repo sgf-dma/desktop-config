@@ -23,6 +23,7 @@
                 , 'disable_wol' : disable_wol
                                   and ( item.0[0:2] == 'en' or item.0[0:3] == 'eth' )
                 , 'phy_macaddress' : item.1.content | default('') | b64decode | trim
+                      | default(ansible_facts[item.0]['macaddress'], true)
                 } | combine(interface_links[item.0] | default({}))
               ] + _interface_links
           }}
