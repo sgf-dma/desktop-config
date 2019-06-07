@@ -5,3 +5,9 @@
   systemd:
     daemon-reload: yes
   become: yes
+
+- name: restart NetworkManager
+  service:
+    name: NetworkManager
+    state: restarted
+  become: yes
