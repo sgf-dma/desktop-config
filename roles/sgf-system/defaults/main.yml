@@ -12,3 +12,6 @@ disable_wol: "{{ _sys_notebook | ternary(true, false) }}"
 # values. For now, this is useful only for forcing disabling wake on lan on
 # some interfaces.
 interface_links: {}
+
+# Address of DNS forwarder. Usually, this should be dnscrypt proxy.
+#dns_forwarder: '127.0.2.1:53'

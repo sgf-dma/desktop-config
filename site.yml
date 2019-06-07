@@ -15,11 +15,17 @@
       vars:
         git_email: sgf.dma@gmail.com
         git_name: sgf
+        dns_forwarder: '127.0.2.1:53'
       tags:
         - 'console'
+
     - role: sgf-desktop
       tags:
         - 'desktop'
+    - role: sgf-system
+      tags:
+        - 'system'
+
     - role: sgf-system
       tags:
         - 'system'
