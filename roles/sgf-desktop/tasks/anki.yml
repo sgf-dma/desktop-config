@@ -2,13 +2,13 @@
 # FIXME: This is a copy of a block installing firefox 52 esr. May i create a
 # role from this?
 - block:
-    - name: Download anki
+    - name: anki | Download
       get_url:
         url:  "{{ anki_url }}"
         dest: "{{ user_opt_dir + '/anki.tar.bz2' }}"
         force:  "{{ force_overwrite }}"
       register: anki_download
-    - name: Unpack anki
+    - name: anki | Unpack
       unarchive:
         src:      "{{ user_opt_dir + '/anki.tar.bz2' }}"
         remote_src: yes
@@ -17,7 +17,7 @@
           {{ ( force_overwrite or anki_download.changed )
               | ternary('/nonexistent-H5T6f', anki_bin)
           }}
-    - name: Copy anki wrapper script to ~/bin
+    - name: anki | Copy wrapper script to ~/bin
       copy:
         src:    "anki/anki"
         force:  yes
@@ -30,7 +30,7 @@
     # case (unlike regular behavior, where `regexp` must match with _both_
     # previous and edited versions of a file). So, here `regexp` matches
     # _only_ original version of file (i.e. one, which i need to edit).
-    - name: Write correct path to anki desktop entry.
+    - name: anki | Write correct path to desktop entry.
       lineinfile:
         dest:   "{{ anki_desktop }}"
         backup: yes
@@ -42,7 +42,7 @@
         #regexp: '(^#+|^)Exec=[^ ]+ (?:[^ ]+ ){0,2}(.*)$'
         backrefs: yes
         state:  present
-    - name: Copy anki desktop entry
+    - name: anki | Copy desktop entry
       copy:
         src:    "{{ anki_desktop }}"
         remote_src: yes
@@ -52,19 +52,19 @@
 
 # FIXME: Make this into role too?
 - block:
-    - name: Define anki dependencies to install
+    - name: anki | Define dependencies
       set_fact:
         anki_install_pkgs: "{{ anki_install_pkgs + [item] }}"
       when: ansible_facts.packages[item] is not defined
       loop: "{{ anki_required_pkgs }}"
-    - name: Required desktop dependencies to be installed
+    - name: anki | Show desktop dependencies to be installed
       debug:
         var: anki_install_pkgs
   tags:
     - 'load'
     - 'anki_deps'
 
-- name: Install required anki packages
+- name: anki | Install dependencies
   apt:
     name: "{{ anki_install_pkgs }}"
     state: present

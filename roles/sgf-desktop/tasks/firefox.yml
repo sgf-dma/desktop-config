@@ -1,6 +1,6 @@
 ---
 
-- name: Install OS firefox
+- name: firefox | Install OS package
   apt:
     name: 'firefox-esr'
     state: present
@@ -8,17 +8,17 @@
   when: ansible_facts.packages['firefox-esr'] is not defined
 
 - block:
-    - name: Stat system firefox .desktop files
+    - name: firefox | Stat system .desktop files
       stat:
         path: "{{ system_desktop_entries + '/' + item }}"
       loop: "{{ firefox_desktop_names }}"
       register: system_firefox_desktop_files_stats
-    - name: Stat user firefox .desktop files
+    - name: firefox | Stat user .desktop files
       stat:
         path: "{{ user_desktop_entries + '/' + item }}"
       loop: "{{ firefox_desktop_names }}"
       register: user_firefox_desktop_files_stats
-    - name: Define firefox desktop files
+    - name: firefox | Define desktop files
       set_fact:
         firefox_desktop_files: >
           {{ firefox_desktop_files +
@@ -36,7 +36,7 @@
             | zip(user_firefox_desktop_files_stats.results)
             | list
         }}
-    - name: Show firefox .desktop files
+    - name: firefox | Show .desktop files
       debug:
         var: firefox_desktop_files
   tags:
@@ -45,18 +45,18 @@
 
 # FIXME: Use `desktop-file-install` for installing desktop files?
 - block:
-    - name: Install desktop file utils
+    - name: firefox | Install desktop file utils
       apt:
         name: 'desktop-file-utils'
         state: present
       become: yes
       when: ansible_facts.packages['desktop-file-utils'] is not defined
-    - name: Create directory for user .desktop entries
+    - name: firefox | Create directory for user .desktop entries
       file:
         path:   "{{ user_desktop_entries }}"
         mode:   0755
         state:  directory
-    - name: Copy firefox system .desktop files
+    - name: firefox | Copy system .desktop files
       copy:
         src:    "{{ item.sys_path }}"
         dest:   "{{ item.user_path }}"
@@ -69,7 +69,7 @@
     # Hardcode profile name into _all_ found .desktop entries.
     # Because `backrefs` is used in this task, if regexp does not match, file
     # will be left unmodified.
-    - name: Hardcode profile name for all found firefox .desktop files
+    - name: firefox | Hardcode profile name in .desktop files
       lineinfile:
         dest:   "{{ item.user_path }}"
         backup: "{{ item.user_exists }}"
@@ -87,7 +87,7 @@
       loop: "{{ firefox_desktop_files }}"
       # I probably, shouldn't disable any .desktop entries. It's better to
       # hardcode profile name to all of them.
-  #    - name: Hide iceweasel .desktop entry
+  #    - name: firefox | Hide iceweasel .desktop entry
   #      lineinfile:
   #        dest:   "{{ user_desktop_entries + '/iceweasel.desktop' }}"
   #        backup: >-
@@ -104,7 +104,7 @@
     # - i assume, that hardcoding is run for all desktop files copied to local
     # user directory, thus it's enough to check hardcoding task changed
     # status.
-    - name: Update user's mime info cache
+    - name: firefox | Update user's mime info cache
       command: update-desktop-database "{{ user_desktop_entries }}"
       when: >
         firefox_desktop_changed is defined
@@ -120,17 +120,17 @@
 # hardcoded profile name to avoid breaking last used profile i may still want
 # to disable auto-start.
 - block:
-    - name: Create firefox profile directory
+    - name: firefox | Create profile directory
       file:
         path: "{{ firefox_profile_dir }}"
         mode:   0755
         state: 'directory'
-    - name: Create empty firefox profiles.ini, if it doesn't exist
+    - name: firefox | Create empty profiles.ini, if it doesn't exist
       copy:
         src:  "{{ 'files/firefox/' + firefox_profiles_ini | basename }}"
         dest: "{{ firefox_profiles_ini }}"
         force: no
-    - name: Disable profile auto start for now
+    - name: firefox | Disable profile auto start for now
       lineinfile:
         dest:   "{{ firefox_profiles_ini }}"
         backup: yes
@@ -141,18 +141,18 @@
     - 'firefox_profile_noauto'
 
 - block:
-    - name: Create directory for storing firefox 52 ESR
+    - name: firefox | Create directory for storing 52 ESR
       file:
         path:   "{{ firefox52esr_dir }}"
         mode:   0755
         state:  directory
-    - name: Download firefox 52 ESR
+    - name: firefox | Download 52 ESR
       get_url:
         url:  "{{ firefox52esr_url }}"
         dest: "{{ user_opt_dir + '/firefox-52.9.0esr.tar.bz2' }}"
         force:  "{{ force_overwrite }}"
       register: firefox52esr_download
-    - name: Unpack firefox 52 ESR
+    - name: firefox | Unpack 52 ESR
       unarchive:
         src:      "{{ user_opt_dir + '/firefox-52.9.0esr.tar.bz2' }}"
         dest:     "{{ firefox52esr_dir }}"
@@ -161,12 +161,12 @@
           {{ ( force_overwrite or firefox52esr_download.changed )
               | ternary('/nonexistent-H5T6f', firefox52esr_bin)
           }}
-    - name: Create symlink to firefox 52 ESR binary
+    - name: firefox | Create symlink to 52 ESR binary
       file:
         path:   "{{ ansible_user_dir + '/bin/firefox-52esr' }}"
         state:  link
         src:    "{{ firefox52esr_bin }}"
-    - name: Copy firefox 52 ESR desktop entry
+    - name: firefox | Copy 52 ESR desktop entry
       template:
         src:    "firefox/firefox-52esr.desktop"
         dest:   "{{ user_desktop_entries + '/firefox-52esr.desktop' }}"
@@ -176,7 +176,7 @@
     - 'firefox52esr'
 
 - block:
-    - name: Install mime utils
+    - name: firefox | Install mime utils
       apt:
         name: "{{ item }}"
         state: present
@@ -185,7 +185,7 @@
       loop:
         - 'gvfs-bin'
         - 'xdg-utils'
-    - name: Create mimeapps.list file, if it doesn't exist
+    - name: firefox | Create mimeapps.list file, if it doesn't exist
       template:
         force: "{{ force_overwrite }}"
         backup: yes
@@ -199,14 +199,14 @@
     # And to avoid false match i may use, that value in `Added Associations`
     # is a semicolon separated list (and `gvfs-mime` adds semicolon always,
     # even if there's only one item in the list).
-    - name: Set firefox default for http handler
+    - name: firefox | Set default for http handler
       lineinfile:
         insertafter: 'Default Applications'
         regexp: '(^#+|^)x-scheme-handler/http=[^;]+$'
         line: "x-scheme-handler/http={{ firefox_default_desktop }}"
         path: "{{ item }}"
       loop: "{{ mimeapps_list_files }}"
-    - name: Set firefox default for https handler
+    - name: firefox | Set default for https handler
       lineinfile:
         insertafter: 'Default Applications'
         regexp: '(^#+|^)x-scheme-handler/https=[^;]+$'

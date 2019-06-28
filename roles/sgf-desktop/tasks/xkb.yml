@@ -2,7 +2,7 @@
 # names of configs to install.
 # TODO: Ansible option for preserving old `-option`-s or resetting them (now).
 
-- name: Create user xkb dir
+- name: xkb | Create user xkb dir
   file: 
     path:  "{{ user_xkb_dir + item }}"
     state: directory
@@ -14,19 +14,19 @@
 # FIXME: I should check, that system file is not changed since last time i
 # copied it and patched. On the other hand, i can't just copy it again, because
 # then play will always have `changed` status.
-- name: Copy current evdev rules
+- name: xkb | Copy current evdev rules
   copy:
     src:    "/usr/share/X11/xkb/rules/evdev"
     force:  no
     dest:   "{{ user_xkb_rules }}"
 
-- name: Copy current evdev rules list
+- name: xkb | Copy current evdev rules list
   copy:
     src:    "/usr/share/X11/xkb/rules/evdev.lst"
     force:  no
     dest:   "{{ user_xkb_rules + '.lst' }}"
 
-- name: Add rules
+- name: xkb | Add rules
   blockinfile:
     path:   "{{ user_xkb_rules }}"
     backup: yes
@@ -39,7 +39,7 @@
       ! option        = symbols
       ctrl_shift_to_group1            = +ctrl_shift_to_group1
 
-- name: Install custom symbols
+- name: xkb | Install custom symbols
   copy:
     src:    "{{ item }}"
     force:  yes
@@ -47,7 +47,7 @@
   with_fileglob:
     - xkb/symbols/*
 
-- name: Install custom types
+- name: xkb | Install custom types
   copy:
     src:    "{{ item }}"
     force:  yes
@@ -55,7 +55,7 @@
   with_fileglob:
     - xkb/types/*
 
-- name: Install xkb script
+- name: xkb | Install xkb script
   template:
     src:    "xkb.sh"
     force:  yes

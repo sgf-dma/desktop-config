@@ -4,18 +4,18 @@
     # Wireless interfaces may have generated mac address different from real
     # hardware mac. I need to use real hardware macaddress in link files to
     # match.
-    - name: Stat wireless phy macaddress file
+    - name: interfaces | Stat wireless phy80211 macaddress file
       stat:
         path: "{{ '/sys/class/net/' + item + '/phy80211/macaddress' }}"
       register: macaddress_stats
       loop: "{{ ansible_facts['interfaces'] }}"
-    - name: Obtain phy macaddresses
+    - name: interfaces | Obtain physical macaddresses
       slurp:
         src: "{{ item.stat.path }}"
       register: phy_macaddress_content
       when: item.stat.exists
       loop: "{{ macaddress_stats.results }}"
-    - name: Define interfaces
+    - name: interfaces | Define
       set_fact:
         _interface_links: >
           {{  [ { 'name'        : item.0
@@ -29,7 +29,7 @@
           }}
       when: ansible_facts[item.0]['macaddress'] is defined
       loop: "{{ ansible_facts['interfaces'] | zip(phy_macaddress_content.results) | list }}"
-    - name: Show interfaces
+    - name: interfaces | Show
       debug:
         var: _interface_links
 
@@ -39,7 +39,7 @@
     # `/lib/udev/rules.d/73-usb-net-by-mac.rules`) i may create this symlink
     # (see `TEST` in that file for other ways to avoid). After that link files
     # will apply.
-    - name: Disable udev rule forcing mac naming policy for usb interfaces
+    - name: interfaces | Disable udev rule forcing mac naming policy for usb
       file:
         src:  '/lib/udev/rules.d/80-net-setup-link.rules'
         path: '/etc/udev/rules.d/80-net-setup-link.rules'
@@ -50,7 +50,7 @@
             and ansible_distribution_major_version | int == 9
 
     # Template expects variable `interface` containing interface name.
-    - name: Generate per-interface link file based on default.link
+    - name: interfaces | Generate link files based on default.link
       template:
         src:  'interface.link'
         dest: "{{ item.file }}"
@@ -65,7 +65,7 @@
       notify:
         - reload systemd
 
-    - name: Disable wake on lan
+    - name: interfaces | Disable wake on lan
       lineinfile:
         dest: "{{ item.file }}"
         backup: yes
@@ -79,7 +79,7 @@
       notify:
         - reload systemd
 
-    - name: Remove disable wake on lan line for others
+    - name: interfaces | Remove disabled wake on lan for others
       lineinfile:
         dest: "{{ item.file }}"
         backup: yes
@@ -92,7 +92,7 @@
         - reload systemd
 
 - block:
-    - name: Copy NetworkManager configs
+    - name: interfaces | Copy NetworkManager configs
       copy:
         src: "{{ item }}"
         dest: '/etc/NetworkManager/conf.d'

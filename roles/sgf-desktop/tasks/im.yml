@@ -1,12 +1,12 @@
 ---
 
 - block:
-    - name: Debug
+    - name: im | Debug
       set_fact:
         install_im_pkgs: "{{ install_im_pkgs + [item] }}"
       when: ansible_facts.packages[item] is not defined
       loop: "{{ required_im_pkgs }}"
-    - name: Install required packages
+    - name: im | Install required packages
       apt:
         name: "{{ install_im_pkgs }}"
         state: present
@@ -14,7 +14,7 @@
       when: install_im_pkgs | length > 0
 
 - block:
-    - name: Install IM config
+    - name: im | Install config
       template:
         src:    "xinputrc"
         force:  yes
@@ -22,7 +22,7 @@
         dest:   "{{ ansible_user_dir }}/.xinputrc"
     # FIXME: Several ibus options are required for xkb config to work (if ibus
     # is running). Particularly, `use-system-keyboard-layout`..
-    - name: Set up ibus config in dconf
+    - name: im | Set up ibus config in dconf
       dconf:
         key: "{{ '/desktop/ibus/' + item.key }}"
         value: "{{ item.value }}"

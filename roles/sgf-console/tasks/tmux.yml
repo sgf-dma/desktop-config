@@ -1,6 +1,6 @@
 ---
 
-- name: Install common tmux config
+- name: tmux | Install common config
   template:
     src:    "tmux-common.conf"
     force:  yes
@@ -9,19 +9,19 @@
   tags:
     - 'colors_config'
 
-- name: Install main tmux config
+- name: tmux | Install main config
   copy:
     src:    "files/tmux.conf"
     force:  no
     dest:   "{{ tmux_conf }}"
 
 - block:
-    - name: Install tpm
+    - name: tmux | Install tpm
       git:
         repo:   'https://github.com/tmux-plugins/tpm'
         clone:  yes
         dest:   "{{ tmux_plugin_dir + '/tpm' }}"
-    - name: Add tpm run to tmux.conf
+    - name: tmux | Add tpm run to tmux.conf
       lineinfile:
         dest:   "{{ tmux_conf }}"
         insertafter: EOF
@@ -31,12 +31,12 @@
         line:   "run '~/.tmux/plugins/tpm/tpm'"
 
 - block:
-    - name: Install tmux solarized colors plugin
+    - name: tmux | Install solarized colors plugin
       git:
         repo:   'https://github.com/seebi/tmux-colors-solarized'
         clone:  yes
         dest:   "{{ tmux_plugin_dir + '/tmux-colors-solarized' }}"
-    - name: Install additional tmux colorschemes
+    - name: tmux | Install additional colorschemes
       copy:
         src:    "{{ item }}"
         dest:   "{{ tmux_plugin_dir + '/tmux-colors-solarized' }}"

@@ -1,6 +1,6 @@
 ---
 
-- name: Create vim directories
+- name: vim | Create directories
   file:
     path:   "{{ vim_dir + item }}"
     state:  directory
@@ -8,13 +8,13 @@
     - '/autoload'
     - '/bundle'
 
-- name: Install pathogen
+- name: vim | Install pathogen
   get_url:
     url:  'https://tpo.pe/pathogen.vim'
     dest: "{{ vim_dir + '/autoload/pathogen.vim' }}"
 
 # FIXME: `.vimrc` references some plugins, which may not be there..
-- name: Intall common vimrc
+- name: vim | Intall common vimrc
   copy:
     src:    "{{ item }}"
     force:  yes
@@ -24,7 +24,7 @@
   tags:
     - 'vim_config'
 
-- name: Intall main vimrc
+- name: vim | Intall main vimrc
   template:
     src:    "vim/vimrc"
     force:  yes
@@ -33,7 +33,7 @@
     - 'vim_config'
     - 'colors_config'
 
-- name: Checkout plugins
+- name: vim | Checkout plugins
   git:
     repo: "{{ item.repo }}"
     # Note, yaml block chomping indicator to remove trailing newline.
