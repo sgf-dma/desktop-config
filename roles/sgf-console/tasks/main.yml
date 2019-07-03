@@ -32,7 +32,12 @@
       become: yes
       when: ansible_facts.packages['tmux'] is not defined
     - name: Install common tmux config
-      include_tasks: tmux.yml
+      include_tasks:
+        file: tmux.yml
+        apply:
+          tags:
+            - 'tmux'
+            - 'colors'
   when: tmux_enable
   tags:
     - 'tmux'
@@ -62,7 +67,12 @@
       become: yes
       when: ansible_facts.packages['vim'] is not defined
     - name: Configure vim
-      include_tasks: vim.yml
+      include_tasks:
+        file: vim.yml
+        apply:
+          tags:
+            - 'vim'
+            - 'colors'
   when: vim_enable
   tags:
     - 'vim'

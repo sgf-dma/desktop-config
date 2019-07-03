@@ -7,7 +7,11 @@
     - 'always'
 
 - name: Configure xkb layout
-  include_tasks: xkb.yml
+  include_tasks:
+    file: xkb.yml
+    apply:
+      tags:
+        - 'xkb'
   when: xkb_mods
   tags:
     - 'xkb'
