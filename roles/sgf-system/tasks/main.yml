@@ -22,3 +22,19 @@
 
   become: yes
 
+- block:
+    - name: Mount tmpfs on /tmp
+      mount:
+        path:   /tmp
+        src:    tmpfs
+        fstype: tmpfs
+        opts:   relatime,nodev,nosuid,noexec
+        backup: yes
+        state:  present
+      notify:
+        - reload systemd
+
+  become: yes
+  tags:
+    - 'mount'
+
