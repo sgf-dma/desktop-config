@@ -18,6 +18,7 @@
   copy:
     src:    "{{ item }}"
     force:  yes
+    backup: yes
     dest:   "{{ ansible_user_dir + '/.' + item | basename }}"
   with_fileglob:
     - "vim/vimrc*"
@@ -28,6 +29,7 @@
   template:
     src:    "vim/vimrc"
     force:  yes
+    backup: yes
     dest:   "{{ ansible_user_dir + '/.vimrc' }}"
   tags:
     - 'vim_config'
