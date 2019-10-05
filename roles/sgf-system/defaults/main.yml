@@ -15,3 +15,5 @@ interface_links: {}
 
 # Address of DNS forwarder. Usually, this should be dnscrypt proxy.
 #dns_forwarder: '127.0.2.1:53'
+
+tmp_on_tmpfs: yes

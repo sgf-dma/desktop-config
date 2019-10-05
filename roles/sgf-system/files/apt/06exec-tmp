@@ -1,0 +1,2 @@
+DPkg::Pre-Invoke       { "if mountpoint -q /tmp; then mount /tmp -o remount,exec; fi"; };
+DPkg::Post-Invoke      { "if mountpoint -q /tmp; then mount /tmp -o remount,noexec; fi"; };

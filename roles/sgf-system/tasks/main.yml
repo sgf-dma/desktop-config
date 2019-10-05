@@ -34,7 +34,16 @@
       notify:
         - reload systemd
 
+    - name: Remount /tmp with exec before apt-get run
+      copy:
+        src:    "files/apt/06exec-tmp"
+        dest:   "/etc/apt/apt.conf.d/06exec-tmp"
+        owner:  root
+        group:  root
+        mode:   '0644'
+
   become: yes
+  when: tmp_on_tmpfs
   tags:
     - 'mount'
 
