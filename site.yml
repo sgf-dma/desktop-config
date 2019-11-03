@@ -27,6 +27,9 @@
         - 'system'
 
     - role: sgf-system
+      vars:
+        my_pdns_rec_config:
+          network-timeout: 5000
       tags:
         - 'system'
 
