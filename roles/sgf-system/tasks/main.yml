@@ -21,6 +21,8 @@
       mode: 0644
 
   become: yes
+  tags:
+    - 'pdns_recursor'
 
 - block:
     - name: Mount tmpfs on /tmp

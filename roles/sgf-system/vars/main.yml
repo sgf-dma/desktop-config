@@ -16,7 +16,7 @@ rpz_dest: '/etc/powerdns/rpz.db'
 pdns_rec_config_lua_file_content: >
   rpzFile("{{ rpz_dest }}", {})
 
-pdns_rec_config:
+default_pdns_rec_config:
   allow-from:
     - "127.0.0.1/8"
   local-address:
@@ -25,3 +25,6 @@ pdns_rec_config:
   reuseport: true
   forward-zones-recurse: >
     {{ dns_forwarder is defined | ternary('.=' + dns_forwarder | default(omit), none) }}
+
+pdns_rec_config: >-
+  {{ my_pdns_rec_config | default({}) | combine(default_pdns_rec_config) }}

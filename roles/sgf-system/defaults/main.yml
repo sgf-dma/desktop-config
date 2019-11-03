@@ -17,3 +17,6 @@ interface_links: {}
 #dns_forwarder: '127.0.2.1:53'
 
 tmp_on_tmpfs: yes
+
+# Overwrite for `pdns_rec_config` .
+my_pdns_rec_config: {}
