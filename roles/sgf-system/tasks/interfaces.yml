@@ -47,7 +47,8 @@
         force: no
       become: yes
       when: ansible_distribution == "Debian"
-            and ansible_distribution_major_version | int == 9
+            and (   ansible_distribution_major_version | int > 9
+                or  ansible_distribution_major_version | int < 11 )
 
     # Template expects variable `interface` containing interface name.
     - name: interfaces | Generate link files based on default.link
