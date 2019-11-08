@@ -22,9 +22,6 @@
     - role: sgf-desktop
       tags:
         - 'desktop'
-    - role: sgf-system
-      tags:
-        - 'system'
 
     - role: sgf-system
       vars:
