@@ -11,7 +11,8 @@ user_x_resources: "{{ ansible_user_dir + '/.Xresources.d' }}"
 im_enabled: true
 
 xmonad_branch: master
-
+xmobar_branch: fcade764395401097b8907d230bc85c2437b65b5
+xmonad_repo_dir: "{{ ansible_user_dir + '/sgf-xmonad-config' }}"
 user_opt_dir: "{{ ansible_user_dir + '/opt' }}"
 
 # Firefox .desktop entry names (which to overwrite). Note, that i should

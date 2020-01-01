@@ -2,6 +2,7 @@
 # vars file for sgf-desktop
 
 xmonad_bin: "{{ ansible_user_dir + '/bin/xmonad' }}"
+xmobar_bin: "{{ ansible_user_dir + '/bin/xmobar' }}"
 
 ibus_dconf:
   - key: "general/use-system-keyboard-layout"

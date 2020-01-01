@@ -39,18 +39,31 @@
     - name: xmonad | Clone repository
       git:
         repo: 'https://github.com/sgf-dma/sgf-xmonad-config.git'
-        dest: "{{ ansible_user_dir + '/sgf-xmonad-config' }}"
+        dest: "{{ xmonad_repo_dir }}"
         version: "{{ xmonad_branch }}"
         clone: yes
       register: xmonad_updated
+    - name: xmonad | Clone xmobar repository
+      git:
+        repo: 'https://github.com/jaor/xmobar.git'
+        dest: "{{ xmonad_repo_dir + '/extra-pkgs/xmobar' }}"
+        version: "{{ xmobar_branch }}"
+        clone: yes
+      register: xmobar_updated
 
     - name: xmonad | Stat binary
       stat:
         path: "{{ xmonad_bin }}"
       register: xmonad_bin_stats
+    - name: xmonad | Stat xmobar binary
+      stat:
+        path: "{{ xmobar_bin }}"
+      register: xmobar_bin_stats
+
     - name: xmonad | Build
       make:
-        chdir: "{{ ansible_user_dir + '/sgf-xmonad-config' }}"
+        chdir: "{{ xmonad_repo_dir }}"
         target: install
-      when: not xmonad_bin_stats.stat.exists or xmonad_updated.changed
+      when: not ( xmonad_bin_stats.stat.exists and xmobar_bin_stats.stat.exists )
+            or  ( xmonad_updated.changed or xmobar_updated.changed )
 
