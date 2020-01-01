@@ -43,10 +43,19 @@
         version: "{{ xmonad_branch }}"
         clone: yes
       register: xmonad_updated
+
+    - name: xmonad | Determine xmobar repo path
+      command:
+        argv:
+          - /bin/readlink
+          - '-f'
+          - "{{ xmonad_repo_dir + '/extra-pkgs/xmobar' }}"
+      register: xmobar_repo_readlink
+      changed_when: false
     - name: xmonad | Clone xmobar repository
       git:
         repo: 'https://github.com/jaor/xmobar.git'
-        dest: "{{ xmonad_repo_dir + '/extra-pkgs/xmobar' }}"
+        dest: "{{ xmobar_repo_readlink.stdout }}"
         version: "{{ xmobar_branch }}"
         clone: yes
       register: xmobar_updated
