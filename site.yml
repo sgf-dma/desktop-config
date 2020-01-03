@@ -20,6 +20,8 @@
         - 'console'
 
     - role: sgf-desktop
+      vars:
+        xmobar_branch: ca5b802bd4fa134cdbc3e4986d64b5116bcffd68
       tags:
         - 'desktop'
 
