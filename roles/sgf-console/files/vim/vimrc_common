@@ -201,4 +201,4 @@ onoremap il@ :<c-u>execute ":normal! ?[^ ]\\+@[^ ]\\+\r:nohlsearch\rvE"<cr>
 
 " }}}
 
-
+set modeline
