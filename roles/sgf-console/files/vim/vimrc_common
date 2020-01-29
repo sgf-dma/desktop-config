@@ -189,13 +189,7 @@ augroup END
 " }}}
 " Abbrevations. {{{
 
-iabbrev adn and
-iabbrev waht what
-iabbrev tehn then
-
 " Emails and signatures.
-iabbrev @@ sgf.dma@gmail.com
-iabbrev ssig --<cr>    Dmitriy Matrosov<cr>sgf.dma@gmail.com
 onoremap in@ :<c-u>execute ":normal! /[^ ]\\+@[^ ]\\+\r:nohlsearch\rvE"<cr>
 onoremap il@ :<c-u>execute ":normal! ?[^ ]\\+@[^ ]\\+\r:nohlsearch\rvE"<cr>
 
