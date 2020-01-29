@@ -40,8 +40,6 @@ set imsearch=-1
 " }}}
 " Mappings {{{
 
-inoremap jk <esc>
-
 nnoremap H ^
 nnoremap L $
 
