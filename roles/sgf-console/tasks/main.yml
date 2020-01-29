@@ -44,30 +44,12 @@
     - 'colors'
 
 - block:
-    - name: Install bashrc dependencies
-      apt:
-        name: keychain
-        state: present
-      become: yes
-      when: ansible_facts.packages['keychain'] is not defined
-    - name: Modifications to .bashrc
-      blockinfile:
-        path:   "{{ ansible_user_dir + '/.bashrc' }}"
-        backup: yes
-        marker: '# {mark} desktop-config ANSIBLE MANAGED BLOCK'
-        insertafter: EOF
-        block: |-
-
-            # Include common settings.
-            . ~/.bashrc-common
-
-    - name: Install common bashrc
-      template:
-        src:    'bashrc'
-        force:  yes
-        backup: yes
-        dest:   "{{ ansible_user_dir + '/.bashrc-common' }}"
-
+    - name: Configure bashrc
+      include_tasks:
+        file: shell.yml
+        apply:
+          tags:
+            - 'shell'
 
   tags:
     - 'shell'

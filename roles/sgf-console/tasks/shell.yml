@@ -1,0 +1,28 @@
+---
+
+- block:
+    - name: shell | Install bashrc dependencies
+      apt:
+        name: keychain
+        state: present
+      become: yes
+      when: ansible_facts.packages['keychain'] is not defined
+- block:
+    - name: shell | Include common .bashrc
+      blockinfile:
+        path:   "{{ ansible_user_dir + '/.bashrc' }}"
+        backup: yes
+        marker: '# {mark} desktop-config ANSIBLE MANAGED BLOCK'
+        insertafter: EOF
+        block: |-
+
+            # Include common settings.
+            . ~/.bashrc-common
+
+    - name: shell | Install common bashrc
+      template:
+        src:    'bashrc'
+        force:  yes
+        backup: yes
+        dest:   "{{ ansible_user_dir + '/.bashrc-common' }}"
+
