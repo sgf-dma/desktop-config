@@ -54,8 +54,21 @@
       blockinfile:
         path:   "{{ ansible_user_dir + '/.bashrc' }}"
         backup: yes
+        marker: '# {mark} desktop-config ANSIBLE MANAGED BLOCK'
         insertafter: EOF
-        block: "{{ lookup('file', 'files/bashrc') }}"
+        block: |-
+
+            # Include common settings.
+            . ~/.bashrc-common
+
+    - name: Install common bashrc
+      template:
+        src:    'bashrc'
+        force:  yes
+        backup: yes
+        dest:   "{{ ansible_user_dir + '/.bashrc-common' }}"
+
+
   tags:
     - 'shell'
 
