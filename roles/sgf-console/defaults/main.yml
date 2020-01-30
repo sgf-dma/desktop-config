@@ -37,6 +37,9 @@ dont_fuck_with_me: false
 thefuck_repo_dir: "{{ user_dist_dir + '/thefuck' }}"
 thefuck_branch: 'master'
 
+pass_repo_dir: "{{ user_dist_dir + '/password-store' }}"
+pass_branch: 'master'
+
 # Overwrite files normally left untoched. Set this only _once_ for overwriting
 # previous possible incorrect configuration, because setting this permanently
 # will result in _always changed_ status of playbook run.

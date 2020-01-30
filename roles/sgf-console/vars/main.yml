@@ -16,6 +16,8 @@ thefuck_deps:
   - 'python3-pip'
   - 'python3-setuptools'
 
+pass_bin: "{{ user_local_path + '/bin/pass' }}"
+
 # Default console colors for initialize `colors` dictionary. Set `all_colors`
 # to overwrite them all at once or set particular dictionary key to desired
 # color in `colors` dictionary.

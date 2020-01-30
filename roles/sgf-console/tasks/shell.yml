@@ -81,6 +81,30 @@
   tags:
     - fuck
 
+- block:
+    - name: shell | Clone pass repository
+      git:
+        repo: 'https://git.zx2c4.com/password-store'
+        dest: "{{ pass_repo_dir }}"
+        version: "{{ pass_branch }}"
+        clone: yes
+      register: pass_updated
+
+    - name: shell | Stat pass binary
+      stat:
+        path: "{{ pass_bin }}"
+      register: pass_bin_stats
+
+    - name: shell | Install pass
+      make:
+        chdir: "{{ pass_repo_dir }}"
+        target: install
+        params:
+          PREFIX: "{{ user_local_path }}"
+      when: force_overwrite or pass_updated.changed or not pass_bin_stats.stat.exists
+
+  tags:
+    - pass
 
 - block:
     - name: shell | Include common .bashrc
@@ -105,4 +129,5 @@
     - bashrc
     - keychain
     - fuck
+    - pass
 
