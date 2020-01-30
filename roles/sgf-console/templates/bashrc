@@ -12,5 +12,6 @@ export LC_COLLATE=ru_RU.utf8
 prependPATH "$HOME/bin"
 umask 027
 
+export MANPATH="$HOME/.local/share/man:"
 eval $(thefuck --alias)
 eval $(keychain --eval id_rsa)
