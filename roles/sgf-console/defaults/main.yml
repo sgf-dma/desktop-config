@@ -21,6 +21,11 @@ keychain_repo_dir: "{{ user_dist_dir + '/keychain' }}"
 # Branch to use.
 keychain_branch: 'master'
 
+# Whether to install fuck ('false' - "do fuck with me" - means install).
+dont_fuck_with_me: false
+thefuck_repo_dir: "{{ user_dist_dir + '/thefuck' }}"
+thefuck_branch: 'master'
+
 # This dictionary is used by several roles (e.g. `sgf-console` and
 # `sgf-desktop`). This role initializes only part of its keys from
 # `console_colors` dictionary. To overwrite particular keys, set them in

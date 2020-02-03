@@ -8,6 +8,12 @@ tmux_conf:  "{{ ansible_user_dir + '/.tmux.conf' }}"
 
 keychain_bin: "{{ user_local_path + '/bin/keychain' }}"
 
+thefuck_bin: "{{ user_local_path + '/bin/thefuck' }}"
+thefuck_deps:
+  - 'python3-dev'
+  - 'python3-pip'
+  - 'python3-setuptools'
+
 # Default console colors for initialize `colors` dictionary. Set `all_colors`
 # to overwrite them all at once or set particular dictionary key to desired
 # color in `colors` dictionary.
