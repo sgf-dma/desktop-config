@@ -15,5 +15,9 @@ umask 027
 export MANPATH="$HOME/.local/share/man:"
 eval $(thefuck --alias)
 {% if install_keychain | bool %}
-eval $(keychain --eval id_rsa)
+{% if gpg_keys | length == 0 %}
+eval $(keychain --agents ssh --eval {{ ssh_keys | join(' ') }} )
+{% else %}
+eval $(keychain --gpg2 --agents ssh,gpg --eval {{ (ssh_keys + gpg_keys) | join(' ') }} )
+{% endif %}
 {% endif %}
