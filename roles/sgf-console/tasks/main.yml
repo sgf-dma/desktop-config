@@ -7,6 +7,20 @@
     - 'always'
 
 - block:
+    - name: shell | Ensure user local path exists
+      file:
+        path: "{{ user_local_path }}"
+        state: directory
+
+    - name: shell | Ensure user man1 directory exists
+      file:
+        path: "{{ user_man1_path }}"
+        state: directory
+
+  tags:
+    - always
+
+- block:
     - name: Install git
       package:
         name: 'git'

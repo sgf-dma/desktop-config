@@ -14,6 +14,13 @@ vim_plugins:
 
 vim_disable_arrow_keys: true
 
+# Whether to install keychain or not.
+install_keychain: true
+# Repository, where to clone keychain.
+keychain_repo_dir: "{{ user_dist_dir + '/keychain' }}"
+# Branch to use.
+keychain_branch: 'master'
+
 # This dictionary is used by several roles (e.g. `sgf-console` and
 # `sgf-desktop`). This role initializes only part of its keys from
 # `console_colors` dictionary. To overwrite particular keys, set them in
@@ -32,3 +39,6 @@ user_opt_dir: "{{ ansible_user_dir + '/opt' }}"
 
 # Directory, where to download and save locally installed programs and files.
 user_dist_dir: "{{ user_opt_dir + '/dist' }}"
+
+# Directory, where to install user's programs.
+user_local_path: "{{ ansible_user_dir + '/.local' }}"
