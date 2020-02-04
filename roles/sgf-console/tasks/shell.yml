@@ -131,3 +131,14 @@
     - fuck
     - pass
 
+- name: shell | Install gpg-agent.conf
+  template:
+    src:    'gpg-agent.conf'
+    force:  yes
+    backup: yes
+    dest:   "{{ ansible_user_dir + '/.gnupg/gpg-agent.conf' }}"
+  notify:
+    - reload gpg-agent
+  tags:
+    - pass
+

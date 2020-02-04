@@ -10,6 +10,7 @@ export LANG=en_US.utf8
 export LC_CTYPE=ru_RU.utf8
 export LC_COLLATE=ru_RU.utf8
 prependPATH "$HOME/bin"
+export GPG_TTY="$(tty)"
 umask 027
 
 export MANPATH="$HOME/.local/share/man:"

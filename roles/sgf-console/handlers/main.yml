@@ -1,2 +1,5 @@
 ---
 # handlers file for sgf-tmux
+
+- name: reload gpg-agent
+  command: gpg-connect-agent 'reloadagent' /bye

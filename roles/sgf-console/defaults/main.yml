@@ -25,12 +25,40 @@ keychain_branch: 'master'
 ssh_keys:
   - 'id_rsa'
 
-# List of gpg keys to load into keychain. Note, that if this list left empty,
-# keychain will _not_ manage `gpg-agent`. Moreover, GPG versions 2.1 and later
-# do not need (ignore, in fact) GPG_AGENT_INFO environment variable at all
-# (which keychain tries to set). Thus, on recent enough gpg it may be better
-# to leave this list empty.
+# List of gpg keys to load into keychain.
+#
+# Note, that if this list left empty, keychain will _not_ manage `gpg-agent`.
+# Moreover, GPG versions 2.1 and later do not need (ignore, in fact)
+# GPG_AGENT_INFO environment variable at all (which keychain tries to set).
+# Thus, on recent enough gpg it may be better to leave this list empty.
 gpg_keys: []
+
+# gpg-agent's `default-cache-ttl` option.
+gpg_cache_ttl: 600
+# gpg-agent's `max-cache-ttl` option.
+gpg_max_cache_ttl: 7200
+
+# Force the use of console pinentry program.
+#
+# Note, that GUI pinentry program `/usr/bin/pinentry-gnome3` may cache key
+# encryption _password_ (not key itself) in gnome keyring, if corresponding
+# checkbox was checked in password asking dialog. If that happens, all further
+# requests to pinentry will _not even spawn a dialog box_: password will be
+# just taken from gnome keyring and used to decrypt gpg keys (effectively
+# making `gpg-agent`'s own cache ttl-s useless, because the key will be indeed
+# removed from gpg-agent's cache after ttl expires, but the password will
+# _remain_ unlocked in gnome keyring).
+#
+# Though, by specifying 'no-allow-external-cache' option in gpg-agent.conf i
+# tell pinentry-gnome3 to not cache password.
+#
+# Using console-based pinentry avoids gnome keyring completely. But in that
+# case 'passff' firefox plugin will not be able to spawn pinentry to ask for
+# unlocking gpg key.
+gpg_console_pinentry: false
+
+# Set gpg pinentry path directly. To use default (see above), leave it empty.
+gpg_pinentry: ''
 
 # Whether to install fuck ('false' - "do fuck with me" - means install).
 dont_fuck_with_me: false
