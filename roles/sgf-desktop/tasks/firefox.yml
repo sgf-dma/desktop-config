@@ -1,7 +1,7 @@
 ---
 
 - name: firefox | Install OS package
-  apt:
+  package:
     name: 'firefox-esr'
     state: present
   become: yes
@@ -130,7 +130,7 @@
 # FIXME: Use `desktop-file-install` for installing desktop files?
 - block:
     - name: firefox | Install desktop file utils
-      apt:
+      package:
         name: 'desktop-file-utils'
         state: present
       become: yes
@@ -284,4 +284,33 @@
       loop: "{{ mimeapps_list_files }}"
   tags:
     - 'firefox_set_default'
+
+- block:
+    - name: firefox | Get passff-host installer
+      get_url:
+        url:    'https://github.com/passff/passff-host/releases/latest/download/install_host_app.sh'
+        dest:   "{{ passff_host_installer }}"
+        force:  "{{ force_overwrite }}"
+        mode: '0750'
+      register: passff_host_download
+
+    - name: firefox | Remove passff json, if installing new version
+      file:
+        path: "{{ passff_host_json }}"
+        state: absent
+      when: force_overwrite or passff_host_download.changed
+
+    - name: firefox | Run passff-host installer
+      command:
+        argv:
+          - "{{ passff_host_installer }}"
+          - 'firefox'
+      args:
+        creates: >-
+          {{ ( force_overwrite or passff_host_download.changed )
+              | ternary(file_does_not_exist, passff_host_bin)
+          }}
+
+  tags:
+    - 'firefox_pass'
 

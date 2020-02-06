@@ -116,3 +116,9 @@ file_does_not_exist: '/nonexistent-H5T6f'
 # Path to user's Xsession.d . This path is also hardcoded in xmonad's
 # Makefile.
 user_xsession_dir: "{{ ansible_user_dir + '/.Xsession.d' }}"
+
+# Path to passff-host installer script.
+passff_host_installer: "{{ user_dist_dir + '/install_host_app.sh' }}"
+# Files installed by passff-host.
+passff_host_bin: "{{ ansible_user_dir + '/.mozilla/native-messaging-hosts/passff.py' }}"
+passff_host_json: "{{ ansible_user_dir + '/.mozilla/native-messaging-hosts/passff.json' }}"
