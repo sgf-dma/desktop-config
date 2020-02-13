@@ -67,13 +67,16 @@ firefox_desktop_files: []
 firefox_profile_dir: "{{ ansible_user_dir + '/.mozilla/firefox' }}"
 firefox_profiles_ini: "{{ firefox_profile_dir + '/profiles.ini' }}"
 
-# URL where to download firefox 52 ESR.
-firefox52esr_url: >
-  {{ 'https://ftp.mozilla.org/pub/firefox/releases/52.9.0esr/linux-x86_64/'
-        + firefox52esr_lang | replace('_', '-')
-        + '/firefox-52.9.0esr.tar.bz2'
-  }}
-firefox52esr_bin: "{{ firefox52esr_dir + '/firefox/firefox' }}"
+# Default firefox dictionary element, if particular version is specified.
+firefox_by_ver:
+  url: 'https://ftp.mozilla.org/pub/firefox/releases'
+  comment: 'Firefox '
+
+# Default firefox dictionary element, if latest version is requested.
+firefox_latest:
+  url: 'https://download.mozilla.org/?product=firefox-latest-ssl&os=linux64'
+  archive: 'firefox-latest.tar.bz2'
+  comment: 'Firefox Latest'
 
 # List of dicts, describing firefox versions to install.
 firefox_versions: []

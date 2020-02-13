@@ -12,21 +12,44 @@
       set_fact:
         firefox_versions: >-
           {{ firefox_versions + 
-              [ { 'archive' : item.url  | basename
-                , 'profile' : item.name | regex_replace('^firefox', 'default')
-                } | combine(item,
+              [ def_item | combine(item,
                       { 'dir'     : user_opt_dir + '/' + item.name
                       , 'desktop' : item.name + '.desktop'
                       }
                     )
               ]
           }}
+      vars:
+        def_item: >-
+          {{ ( { 'url': item.url } if item.version is not defined
+                else
+                  firefox_latest | combine(
+                    { 'url': firefox_latest.url + '&lang=' + item_lang
+                    })
+                  if item.version == 'latest'
+                else
+                  firefox_by_ver | combine(
+                    { 'url'     : firefox_by_ver.url + '/'
+                                    + item.version + '/linux-x86_64/'
+                                    + item_lang + '/'
+                                    + 'firefox-' + item.version + '.tar.bz2'
+                    , 'archive' : 'firefox-' + item.version + '.tar.bz2'
+                    , 'comment' : firefox_by_ver.comment + item.version
+                    })
+             ) | combine(
+                    { 'profile' : item.name | regex_replace('^firefox', 'default')
+                    , 'lang'    : item_lang
+                    })
+          }}
+        item_lang: "{{ item.lang | default('en-US') | replace('_', '-') }}"
       loop: "{{ firefox2 }}"
+
     - name: huy
       debug:
         var: firefox_versions
   tags:
     - firefox_install
+    - firefox_debug
 
 - block:
     - name: firefox | Stat system .desktop files
@@ -99,7 +122,7 @@
         #              | map(attribute='changed') | first
         #          }}
         line: >
-          {{ 'Exec=\2 --new-instance -P ' + firefoxDefault_profile + ' %u' }}
+          {{ 'Exec=\2 --new-instance -P ' + firefox_default_profile + ' %u' }}
         regexp: "(^#+|^)Exec=([^ ]+).*"
         backrefs: yes
         state:  present

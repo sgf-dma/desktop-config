@@ -16,29 +16,36 @@ xmonad_repo_dir: "{{ ansible_user_dir + '/sgf-xmonad-config' }}"
 
 user_opt_dir: "{{ ansible_user_dir + '/opt' }}"
 
-# Firefox .desktop entry names (which to overwrite). Note, that i should
-# overwrite _all_ entries, otherwise ones left intact may break profile.
+# System firefox .desktop entry names (which to overwrite). Note, that i
+# should overwrite _all_ entries, otherwise ones left intact may break
+# profile.
 firefox_desktop_names:
   - 'firefox.desktop'
   - 'firefox-esr.desktop'
   - 'iceweasel.desktop'
-# Language of firefox 52.9.0esr to use. Note, that these are _not_ locale
-# language codes. E.g. for russian version, i should use just `ru`.. Check the
-# download link to ensure the code is correct.
-firefox52esr_lang: 'en_US'
-# Profile name to use with system default firefox.
-firefoxDefault_profile: 'default'
+# FIXME: Rename to 'firefox-system-profile'
+# Profile name to hardcode into found system .desktop files.
+firefox_default_profile: 'default'
 # Which firefox to use as default browser (default mime handler for urls,
 # etc).
 firefox_default_desktop: 'firefox-52esr.desktop'
 
-# Firefox version to install.
+# Firefox versions to install.
 #   - 'name' is unique name (required). It's used to derive directory, where
 #   to unpack (i.e. install), and .desktop file name. Also, when deriving
 #   'profile' name (if omitted), starting 'firefox-' prefix in 'name' will be
 #   replaced with word 'default'. I.e. 'name' structure "firefox-X", where X
 #   is some reference to firefox version, is assumed (though, not required).
-#   - 'url' is download url (required).
+#   - 'url' is download url. Instead i may specify 'version' and 'lang' and
+#   'url' will be guessed.
+#   - 'lang' is language to use. This may be used to construct url. Though,
+#   note, that these are _not_ locale language codes. E.g. for russian
+#   version, i should use just `ru`. Check the
+#   https://ftp.mozilla.org/pub/firefox/releases/ download link to ensure the
+#   code is correct. Language and country separator may be '_' or '-'.
+#   - 'version' is version to install. See
+#   https://ftp.mozilla.org/pub/firefox/releases/ for a list of valid
+#   versions.  Also, word 'latest' is recognized.
 #   - 'archive' is name under which to save downloaded archive. If omitted,
 #   it'll be derived from last component of url.
 #   - 'profile' is profile name to hardcode into .desktop file. If omitted,
@@ -46,12 +53,6 @@ firefox_default_desktop: 'firefox-52esr.desktop'
 #   - 'comment' is description used in desktop entry in 'Comment' and
 #   'X-GNOME-FullName' fields.
 firefox2: []
-
-# Defintion of firefox 52 ESR version.
-firefox_ver_52esr:
-  name: 'firefox-52esr'
-  url: 'https://ftp.mozilla.org/pub/firefox/releases/52.9.0esr/linux-x86_64/en-US/firefox-52.9.0esr.tar.bz2'
-  comment: 'Firefox 52 ESR'
 
 # Overwrite files normally left untoched. Set this only _once_ for overwriting
 # previous possible incorrect configuration, because setting this permanently
