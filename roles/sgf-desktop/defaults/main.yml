@@ -24,8 +24,8 @@ firefox_desktop_names:
   - 'firefox-esr.desktop'
   - 'iceweasel.desktop'
 # FIXME: Rename to 'firefox-system-profile'
-# Profile name to hardcode into found system .desktop files.
-firefox_default_profile: 'default'
+# Profile name to hardcode into .desktop files launching _system_ firefox.
+firefox_system_profile: 'default'
 # Which firefox to use as default browser (default mime handler for urls,
 # etc).
 firefox_default_desktop: 'firefox-52esr.desktop'
