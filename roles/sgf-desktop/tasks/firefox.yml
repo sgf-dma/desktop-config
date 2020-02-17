@@ -8,19 +8,34 @@
   when: ansible_facts.packages['firefox-esr'] is not defined
 
 - block:
+    # I need to use both 'version' and 'lang' in 'archive' and 'dir' (install
+    # (unpack) directory) names in order to make language or version change to
+    # cause re-download and re-unpack (if archive is already present). Though,
+    # in 'profile' name only 'version' is sufficient (different languages
+    # should work on the same profile, but different firefox versions may
+    # not). Firefox 'desktop' file name also contain version only (i may
+    # install several firefox versions simultaneously, but each version may be
+    # of one language only).
     - name: firefox | Define firefox versions
       set_fact:
         firefox_versions: >-
           {{ firefox_versions + 
               [ def_item | combine(item,
-                      { 'dir'     : user_opt_dir + '/' + item.name
-                      , 'desktop' : item.name + '.desktop'
+                      { 'lang'    : item_lang
+                      , 'archive' : item_id + '.tar.bz2'
+                      , 'dir'     : item_dir
+                      , 'bin'     : item_dir + '/firefox/firefox'
+                      , 'desktop' : 'firefox-' + item_id_v + '.desktop'
                       }
                     )
               ]
           }}
       vars:
-        def_item: >-
+        item_lang : "{{ item.lang | default('en-US') | replace('_', '-') }}"
+        item_id_v : "{{ item.version | default(item.name) }}"
+        item_id   : "{{ 'firefox-' + item_id_v + '.' +  item_lang }}"
+        item_dir  : "{{ user_opt_dir + '/' + item_id }}"
+        def_item  : >-
           {{ ( { 'url': item.url } if item.version is not defined
                 else
                   firefox_latest | combine(
@@ -33,15 +48,12 @@
                                     + item.version + '/linux-x86_64/'
                                     + item_lang + '/'
                                     + 'firefox-' + item.version + '.tar.bz2'
-                    , 'archive' : 'firefox-' + item.version + '.tar.bz2'
                     , 'comment' : firefox_by_ver.comment + item.version
                     })
              ) | combine(
-                    { 'profile' : item.name | regex_replace('^firefox', 'default')
-                    , 'lang'    : item_lang
-                    })
+                  { 'profile' : 'default-' + item_id_v
+                  })
           }}
-        item_lang: "{{ item.lang | default('en-US') | replace('_', '-') }}"
       loop: "{{ firefox2 }}"
 
     - name: huy

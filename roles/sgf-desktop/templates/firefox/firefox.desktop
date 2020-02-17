@@ -1,9 +1,10 @@
 [Desktop Entry]
-Name={{ cur_firefox.name }}
+{# The same as 'item_id_v' definition in firefox.yml -#}
+Name={{ cur_firefox.version | default(cur_firefox.name) }}
 Comment={{ cur_firefox.comment }}
 GenericName=Web Browser
 X-GNOME-FullName={{ cur_firefox.comment }}
-Exec={{ firefox2_bin }} --new-instance -P {{ cur_firefox.profile }} %u
+Exec={{ cur_firefox.bin }} --new-instance -P {{ cur_firefox.profile }} %u
 Terminal=false
 X-MultipleArgs=false
 Type=Application

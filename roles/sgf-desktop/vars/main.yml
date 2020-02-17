@@ -75,13 +75,10 @@ firefox_by_ver:
 # Default firefox dictionary element, if latest version is requested.
 firefox_latest:
   url: 'https://download.mozilla.org/?product=firefox-latest-ssl&os=linux64'
-  archive: 'firefox-latest.tar.bz2'
   comment: 'Firefox Latest'
 
 # List of dicts, describing firefox versions to install.
 firefox_versions: []
-firefox2_bin: "{{ cur_firefox.dir + '/firefox/firefox' }}"
-firefox2_archive: "{{ user_dist_dir + '/' + cur_firefox.archive }}"
 
 anki_url: 'https://apps.ankiweb.net/downloads/current/anki-2.1.7-linux-amd64.tar.bz2'
 # FIXME: Guess this directories?
