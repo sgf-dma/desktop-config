@@ -8,12 +8,25 @@
   when: ansible_facts.packages['firefox-esr'] is not defined
 
 - block:
+    # If 'url' is defined by user, i don't use 'version' and 'lang' fields
+    # (they're ignored), but require 'name' to be defined instead. If 'url' is
+    # _not_ defined by user, 'name' field is ignored, but 'version' is
+    # required ('lang' is used, but optional due to default).
+    #
     # I need to use both 'version' and 'lang' in 'archive' and 'dir' (install
     # (unpack) directory) names in order to make language or version change to
-    # cause re-download and re-unpack (if archive is already present). Though,
-    # in 'profile' name only 'version' is sufficient (different languages
-    # should work on the same profile, but different firefox versions may
-    # not). Firefox 'desktop' file name also contain version only (i may
+    # cause re-download and re-unpack (if archive is already present).
+    #
+    # In case of 'name' (when 'url' is defined explicitly), i just use 'name'
+    # (in place of 'version'). (Thus, changing 'url' does _not_ cause
+    # re-download and re-unpack).
+    #
+    # In 'profile' name only 'version' or 'name' is sufficient (different
+    # languages should work on the same profile, but different firefox
+    # versions may not; for the second case - i don't care, if user've changed
+    # 'url' to something incompatible without changing the 'name').
+    #
+    # Firefox 'desktop' file name also contain 'version' or 'name' only (i may
     # install several firefox versions simultaneously, but each version may be
     # of one language only).
     - name: firefox | Define firefox versions
@@ -21,7 +34,8 @@
         firefox_versions: >-
           {{ firefox_versions + 
               [ def_item | combine(item,
-                      { 'lang'    : item_lang
+                      { 'id'      : item_id
+                      , 'lang'    : item_lang
                       , 'archive' : item_id + '.tar.bz2'
                       , 'dir'     : item_dir
                       , 'bin'     : item_dir + '/firefox/firefox'
@@ -32,11 +46,21 @@
           }}
       vars:
         item_lang : "{{ item.lang | default('en-US') | replace('_', '-') }}"
-        item_id_v : "{{ item.version | default(item.name) }}"
-        item_id   : "{{ 'firefox-' + item_id_v + '.' +  item_lang }}"
+        item_id_v : >-
+          {{  item.version if item.url is not defined
+              else item.name
+          }}
+        item_id   : >-
+          {{ ('firefox-' + item_id_v + '.' +  item_lang)
+                if item.url is not defined
+              else
+                item.url | basename| regex_replace('.tar.bz2$', '') + '.' + item.name
+          }}
         item_dir  : "{{ user_opt_dir + '/' + item_id }}"
         def_item  : >-
-          {{ ( { 'url': item.url } if item.version is not defined
+          {{ (  { 'url': item.url
+                , 'comment': 'Firefox ' + item.name
+                } if item.url is defined
                 else
                   firefox_latest | combine(
                     { 'url': firefox_latest.url + '&lang=' + item_lang
@@ -50,6 +74,7 @@
                                     + 'firefox-' + item.version + '.tar.bz2'
                     , 'comment' : firefox_by_ver.comment + item.version
                     })
+                  if item.version is defined
              ) | combine(
                   { 'profile' : 'default-' + item_id_v
                   })

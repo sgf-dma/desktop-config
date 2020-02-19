@@ -28,33 +28,39 @@ firefox_desktop_names:
 firefox_system_profile: 'default'
 # Which firefox to use as default browser (default mime handler for urls,
 # etc).
-firefox_default_desktop: 'firefox-52esr.desktop'
+firefox_default_desktop: 'firefox-52.0.9esr.desktop'
 
-# Firefox versions to install.
-#   - 'name' is unique name (either 'name' or 'version' is required). It's
-#   used as id string in various places (see below).
-#   - 'version' is firefox version to install (either 'name' or 'version' is
-#   required). It's used to construct 'url' and 'comment' fields, if either
-#   one is omitted, and as id string in various places (see below). See
-#   https://ftp.mozilla.org/pub/firefox/releases/ for a list of valid
-#   versions. Also, word 'latest' is recognized.
+# Firefox versions to install. There're two methods of specifying firefox
+# versions depending on 'url' value:
+# 1. Download 'url' specified. Then
+#   - 'url' is download url.
+#   - 'name' (required) is unique name. It's used to construct id string (see
+#   below).
+#   - 'version' (not used).
+#   - 'lang' (not used).
+# 2. Download 'url' is not specified. Then
+#   - 'version' (required) is firefox version to install. It's used to
+#   construct id string. See https://ftp.mozilla.org/pub/firefox/releases/ for
+#   a list of valid versions. Also, word 'latest' is recognized.
+#   - 'name' (not used).
 #   - 'lang' is firefox language to install. Languages here are _not_ locale
 #   language codes. E.g. for russian version, i should just use `ru`. Check
 #   the https://ftp.mozilla.org/pub/firefox/releases/ download link to ensure
 #   the code is correct. Language and country separator may be '_' or '-'.
-#   It's also used as id string (see below).
-#   - 'url' (optional) is download url. If omitted, 'url' will be constructed
-#   depending on 'version' and 'lang' fields.
+#   It's also used to construct id string (see below).
+#
+# Also, there're a number of fields, which may be specified for both methods:
 #   - 'profile' (optional) is profile name to hardcode into firefox's .desktop
-#   file . If omitted, it'll be derived from 'version' or 'name' (see below).
+#   file . If omitted, it'll be derived from id string (see below).
 #   - 'comment' (optional) is description used in desktop entry in 'Comment'
 #   and 'X-GNOME-FullName' fields. If omitted, comment will be derived from
-#   'version'.
+#   id string.
 #
-# Firefox dictionary element id string is constructed from 'version' (if not
-# defined, 'name' is used instead) and (sometimes) 'lang' fields and used to
-# derive archive name, install (unpack) directory name, binary name (symlink
-# in user's ~/bin), desktop file and default profile names, etc.
+# Firefox version (dictionary element) id string is constructed from 'name',
+# if 'url' is defined explicitly, or 'version' and (sometimes) 'lang' fields,
+# if 'url' is not defined explicitly.  It's used to derive archive name,
+# install (unpack) directory name, binary name (symlink in user's ~/bin),
+# desktop file name, default profile name, etc.
 firefox2: []
 
 # Overwrite files normally left untoched. Set this only _once_ for overwriting

@@ -4,8 +4,14 @@
     - name: firefox_versions | Report version
       debug:
         msg: >-
-          {{ "Installing firefox version: '" + cur_firefox.version
-              + "' with language '" + cur_firefox.lang + "'"
+          {{ "Installing firefox " +
+                (   "named '" + cur_firefox.name + "'"
+                  if cur_firefox.name is defined
+                  else
+                    "version '" + cur_firefox.version + "' "
+                      + "with language '" + cur_firefox.lang + "'"
+                    if cur_firefox.version is defined
+                )
           }}
     - name: firefox_versions | Create install directory
       file:
