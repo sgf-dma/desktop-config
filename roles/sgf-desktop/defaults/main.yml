@@ -28,7 +28,7 @@ firefox_desktop_names:
 firefox_system_profile: 'default'
 # Which firefox to use as default browser (default mime handler for urls,
 # etc).
-firefox_default_desktop: 'firefox-52.0.9esr.desktop'
+firefox_default_desktop: 'firefox-esr.desktop'
 
 # Firefox versions to install. There're two methods of specifying firefox
 # versions depending on 'url' value:
