@@ -44,4 +44,8 @@
         dest:   "{{ user_desktop_entries + '/' + cur_firefox.desktop }}"
         force:  yes
         backup: yes
+      register: cur_firefox_desktop_changed
+    - name: firefox_versions | Update user's mime info cache
+      command: update-desktop-database "{{ user_desktop_entries }}"
+      when: cur_firefox_desktop_changed.changed
 

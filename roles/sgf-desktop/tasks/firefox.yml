@@ -179,21 +179,28 @@
   #        line:   'NoDisplay=true'
   #        regexp: "(^#+|^)NoDisplay="
   #        state:  present
-    # Note:
-    # -`force_overwrite` will trigger changed status of profile hardcoding
-    # task (above) and, thus, will trigger this task too.
-    # - i assume, that hardcoding is run for all desktop files copied to local
-    # user directory, thus it's enough to check hardcoding task changed
-    # status.
-    - name: firefox | Update user's mime info cache
-      command: update-desktop-database "{{ user_desktop_entries }}"
-      when: >
-        firefox_desktop_changed is defined
-        and firefox_desktop_changed.results
-              | selectattr('changed', 'equalto', true) | list
-              | length > 0
   tags:
     - 'firefox_profile_hardcode'
+
+# Note:
+# -`force_overwrite` will trigger changed status of profile hardcoding
+# task (above) and, thus, will trigger this task too.
+# - i assume, that hardcoding is run for all desktop files copied to local
+# user directory, thus it's enough to check hardcoding task changed
+# status.
+- name: firefox | Update user's mime info cache
+  command: update-desktop-database "{{ user_desktop_entries }}"
+  when: >-
+    force_overwrite
+    or (  firefox_desktop_changed is defined
+          and firefox_desktop_changed.results
+                | selectattr('changed', 'equalto', true) | list
+                | length > 0
+       )
+  tags:
+    - 'firefox_profile_hardcode'
+    - 'firefox_set_default'
+    - 'firefox_mime'
 
 # Now, because i hardcode profile names for system and 52 ESR firefox
 # launches, i shouldn't notice any difference between auto-starting with last
