@@ -63,6 +63,10 @@ user_desktop_entries: "{{ ansible_user_dir + '/.local/share/applications' }}"
 # List of system and user firefox .desktop files found.
 firefox_desktop_files: []
 
+# Firefox launch options. The same options are hardcoded in both desktop files
+# launching locally installed firefox versions and system firefox.
+cur_firefox_exec_opts: "{{ ' -P ' + cur_firefox.profile + ' %u' }}"
+
 # Path to firfox `profiles.ini` .
 firefox_profile_dir: "{{ ansible_user_dir + '/.mozilla/firefox' }}"
 firefox_profiles_ini: "{{ firefox_profile_dir + '/profiles.ini' }}"
