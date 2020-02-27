@@ -22,6 +22,12 @@
     - role: sgf-desktop
       vars:
         xmobar_branch: ca5b802bd4fa134cdbc3e4986d64b5116bcffd68
+        firefox2:
+          - "{{ firefox_ver_52esr }}"
+          - name: 'firefox'
+            url: 'https://download.mozilla.org/?product=firefox-latest-ssl&os=linux64&lang=en-US'
+            comment: 'Firefox Latest'
+            archive: 'firefox-latest.tar.bz2'
       tags:
         - 'desktop'
 

@@ -18,6 +18,7 @@
         vim_disable_arrow_keys: false
         tmux_prefix: 'C-a'
         tmux_prefix_key: 'a'
+        firefox_default_desktop: 'firefox.desktop'
       tags:
         - 'console'
     - role: sgf-desktop
