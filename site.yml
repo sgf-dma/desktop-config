@@ -23,10 +23,11 @@
       vars:
         xmobar_branch: ca5b802bd4fa134cdbc3e4986d64b5116bcffd68
         firefox2:
-          - name: 'firefox-52esr'
-            version: '52.9.0esr'
-          - name: 'firefox'
-            version: 'latest'
+          - version: '52.9.0esr'
+            profile: 'default-52esr'
+          - version: 'latest'
+            lang: 'ru'
+            profile: 'default'
       tags:
         - 'desktop'
 
