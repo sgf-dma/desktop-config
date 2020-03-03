@@ -110,3 +110,7 @@ mimeapps_list_files:
   - "{{ ansible_user_dir + '/.local/share/applications/mimeapps.list' }}"
 
 file_does_not_exist: '/nonexistent-H5T6f'
+
+# Path to user's Xsession.d . This path is also hardcoded in xmonad's
+# Makefile.
+user_xsession_dir: "{{ ansible_user_dir + '/.Xsession.d' }}"
