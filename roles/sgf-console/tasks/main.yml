@@ -1,8 +1,8 @@
 ---
 # tasks file for sgf-tmux
 
-- name: Load
-  import_tasks: load.yml
+- name: Load pre_tasks
+  import_tasks: load_pre.yml
   tags:
     - 'always'
 

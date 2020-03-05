@@ -1,9 +1,9 @@
 
 - block:
     - name: Merge console colors
-      import_tasks: roles/sgf-console/tasks/load.yml
+      import_tasks: roles/sgf-console/tasks/load_pre.yml
     - name: Merge desktop colors
-      import_tasks: roles/sgf-desktop/tasks/load.yml
+      import_tasks: roles/sgf-desktop/tasks/load_pre.yml
   tags:
     - 'colors'
     - 'colors_config'
