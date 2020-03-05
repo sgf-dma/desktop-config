@@ -1,0 +1,8 @@
+---
+
+- name: load | Include OS-specific vars file
+  include_vars: "{{ lookup('first_found', possible_files) }}"
+  vars:
+    possible_files:
+      - '{{ role_path }}/vars/{{ ansible_distribution }}-{{ ansible_distribution_release }}.yml'
+      - '{{ role_path }}/vars/empty.yml'
