@@ -96,6 +96,8 @@ anki_install_pkgs: []
 anki_required_pkgs:
   - 'libnss3'
 
+# Defined per-OS.
+pkgs_mime: []
 
 # Locations of file `mimeapps.list`, where default desktop file is specified.
 # Note, that `xdg-mime` and `gvfs-mime` sets default desktop application in

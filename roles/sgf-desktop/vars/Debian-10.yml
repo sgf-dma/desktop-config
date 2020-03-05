@@ -1,0 +1,7 @@
+---
+
+# These packages are _not_ required for mime to work, but usually quite useful
+# for checking, that everything is set up correctly.
+pkgs_mime:
+  - 'libglib2.0-bin'
+  - 'xdg-utils'

@@ -245,14 +245,12 @@
 
 - block:
     - name: firefox | Install mime utils
-      apt:
-        name: "{{ item }}"
+      package:
+        name: "{{ pkgs_mime }}"
         state: present
       become: yes
-      when: ansible_facts.packages[item] is not defined
-      loop:
-        - 'gvfs-bin'
-        - 'xdg-utils'
+      when: >-
+        pkgs_mime | intersect(ansible_facts.packages.keys()) != pkgs_mime
     - name: firefox | Create mimeapps.list file, if it doesn't exist
       template:
         force: "{{ force_overwrite }}"

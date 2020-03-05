@@ -4,5 +4,5 @@
   include_vars: "{{ lookup('first_found', possible_files) }}"
   vars:
     possible_files:
-      - '{{ role_path }}/vars/{{ ansible_distribution }}-{{ ansible_distribution_release }}.yml'
-      - '{{ role_path }}/vars/empty.yml'
+      - "{{ role_path }}/vars/{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+      - "{{ role_path }}/vars/empty.yml"
