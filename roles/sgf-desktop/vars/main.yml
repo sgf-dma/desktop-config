@@ -82,7 +82,7 @@ firefox_latest:
   comment: 'Firefox Latest'
 
 # List of dicts, describing firefox versions to install.
-firefox_versions: []
+_firefox_versions: []
 
 anki_url: 'https://apps.ankiweb.net/downloads/current/anki-2.1.7-linux-amd64.tar.bz2'
 # FIXME: Guess this directories?

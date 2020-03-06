@@ -61,7 +61,7 @@ firefox_default_desktop: 'firefox-esr.desktop'
 # if 'url' is not defined explicitly.  It's used to derive archive name,
 # install (unpack) directory name, binary name (symlink in user's ~/bin),
 # desktop file name, default profile name, etc.
-firefox2: []
+firefox_versions: []
 
 # Overwrite files normally left untoched. Set this only _once_ for overwriting
 # previous possible incorrect configuration, because setting this permanently

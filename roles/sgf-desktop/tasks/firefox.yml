@@ -31,8 +31,8 @@
     # of one language only).
     - name: firefox | Define firefox versions
       set_fact:
-        firefox_versions: >-
-          {{ firefox_versions + 
+        _firefox_versions: >-
+          {{ _firefox_versions + 
               [ def_item | combine(item,
                       { 'id'      : item_id
                       , 'lang'    : item_lang
@@ -79,11 +79,11 @@
                   { 'profile' : 'default-' + item_id_v
                   })
           }}
-      loop: "{{ firefox2 }}"
+      loop: "{{ firefox_versions }}"
 
     - name: huy
       debug:
-        var: firefox_versions
+        var: _firefox_versions
   tags:
     - firefox_install
     - firefox_debug
@@ -237,7 +237,7 @@
     apply:
       tags:
         - 'firefox_install'
-  loop: "{{ firefox_versions }}"
+  loop: "{{ _firefox_versions }}"
   loop_control:
     loop_var: 'cur_firefox'
   tags:
