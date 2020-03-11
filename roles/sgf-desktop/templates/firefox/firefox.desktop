@@ -1,9 +1,10 @@
 [Desktop Entry]
-Name=Firefox 52 ESR (OLD)
-Comment=Old Firefox ESR (52.9.0)
+{# The same as 'item_id_v' definition in firefox.yml -#}
+Name={{ cur_firefox.id }}
+Comment={{ cur_firefox.comment }}
 GenericName=Web Browser
-X-GNOME-FullName=Old Firefox ESR Web Browser
-Exec={{ firefox52esr_bin }} --new-instance -P {{ firefox52esr_profile }} %u
+X-GNOME-FullName={{ cur_firefox.comment }}
+Exec={{ cur_firefox.bin }} {{ cur_firefox_exec_opts }}
 Terminal=false
 X-MultipleArgs=false
 Type=Application

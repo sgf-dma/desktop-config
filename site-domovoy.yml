@@ -22,9 +22,18 @@
         - 'console'
     - role: sgf-desktop
       vars:
+        xmobar_branch: ca5b802bd4fa134cdbc3e4986d64b5116bcffd68
+        xmonad_branch: domovoy-master
+        firefox_default_desktop: 'firefox-latest.desktop'
+        firefox_system_profile: 'default-esr'
         xkb_clear_options: false
         im_enabled: false
-        xmonad_branch: domovoy-master
+        firefox_versions:
+          - version: '52.9.0esr'
+            profile: 'default-52esr'
+            comment: 'Firefox 52 ESR'
+          - version: 'latest'
+            profile: 'default'
       tags:
         - 'desktop'
 

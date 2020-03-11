@@ -63,17 +63,26 @@ user_desktop_entries: "{{ ansible_user_dir + '/.local/share/applications' }}"
 # List of system and user firefox .desktop files found.
 firefox_desktop_files: []
 
+# Firefox launch options. The same options are hardcoded in both desktop files
+# launching locally installed firefox versions and system firefox.
+cur_firefox_exec_opts: "{{ ' -P ' + cur_firefox.profile + ' %u' }}"
+
 # Path to firfox `profiles.ini` .
 firefox_profile_dir: "{{ ansible_user_dir + '/.mozilla/firefox' }}"
 firefox_profiles_ini: "{{ firefox_profile_dir + '/profiles.ini' }}"
 
-# URL where to download firefox 52 ESR.
-firefox52esr_url: >
-  {{ 'https://ftp.mozilla.org/pub/firefox/releases/52.9.0esr/linux-x86_64/'
-        + firefox52esr_lang | replace('_', '-')
-        + '/firefox-52.9.0esr.tar.bz2'
-  }}
-firefox52esr_bin: "{{ firefox52esr_dir + '/firefox/firefox' }}"
+# Default firefox dictionary element, if particular version is specified.
+firefox_by_ver:
+  url: 'https://ftp.mozilla.org/pub/firefox/releases'
+  comment: 'Firefox '
+
+# Default firefox dictionary element, if latest version is requested.
+firefox_latest:
+  url: 'https://download.mozilla.org/?product=firefox-latest-ssl&os=linux64'
+  comment: 'Firefox Latest'
+
+# List of dicts, describing firefox versions to install.
+_firefox_versions: []
 
 anki_url: 'https://apps.ankiweb.net/downloads/current/anki-2.1.7-linux-amd64.tar.bz2'
 # FIXME: Guess this directories?
@@ -87,6 +96,8 @@ anki_install_pkgs: []
 anki_required_pkgs:
   - 'libnss3'
 
+# Defined per-OS.
+pkgs_mime: []
 
 # Locations of file `mimeapps.list`, where default desktop file is specified.
 # Note, that `xdg-mime` and `gvfs-mime` sets default desktop application in
@@ -100,3 +111,8 @@ mimeapps_list_files:
   - "{{ ansible_user_dir + '/.config/mimeapps.list' }}"
   - "{{ ansible_user_dir + '/.local/share/applications/mimeapps.list' }}"
 
+file_does_not_exist: '/nonexistent-H5T6f'
+
+# Path to user's Xsession.d . This path is also hardcoded in xmonad's
+# Makefile.
+user_xsession_dir: "{{ ansible_user_dir + '/.Xsession.d' }}"

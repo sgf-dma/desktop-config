@@ -16,24 +16,52 @@ xmonad_repo_dir: "{{ ansible_user_dir + '/sgf-xmonad-config' }}"
 
 user_opt_dir: "{{ ansible_user_dir + '/opt' }}"
 
-# Firefox .desktop entry names (which to overwrite). Note, that i should
-# overwrite _all_ entries, otherwise ones left intact may break profile.
+# System firefox .desktop entry names (which to overwrite). Note, that i
+# should overwrite _all_ entries, otherwise ones left intact may break
+# profile.
 firefox_desktop_names:
   - 'firefox.desktop'
   - 'firefox-esr.desktop'
   - 'iceweasel.desktop'
-# Language of firefox 52.9.0esr to use. Note, that these are _not_ locale
-# language codes. E.g. for russian version, i should use just `ru`.. Check the
-# download link to ensure the code is correct.
-firefox52esr_lang: 'en_US'
-# Directory, where to unpack firefox ESR 52.
-firefox52esr_dir: "{{ user_opt_dir + '/firefox-52esr' }}"
-# Profile name to use with firefox ESR 52.
-firefox52esr_profile: 'default-52esr'
-# Profile name to use with system default firefox.
-firefoxDefault_profile: 'default'
-# Which firefox to use as default browser.
-firefox_default_desktop: 'firefox-52esr.desktop'
+# FIXME: Rename to 'firefox-system-profile'
+# Profile name to hardcode into .desktop files launching _system_ firefox.
+firefox_system_profile: 'default'
+# Which firefox to use as default browser (default mime handler for urls,
+# etc).
+firefox_default_desktop: 'firefox-esr.desktop'
+
+# Firefox versions to install. There're two methods of specifying firefox
+# versions depending on 'url' value:
+# 1. Download 'url' specified. Then
+#   - 'url' is download url.
+#   - 'name' (required) is unique name. It's used to construct id string (see
+#   below).
+#   - 'version' (not used).
+#   - 'lang' (not used).
+# 2. Download 'url' is not specified. Then
+#   - 'version' (required) is firefox version to install. It's used to
+#   construct id string. See https://ftp.mozilla.org/pub/firefox/releases/ for
+#   a list of valid versions. Also, word 'latest' is recognized.
+#   - 'name' (not used).
+#   - 'lang' is firefox language to install. Languages here are _not_ locale
+#   language codes. E.g. for russian version, i should just use `ru`. Check
+#   the https://ftp.mozilla.org/pub/firefox/releases/ download link to ensure
+#   the code is correct. Language and country separator may be '_' or '-'.
+#   It's also used to construct id string (see below).
+#
+# Also, there're a number of fields, which may be specified for both methods:
+#   - 'profile' (optional) is profile name to hardcode into firefox's .desktop
+#   file . If omitted, it'll be derived from id string (see below).
+#   - 'comment' (optional) is description used in desktop entry in 'Comment'
+#   and 'X-GNOME-FullName' fields. If omitted, comment will be derived from
+#   id string.
+#
+# Firefox version (dictionary element) id string is constructed from 'name',
+# if 'url' is defined explicitly, or 'version' and (sometimes) 'lang' fields,
+# if 'url' is not defined explicitly.  It's used to derive archive name,
+# install (unpack) directory name, binary name (symlink in user's ~/bin),
+# desktop file name, default profile name, etc.
+firefox_versions: []
 
 # Overwrite files normally left untoched. Set this only _once_ for overwriting
 # previous possible incorrect configuration, because setting this permanently
@@ -51,3 +79,6 @@ colors: {}
 # this value. This variable used by several roles (e.g. `sgf-console` and
 # `sgf-desktop`).
 # all_colors: 'disabled'
+
+# Directory where to download and save locally installed programs and files.
+user_dist_dir: "{{ ansible_user_dir + '/opt/dist' }}"

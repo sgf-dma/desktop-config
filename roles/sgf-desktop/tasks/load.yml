@@ -1,13 +1,8 @@
 ---
 
-# This tasks may be used as pre-tasks in main play.
-
-- name: load | Merge desktop colors
-  set_fact:
-    colors: >
-      {{ {item.key : all_colors | default(item.value)} | combine(colors) }}
-  with_dict: "{{ desktop_colors }}"
-
-- name: load | Loaded desktop colors are..
-  debug:
-    var: colors
+- name: load | Include OS-specific vars file
+  include_vars: "{{ lookup('first_found', possible_files) }}"
+  vars:
+    possible_files:
+      - "{{ role_path }}/vars/{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+      - "{{ role_path }}/vars/empty.yml"

@@ -8,6 +8,87 @@
   when: ansible_facts.packages['firefox-esr'] is not defined
 
 - block:
+    # If 'url' is defined by user, i don't use 'version' and 'lang' fields
+    # (they're ignored), but require 'name' to be defined instead. If 'url' is
+    # _not_ defined by user, 'name' field is ignored, but 'version' is
+    # required ('lang' is used, but optional due to default).
+    #
+    # I need to use both 'version' and 'lang' in 'archive' and 'dir' (install
+    # (unpack) directory) names in order to make language or version change to
+    # cause re-download and re-unpack (if archive is already present).
+    #
+    # In case of 'name' (when 'url' is defined explicitly), i just use 'name'
+    # (in place of 'version'). (Thus, changing 'url' does _not_ cause
+    # re-download and re-unpack).
+    #
+    # In 'profile' name only 'version' or 'name' is sufficient (different
+    # languages should work on the same profile, but different firefox
+    # versions may not; for the second case - i don't care, if user've changed
+    # 'url' to something incompatible without changing the 'name').
+    #
+    # Firefox 'desktop' file name also contain 'version' or 'name' only (i may
+    # install several firefox versions simultaneously, but each version may be
+    # of one language only).
+    - name: firefox | Define firefox versions
+      set_fact:
+        _firefox_versions: >-
+          {{ _firefox_versions + 
+              [ def_item | combine(item,
+                      { 'id'      : item_id
+                      , 'lang'    : item_lang
+                      , 'archive' : item_id + '.tar.bz2'
+                      , 'dir'     : item_dir
+                      , 'bin'     : item_dir + '/firefox/firefox'
+                      , 'desktop' : 'firefox-' + item_id_v + '.desktop'
+                      }
+                    )
+              ]
+          }}
+      vars:
+        item_lang : "{{ item.lang | default('en-US') | replace('_', '-') }}"
+        item_id_v : >-
+          {{  item.version if item.url is not defined
+              else item.name
+          }}
+        item_id   : >-
+          {{ ('firefox-' + item_id_v + '.' +  item_lang)
+                if item.url is not defined
+              else
+                item.url | basename| regex_replace('.tar.bz2$', '') + '.' + item.name
+          }}
+        item_dir  : "{{ user_opt_dir + '/' + item_id }}"
+        def_item  : >-
+          {{ (  { 'url': item.url
+                , 'comment': 'Firefox ' + item.name
+                } if item.url is defined
+                else
+                  firefox_latest | combine(
+                    { 'url': firefox_latest.url + '&lang=' + item_lang
+                    })
+                  if item.version == 'latest'
+                else
+                  firefox_by_ver | combine(
+                    { 'url'     : firefox_by_ver.url + '/'
+                                    + item.version + '/linux-x86_64/'
+                                    + item_lang + '/'
+                                    + 'firefox-' + item.version + '.tar.bz2'
+                    , 'comment' : firefox_by_ver.comment + item.version
+                    })
+                  if item.version is defined
+             ) | combine(
+                  { 'profile' : 'default-' + item_id_v
+                  })
+          }}
+      loop: "{{ firefox_versions }}"
+
+    - name: huy
+      debug:
+        var: _firefox_versions
+  tags:
+    - firefox_install
+    - firefox_debug
+
+- block:
     - name: firefox | Stat system .desktop files
       stat:
         path: "{{ system_desktop_entries + '/' + item }}"
@@ -78,10 +159,13 @@
         #              | map(attribute='changed') | first
         #          }}
         line: >
-          {{ 'Exec=\2 --new-instance -P ' + firefoxDefault_profile + ' %u' }}
+          {{ 'Exec=\2 ' + cur_firefox_exec_opts }}
         regexp: "(^#+|^)Exec=([^ ]+).*"
         backrefs: yes
         state:  present
+      vars:
+        cur_firefox: >-
+          {{ { 'profile': firefox_system_profile } }}
       register: firefox_desktop_changed
       when: item.sys_exists or item.user_exists
       loop: "{{ firefox_desktop_files }}"
@@ -98,21 +182,28 @@
   #        line:   'NoDisplay=true'
   #        regexp: "(^#+|^)NoDisplay="
   #        state:  present
-    # Note:
-    # -`force_overwrite` will trigger changed status of profile hardcoding
-    # task (above) and, thus, will trigger this task too.
-    # - i assume, that hardcoding is run for all desktop files copied to local
-    # user directory, thus it's enough to check hardcoding task changed
-    # status.
-    - name: firefox | Update user's mime info cache
-      command: update-desktop-database "{{ user_desktop_entries }}"
-      when: >
-        firefox_desktop_changed is defined
-        and firefox_desktop_changed.results
-              | selectattr('changed', 'equalto', true) | list
-              | length > 0
   tags:
     - 'firefox_profile_hardcode'
+
+# Note:
+# -`force_overwrite` will trigger changed status of profile hardcoding
+# task (above) and, thus, will trigger this task too.
+# - i assume, that hardcoding is run for all desktop files copied to local
+# user directory, thus it's enough to check hardcoding task changed
+# status.
+- name: firefox | Update user's mime info cache
+  command: update-desktop-database "{{ user_desktop_entries }}"
+  when: >-
+    force_overwrite
+    or (  firefox_desktop_changed is defined
+          and firefox_desktop_changed.results
+                | selectattr('changed', 'equalto', true) | list
+                | length > 0
+       )
+  tags:
+    - 'firefox_profile_hardcode'
+    - 'firefox_set_default'
+    - 'firefox_mime'
 
 # Now, because i hardcode profile names for system and 52 ESR firefox
 # launches, i shouldn't notice any difference between auto-starting with last
@@ -140,58 +231,33 @@
   tags:
     - 'firefox_profile_noauto'
 
-- block:
-    - name: firefox | Create directory for storing 52 ESR
-      file:
-        path:   "{{ firefox52esr_dir }}"
-        mode:   0755
-        state:  directory
-    - name: firefox | Download 52 ESR
-      get_url:
-        url:  "{{ firefox52esr_url }}"
-        dest: "{{ user_opt_dir + '/firefox-52.9.0esr.tar.bz2' }}"
-        force:  "{{ force_overwrite }}"
-      register: firefox52esr_download
-    - name: firefox | Unpack 52 ESR
-      unarchive:
-        src:      "{{ user_opt_dir + '/firefox-52.9.0esr.tar.bz2' }}"
-        dest:     "{{ firefox52esr_dir }}"
-        remote_src: yes
-        creates: >-
-          {{ ( force_overwrite or firefox52esr_download.changed )
-              | ternary('/nonexistent-H5T6f', firefox52esr_bin)
-          }}
-    - name: firefox | Create symlink to 52 ESR binary
-      file:
-        path:   "{{ ansible_user_dir + '/bin/firefox-52esr' }}"
-        state:  link
-        src:    "{{ firefox52esr_bin }}"
-    - name: firefox | Copy 52 ESR desktop entry
-      template:
-        src:    "firefox/firefox-52esr.desktop"
-        dest:   "{{ user_desktop_entries + '/firefox-52esr.desktop' }}"
-        force:  yes
-        backup: yes
+- name: Install specific firefox versions
+  include_tasks:
+    file: firefox_versions.yml
+    apply:
+      tags:
+        - 'firefox_install'
+  loop: "{{ _firefox_versions }}"
+  loop_control:
+    loop_var: 'cur_firefox'
   tags:
-    - 'firefox52esr'
+    - 'firefox_install'
 
 - block:
     - name: firefox | Install mime utils
-      apt:
-        name: "{{ item }}"
+      package:
+        name: "{{ pkgs_mime }}"
         state: present
       become: yes
-      when: ansible_facts.packages[item] is not defined
-      loop:
-        - 'gvfs-bin'
-        - 'xdg-utils'
+      when: >-
+        pkgs_mime | intersect(ansible_facts.packages.keys()) != pkgs_mime
     - name: firefox | Create mimeapps.list file, if it doesn't exist
       template:
         force: "{{ force_overwrite }}"
         backup: yes
         src: 'firefox/mimeapps.list'
         dest: "{{ item }}"
-        mode: 0755
+        mode: 0644
       loop: "{{ mimeapps_list_files }}"
     # There're two sections in `mimeapps.list` file: `Default Applications`
     # and `Added Associations`. And `gvfs-mime` during setting default

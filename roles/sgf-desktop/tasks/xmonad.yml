@@ -76,3 +76,26 @@
       when: not ( xmonad_bin_stats.stat.exists and xmobar_bin_stats.stat.exists )
             or  ( xmonad_updated.changed or xmobar_updated.changed )
 
+  tags:
+    - xmonad_bin
+
+- block:
+    # User's Xsession.d normally is created by xmonad Makefile, but just to be
+    # sure..
+    - name: xmonad | Create user's Xsession.d directory
+      file:
+        path:   "{{ user_xsession_dir }}"
+        mode:   0755
+        state:  directory
+
+    - name: xmonad | Add user's bin to PATH in Xsession
+      copy:
+        src:    "{{ item }}"
+        force:  yes
+        backup: yes
+        dest:   "{{ user_xsession_dir + '/' + item | basename }}"
+      loop: "{{ lookup('fileglob', 'files/Xsession/*', wantlist=True) }}"
+
+  tags:
+    - xmonad_xsession
+

@@ -1,8 +1,18 @@
 ---
 
 - block:
+    - name: Load pre_tasks
+      import_tasks: load_pre.yml
+
     - name: Load
       import_tasks: load.yml
+  tags:
+    - 'always'
+
+- name: Create user dist directory exists
+  file:
+    path: "{{ user_dist_dir }}"
+    state: directory
   tags:
     - 'always'
 
