@@ -257,7 +257,7 @@
         backup: yes
         src: 'firefox/mimeapps.list'
         dest: "{{ item }}"
-        mode: 0755
+        mode: 0644
       loop: "{{ mimeapps_list_files }}"
     # There're two sections in `mimeapps.list` file: `Default Applications`
     # and `Added Associations`. And `gvfs-mime` during setting default
