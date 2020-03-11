@@ -28,7 +28,7 @@
         firefox_system_profile: 'default-esr'
         xkb_clear_options: false
         im_enabled: false
-        firefox2:
+        firefox_versions:
           - version: '52.9.0esr'
             profile: 'default-52esr'
             comment: 'Firefox 52 ESR'

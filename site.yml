@@ -23,7 +23,7 @@
       vars:
         xmobar_branch: ca5b802bd4fa134cdbc3e4986d64b5116bcffd68
         firefox_default_desktop: 'firefox-esr.desktop'
-        firefox2:
+        firefox_versions:
           - version: '52.9.0esr'
             profile: 'default-52esr'
             comment: 'Firefox 52 ESR'
