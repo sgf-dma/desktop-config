@@ -27,8 +27,6 @@
           - version: '52.9.0esr'
             profile: 'default-52esr'
             comment: 'Firefox 52 ESR'
-          - name: 'huy'
-            url: 'https://ftp.mozilla.org/pub/firefox/releases/72.0.2/linux-x86_64/ru/firefox-72.0.2.tar.bz2'
           - version: 'latest'
       tags:
         - 'desktop'
