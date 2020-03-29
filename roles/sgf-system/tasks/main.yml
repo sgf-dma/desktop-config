@@ -11,7 +11,7 @@
     copy:
       src: 'rpz.db'
       dest: "{{ rpz_dest }}"
-      mode: 644
+      mode: 0644
       force: no
     notify: restart PowerDNS Recursor
 
