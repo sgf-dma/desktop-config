@@ -1,5 +1,2 @@
 ---
 all:
-  hosts:
-    xmonad8:
-    xmonad9:
