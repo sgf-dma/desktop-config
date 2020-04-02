@@ -50,11 +50,14 @@
           {{  item.version if item.url is not defined
               else item.name
           }}
+        url_hash: "{{ item.url | checksum if item.url is defined else '' }}"
+        # 'firefox-' dir name prefix is hardcoded in thunderbird apparmor
+        # profile (to be able to open links from thunderbird), so 'id' should
+        # always start from 'firefox-'.
         item_id   : >-
-          {{ ('firefox-' + item_id_v + '.' +  item_lang)
-                if item.url is not defined
-              else
-                item.url | basename| regex_replace('.tar.bz2$', '') + '.' + item.name
+          {{ 'firefox-' + item_id_v + '.'
+                + (item_lang if item.url is not defined
+                    else url_hash[:8])
           }}
         item_dir  : "{{ user_opt_dir + '/' + item_id }}"
         def_item  : >-
