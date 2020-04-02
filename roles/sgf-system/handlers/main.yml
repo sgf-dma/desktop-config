@@ -11,3 +11,9 @@
     name: NetworkManager
     state: restarted
   become: yes
+
+- name: reload apparmor
+  service:
+    name: apparmor
+    state: reloaded
+  become: yes
