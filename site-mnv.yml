@@ -19,7 +19,7 @@
         - 'console'
     - role: sgf-desktop
       vars:
-        firefox_default_desktop: 'firefox-52.0.9esr.desktop'
+        firefox_default_desktop: 'firefox-52.9.0esr.desktop'
         firefox_versions:
           - version: '52.9.0esr'
             profile: 'default-52esr'
