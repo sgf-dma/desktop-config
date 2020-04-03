@@ -24,6 +24,7 @@
           - version: '52.9.0esr'
             profile: 'default-52esr'
             comment: 'Firefox 52 ESR'
+            lang:    'ru'
       tags:
         - 'desktop'
 
