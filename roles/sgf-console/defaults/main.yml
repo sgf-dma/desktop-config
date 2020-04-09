@@ -25,3 +25,10 @@ colors: {}
 # this value. This variable used by several roles (e.g. `sgf-console` and
 # `sgf-desktop`).
 # all_colors: 'disabled'
+
+# Directory, where to unpack programs (which can't be properly installed into
+# ~/.local).
+user_opt_dir: "{{ ansible_user_dir + '/opt' }}"
+
+# Directory, where to download and save locally installed programs and files.
+user_dist_dir: "{{ user_opt_dir + '/dist' }}"
