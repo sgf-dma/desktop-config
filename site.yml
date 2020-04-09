@@ -35,6 +35,7 @@
       vars:
         my_pdns_rec_config:
           network-timeout: 5000
+          packetcache-servfail-ttl: 5
       tags:
         - 'system'
 
