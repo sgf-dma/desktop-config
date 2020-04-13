@@ -7,8 +7,22 @@
     - 'always'
 
 - block:
+    - name: shell | Ensure user local path exists
+      file:
+        path: "{{ user_local_path }}"
+        state: directory
+
+    - name: shell | Ensure user man1 directory exists
+      file:
+        path: "{{ user_man1_path }}"
+        state: directory
+
+  tags:
+    - always
+
+- block:
     - name: Install git
-      apt:
+      package:
         name: 'git'
         state: present
       become: yes
@@ -26,7 +40,7 @@
 
 - block:
     - name: Install tmux
-      apt:
+      package:
         name: 'tmux'
         state: present
       become: yes
@@ -44,24 +58,14 @@
     - 'colors'
 
 - block:
-    - name: Install bashrc dependencies
-      apt:
-        name: keychain
-        state: present
-      become: yes
-      when: ansible_facts.packages['keychain'] is not defined
-    - name: Modifications to .bashrc
-      blockinfile:
-        path:   "{{ ansible_user_dir + '/.bashrc' }}"
-        backup: yes
-        insertafter: EOF
-        block: "{{ lookup('file', 'files/bashrc') }}"
+    - name: Configure bashrc
+      import_tasks: shell.yml
   tags:
     - 'shell'
 
 - block:
     - name: Install vim
-      apt:
+      package:
         name: 'vim'
         state: present
       become: yes

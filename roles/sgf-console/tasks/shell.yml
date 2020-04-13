@@ -1,0 +1,63 @@
+---
+
+- block:
+    - name: shell | Clone keychain repository
+      git:
+        repo: 'https://github.com/funtoo/keychain.git'
+        dest: "{{ keychain_repo_dir }}"
+        version: "{{ keychain_branch }}"
+        clone: yes
+      register: keychain_updated
+
+    - name: shell | State keychain binary
+      stat:
+        path: "{{ keychain_bin }}"
+      register: keychain_bin_stats
+
+    - name: shell | Build keychain
+      make:
+        chdir: "{{ keychain_repo_dir }}"
+        target: all
+      when: keychain_updated.changed or not keychain_bin_stats.stat.exists
+
+    - name: shell | Install keychain bin
+      copy:
+        src:  "{{ keychain_repo_dir + '/keychain' }}"
+        dest: "{{ keychain_bin }}"
+        force: yes
+        mode: 0755
+
+    - name: shell | Install keychain man
+      copy:
+        src:  "{{ keychain_repo_dir + '/keychain.1' }}"
+        dest: "{{ user_man1_path + '/keychain.1' }}"
+        force: yes
+        mode: 0644
+
+  when: install_keychain | bool
+  tags:
+    - keychain
+
+- block:
+    - name: shell | Include common .bashrc
+      blockinfile:
+        path:   "{{ ansible_user_dir + '/.bashrc' }}"
+        backup: yes
+        marker: '# {mark} desktop-config ANSIBLE MANAGED BLOCK'
+        insertafter: EOF
+        block: |-
+
+            # Include common settings.
+            . ~/.bashrc-common
+
+    - name: shell | Install common bashrc
+      template:
+        src:    'bashrc'
+        force:  yes
+        backup: yes
+        dest:   "{{ ansible_user_dir + '/.bashrc-common' }}"
+
+  tags:
+    - bashrc
+    - keychain
+

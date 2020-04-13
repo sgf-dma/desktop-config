@@ -12,5 +12,12 @@ export LC_COLLATE=ru_RU.utf8
 prependPATH "$HOME/bin"
 umask 027
 
+export MANPATH="$HOME/.local/share/man:"
 eval $(thefuck --alias)
-eval $(keychain --eval id_rsa)
+{% if install_keychain | bool %}
+{% if gpg_keys | length == 0 %}
+eval $(keychain --agents ssh --eval {{ ssh_keys | join(' ') }} )
+{% else %}
+eval $(keychain --gpg2 --agents ssh,gpg --eval {{ (ssh_keys + gpg_keys) | join(' ') }} )
+{% endif %}
+{% endif %}

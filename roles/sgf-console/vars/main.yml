@@ -1,11 +1,12 @@
 ---
-# vars file for sgf-tmux
 
 vim_dir:  "{{ ansible_user_dir + '/.vim' }}"
 vim_package_dir:  "{{ vim_dir + '/bundle' }}"
 
 tmux_plugin_dir: "{{ ansible_user_dir + '/.tmux/plugins' }}"
 tmux_conf:  "{{ ansible_user_dir + '/.tmux.conf' }}"
+
+keychain_bin: "{{ user_local_path + '/bin/keychain' }}"
 
 # Default console colors for initialize `colors` dictionary. Set `all_colors`
 # to overwrite them all at once or set particular dictionary key to desired
@@ -14,3 +15,6 @@ console_colors:
   vim:  'disabled'
   tmux: 'disabled'
 
+user_man1_path: "{{ user_local_path + '/share/man/man1' }}"
+
+# vim:
