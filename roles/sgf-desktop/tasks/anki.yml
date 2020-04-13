@@ -5,24 +5,28 @@
     - name: anki | Download
       get_url:
         url:  "{{ anki_url }}"
-        dest: "{{ user_opt_dir + '/anki.tar.bz2' }}"
+        dest: "{{ user_dist_dir + '/anki.tar.bz2' }}"
         force:  "{{ force_overwrite }}"
       register: anki_download
     - name: anki | Unpack
       unarchive:
-        src:      "{{ user_opt_dir + '/anki.tar.bz2' }}"
+        src:      "{{ user_dist_dir + '/anki.tar.bz2' }}"
         remote_src: yes
-        dest:     "{{ anki_unpack_dir }}"
+        dest:     "{{ user_dist_dir }}"
         creates: >-
           {{ ( force_overwrite or anki_download.changed )
               | ternary('/nonexistent-H5T6f', anki_bin)
           }}
-    - name: anki | Copy wrapper script to ~/bin
-      copy:
-        src:    "anki/anki"
-        force:  yes
-        mode:   0755
-        dest:   "{{ ansible_user_dir + '/bin/anki' }}"
+    - name: anki | Stat anki binary
+      stat:
+        path: "{{ anki_bin }}"
+      register: anki_bin_stats
+          #    - name: anki | Copy wrapper script to ~/bin
+          #      copy:
+          #        src:    "anki/anki"
+          #        force:  yes
+          #        mode:   0755
+          #        dest:   "{{ ansible_user_dir + '/bin/anki' }}"
     # Here i use the fact, that `backrefs` changes `lineinfile` module
     # behavior: when enabled, `lineinfile` will _never_ add lines, only change
     # existing lines matched with `regexp`. Thus, when line is _already_
@@ -30,25 +34,25 @@
     # case (unlike regular behavior, where `regexp` must match with _both_
     # previous and edited versions of a file). So, here `regexp` matches
     # _only_ original version of file (i.e. one, which i need to edit).
-    - name: anki | Write correct path to desktop entry.
-      lineinfile:
-        dest:   "{{ anki_desktop }}"
-        backup: yes
-        line:   >
-          {{ 'Exec=env ANKI_NOHIGHDPI=1 ' + anki_bin + ' \2' }}
-        regexp: "(^#+|^)Exec=[^ ]+ (?!ANKI_NOHIGHDPI=1)(.*)$"
-        # Or i may use regexp below, which will match both original and edited
-        # versions of file..
-        #regexp: '(^#+|^)Exec=[^ ]+ (?:[^ ]+ ){0,2}(.*)$'
-        backrefs: yes
-        state:  present
-    - name: anki | Copy desktop entry
-      copy:
-        src:    "{{ anki_desktop }}"
-        remote_src: yes
-        dest:   "{{ user_desktop_entries + '/anki.desktop' }}"
-        force:  yes
-        backup: yes
+    #    - name: anki | Write correct path to desktop entry.
+    #      lineinfile:
+    #        dest:   "{{ anki_desktop }}"
+    #        backup: yes
+    #        line:   >
+    #          {{ 'Exec=env ANKI_NOHIGHDPI=1 ' + anki_bin + ' \2' }}
+    #        regexp: "(^#+|^)Exec=[^ ]+ (?!ANKI_NOHIGHDPI=1)(.*)$"
+    #        # Or i may use regexp below, which will match both original and edited
+    #        # versions of file..
+    #        #regexp: '(^#+|^)Exec=[^ ]+ (?:[^ ]+ ){0,2}(.*)$'
+    #        backrefs: yes
+    #        state:  present
+    #    - name: anki | Copy desktop entry
+    #      copy:
+    #        src:    "{{ anki_desktop }}"
+    #        remote_src: yes
+    #        dest:   "{{ user_desktop_entries + '/anki.desktop' }}"
+    #        force:  yes
+    #        backup: yes
 
 # FIXME: Make this into role too?
 - block:

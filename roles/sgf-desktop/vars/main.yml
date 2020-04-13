@@ -86,10 +86,10 @@ _firefox_versions: []
 
 anki_url: 'https://apps.ankiweb.net/downloads/current/anki-2.1.7-linux-amd64.tar.bz2'
 # FIXME: Guess this directories?
-anki_unpack_dir: "{{ user_opt_dir }}"
+anki_unpack_dir: "{{ user_dist_dir }}"
 anki_dir: "{{ user_opt_dir + '/anki-2.1.7-linux-amd64' }}"
 
-anki_bin: "{{ anki_dir + '/bin/anki' }}"
+anki_bin: "{{ user_local_dir + '/bin/anki' }}"
 anki_desktop: "{{ anki_dir + '/anki.desktop' }}"
 # Packages to install. This list is built automatically.
 anki_install_pkgs: []

@@ -78,6 +78,9 @@ colors: {}
 # `sgf-desktop`).
 # all_colors: 'disabled'
 
+# Directory tree for user's local installs.
+user_local_dir: "{{ ansible_user_dir + '/.local' }}"
+
 # Directory, where to unpack programs (which can't be properly installed into
 # ~/.local).
 user_opt_dir: "{{ ansible_user_dir + '/opt' }}"
