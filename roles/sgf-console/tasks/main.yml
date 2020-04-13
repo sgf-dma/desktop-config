@@ -59,11 +59,7 @@
 
 - block:
     - name: Configure bashrc
-      include_tasks:
-        file: shell.yml
-        apply:
-          tags:
-            - 'shell'
+      import_tasks: shell.yml
   tags:
     - 'shell'
 
