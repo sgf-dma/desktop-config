@@ -9,7 +9,7 @@
         clone: yes
       register: keychain_updated
 
-    - name: shell | State keychain binary
+    - name: shell | Stat keychain binary
       stat:
         path: "{{ keychain_bin }}"
       register: keychain_bin_stats
@@ -18,7 +18,8 @@
       make:
         chdir: "{{ keychain_repo_dir }}"
         target: all
-      when: keychain_updated.changed or not keychain_bin_stats.stat.exists
+      when: >-
+        force_overwrite or keychain_updated.changed or not keychain_bin_stats.stat.exists
 
     - name: shell | Install keychain bin
       copy:
@@ -37,6 +38,41 @@
   when: install_keychain | bool
   tags:
     - keychain
+
+- block:
+    - name: shell | Clone thefuck repository
+      git:
+        repo: 'https://github.com/nvbn/thefuck.git'
+        dest: "{{ thefuck_repo_dir }}"
+        version: "{{ thefuck_branch }}"
+        clone: yes
+      register: thefuck_updated
+
+    - name: shell | Install thefuck dependencies
+      package:
+        name: "{{ thefuck_deps }}"
+        state: present
+      become: yes
+      when: >-
+        ansible_facts.packages.keys() | intersect(thefuck_deps) | length != thefuck_deps | length
+
+    - name: shell | Stat thefuck binary
+      stat:
+        path: "{{ thefuck_bin }}"
+      register: thefuck_bin_stats
+
+    - name: shell | Install thefuck
+      pip:
+        name: thefuck
+        executable: pip3
+        chdir: "{{ thefuck_repo_dir }}"
+      when: >-
+        force_overwrite or thefuck_updated.changed or not thefuck_bin_stats.stat.exists
+
+  when: not dont_fuck_with_me | bool
+  tags:
+    - fuck
+
 
 - block:
     - name: shell | Include common .bashrc
@@ -60,4 +96,5 @@
   tags:
     - bashrc
     - keychain
+    - fuck
 

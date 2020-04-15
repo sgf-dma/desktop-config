@@ -21,6 +21,27 @@ keychain_repo_dir: "{{ user_dist_dir + '/keychain' }}"
 # Branch to use.
 keychain_branch: 'master'
 
+# List of ssh keys to load into keychain.
+ssh_keys:
+  - 'id_rsa'
+
+# List of gpg keys to load into keychain. Note, that if this list left empty,
+# keychain will _not_ manage `gpg-agent`. Moreover, GPG versions 2.1 and later
+# do not need (ignore, in fact) GPG_AGENT_INFO environment variable at all
+# (which keychain tries to set). Thus, on recent enough gpg it may be better
+# to leave this list empty.
+gpg_keys: []
+
+# Whether to install fuck ('false' - "do fuck with me" - means install).
+dont_fuck_with_me: false
+thefuck_repo_dir: "{{ user_dist_dir + '/thefuck' }}"
+thefuck_branch: 'master'
+
+# Overwrite files normally left untoched. Set this only _once_ for overwriting
+# previous possible incorrect configuration, because setting this permanently
+# will result in _always changed_ status of playbook run.
+force_overwrite: no
+
 # This dictionary is used by several roles (e.g. `sgf-console` and
 # `sgf-desktop`). This role initializes only part of its keys from
 # `console_colors` dictionary. To overwrite particular keys, set them in
@@ -32,17 +53,6 @@ colors: {}
 # this value. This variable used by several roles (e.g. `sgf-console` and
 # `sgf-desktop`).
 # all_colors: 'disabled'
-
-# List of ssh keys to load into keychain.
-ssh_keys:
-  - 'id_rsa'
-
-# List of gpg keys to load into keychain. Note, that if this list left empty,
-# keychain will _not_ manage `gpg-agent`. Moreover, GPG versions 2.1 and later
-# do not need (ignore, in fact) GPG_AGENT_INFO environment variable at all
-# (which keychain tries to set). Thus, on recent enough gpg it may be better
-# to leave this list empty.
-gpg_keys: []
 
 # Directory, where to unpack programs (which can't be properly installed into
 # ~/.local).
