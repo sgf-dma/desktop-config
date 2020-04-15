@@ -25,11 +25,20 @@ console_colors:
   vim:  'disabled'
   tmux: 'disabled'
 
+# User man1 directory. Locally installed programs will most likely install own
+# man there.
 user_man1_path: "{{ user_local_path + '/share/man/man1' }}"
 # User's local bin under ~/.local directory tree.
 user_local_bin: "{{ user_local_path + '/bin' }}"
 
 # User's bin in ~/bin .
 user_bin: "{{ ansible_user_dir + '/bin' }}"
+
+# User bash_completion file. It's sourced at the end of main
+# '/etc/bash_completion' .
+user_bash_completion: "{{ ansible_user_dir + '/.bash_completion' }}"
+# User bash completion directory. Locally installed programs will most likely
+# put own completion files there.
+user_bash_completion_dir: "{{ ansible_user_dir + '/.local/share/bash-completion/completions' }}"
 
 # vim:

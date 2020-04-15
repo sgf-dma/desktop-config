@@ -74,6 +74,11 @@
         path: "{{ user_man1_path }}"
         state: directory
 
+    - name: shell | Ensure user bash_completion directory exists
+      file:
+        path: "{{ user_bash_completion_dir }}"
+        state: directory
+
   tags:
     - always
     - pathes

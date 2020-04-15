@@ -1,0 +1,6 @@
+#!/bin/bash
+
+for bcfile in ~/.local/share/bash-completion/completions/*; do
+    [ -f "$bcfile" ] && . $bcfile
+done
+

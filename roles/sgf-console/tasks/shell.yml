@@ -101,6 +101,7 @@
         target: install
         params:
           PREFIX: "{{ user_local_path }}"
+          WITH_BASHCOMP: 'yes'
       when: force_overwrite or pass_updated.changed or not pass_bin_stats.stat.exists
 
   tags:
@@ -124,6 +125,13 @@
         force:  yes
         backup: yes
         dest:   "{{ ansible_user_dir + '/.bashrc-common' }}"
+
+    - name: shell | Install user bash_completion script
+      copy:
+        src:  'bash_completion'
+        force:  yes
+        backup: yes
+        dest: "{{ user_bash_completion }}"
 
   tags:
     - bashrc
