@@ -18,7 +18,8 @@
       make:
         chdir: "{{ keychain_repo_dir }}"
         target: all
-      when: keychain_updated.changed or not keychain_bin_stats.stat.exists
+      when: >-
+        force_overwrite or keychain_updated.changed or not keychain_bin_stats.stat.exists
 
     - name: shell | Install keychain bin
       copy:
@@ -65,7 +66,8 @@
         name: thefuck
         executable: pip3
         chdir: "{{ thefuck_repo_dir }}"
-      when: thefuck_updated.changed or not thefuck_bin_stats.stat.exists
+      when: >-
+        force_overwrite or thefuck_updated.changed or not thefuck_bin_stats.stat.exists
 
   when: not dont_fuck_with_me | bool
   tags:
