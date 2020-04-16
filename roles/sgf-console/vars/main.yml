@@ -22,5 +22,10 @@ console_colors:
   tmux: 'disabled'
 
 user_man1_path: "{{ user_local_path + '/share/man/man1' }}"
+# User's local bin under ~/.local directory tree.
+user_local_bin: "{{ user_local_path + '/bin' }}"
+
+# User's bin in ~/bin .
+user_bin: "{{ ansible_user_dir + '/bin' }}"
 
 # vim:

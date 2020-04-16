@@ -12,6 +12,63 @@
         path: "{{ user_local_path }}"
         state: directory
 
+    - name: shell | Stat user local bin
+      stat:
+        path: "{{ user_local_bin }}"
+      register: user_local_bin_stats
+
+    - name: shell | Stat user bin
+      stat:
+        path: "{{ user_bin }}"
+      register: user_bin_stats
+
+    - block:
+        - name: shell | Remove ~/.local/bin symlink to ~/bin
+          file:
+            path: "{{ user_local_bin }}"
+            state: absent
+          when: >-
+            user_local_bin_stats.stat.islnk is defined
+            and user_local_bin_stats.stat.islnk
+            and user_local_bin_stats.stat.lnk_source == ansible_user_dir + '/bin'
+
+        - name: shell | Move ~/bin, if exists, to ~/.local/bin
+          command:
+            argv:
+              - mv
+              - '-T'
+              - "{{ user_bin }}"
+              - "{{ user_local_bin }}"
+          args:
+            creates: "{{ user_local_bin }}"
+            removes: "{{ user_bin }}"
+          when: user_bin_stats.stat.isdir is defined and user_bin_stats.stat.isdir
+
+        - name: shell | Ensure user local bin exists
+          file:
+            path: "{{ user_local_path + '/bin' }}"
+            force: no
+            follow: no
+            state: directory
+
+        - name: shell | Ensure, that ~/bin was not symlink to wrong target
+          assert:
+            that:
+              - not user_bin_stats.stat.exists
+                or  user_bin_stats.stat.exists
+                    and (   user_bin_stats.stat.islnk
+                            and user_bin_stats.stat.lnk_source == user_local_bin
+                        or  not user_bin_stats.stat.islnk
+                        )
+            msg: "It seems, that ~/bin is already a symlink, but not to ~/.local/bin"
+
+        - name: shell | Create ~/bin as symlink to ~/.local/bin
+          file:
+            path: "{{ user_bin }}"
+            follow: yes
+            state: link
+            src:  "{{ user_local_bin }}"
+
     - name: shell | Ensure user man1 directory exists
       file:
         path: "{{ user_man1_path }}"
@@ -19,6 +76,7 @@
 
   tags:
     - always
+    - pathes
 
 - block:
     - name: Install git
