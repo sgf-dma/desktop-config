@@ -14,6 +14,14 @@
         path: "{{ keychain_bin }}"
       register: keychain_bin_stats
 
+    - name: shell | Install keychain dependencies
+      package:
+        name: "{{ keychain_deps }}"
+        state: present
+      become: yes
+      when: >-
+        ansible_facts.packages.keys() | intersect(keychain_deps) | length != keychain_deps | length
+
     - name: shell | Build keychain
       make:
         chdir: "{{ keychain_repo_dir }}"
