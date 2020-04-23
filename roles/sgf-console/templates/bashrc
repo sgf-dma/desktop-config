@@ -22,3 +22,17 @@ eval $(keychain --agents ssh --eval {{ ssh_keys | join(' ') }} )
 eval $(keychain --gpg2 --agents ssh,gpg --eval {{ (ssh_keys + gpg_keys) | join(' ') }} )
 {% endif %}
 {% endif %}
+
+{% if obtain_cowpowers %}
+say() {
+    cowsay "$@" | lolcat
+}
+
+sayHi() {
+    cowsay -w "${@:-НАХУЮ СИНЕМА ПРОДАКШН представляет..}" | lolcat -a
+}
+
+sayBye() {
+    neo-cowsay --super "${@:-На этом всё, мы прощаемся с вами! Подписывайтесь на наш канал, лайкайте и комментируйте.}"
+}
+{% endif %}

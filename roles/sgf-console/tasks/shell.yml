@@ -33,6 +33,7 @@
       copy:
         src:  "{{ keychain_repo_dir + '/keychain' }}"
         dest: "{{ keychain_bin }}"
+        remote_src: yes
         force: yes
         mode: 0755
 
@@ -40,6 +41,7 @@
       copy:
         src:  "{{ keychain_repo_dir + '/keychain.1' }}"
         dest: "{{ user_man1_path + '/keychain.1' }}"
+        remote_src: yes
         force: yes
         mode: 0644
 
@@ -81,6 +83,70 @@
   tags:
     - fuck
 
+- block:
+    - name: shell | (cowsay) Install cowsay and lolcat
+      package:
+        name: "{{ cowsay_deps }}"
+      become: yes
+      when: >-
+        ansible_facts.packages.keys() | intersect(cowsay_deps) | length != cowsay_deps | length
+
+    # Based on https://stackoverflow.com/questions/24987542/is-there-a-link-to-github-for-downloading-a-file-in-the-latest-release-of-a-repo .
+    - name: shell | (cowsay) Download neo-cowsay assets list
+      get_url:
+        url:  "{{ neo_cowsay_assets_url }}"
+        dest: "{{ neo_cowsay_assets_json }}"
+        force: yes
+      register: neo_cowsay_assets_download
+
+    - name: shell | (cowsay) Load neo-cowsay assets
+      include_vars:
+        file: "{{ neo_cowsay_assets_json }}"
+        name: neo_cowsay_assets
+
+    - name: shell | (cowsay) Determine proper asset link
+      set_fact:
+        neo_cowsay_url:     "{{ item | json_query('browser_download_url') }}"
+        neo_cowsay_archive: "{{ item | json_query('name') }}"
+      when: item | json_query('name') | regex_search('(linux).*(x86_64)', ignorecase=True)
+      loop: "{{ neo_cowsay_assets.assets }}"
+
+    - name: shell | (cowsay) Download neo cowsay
+      get_url:
+        url:    "{{ neo_cowsay_url }}"
+        dest:   "{{ user_dist_dir + '/' + neo_cowsay_archive }}"
+        force:  "{{ force_overwrite or neo_cowsay_assets_download.changed }}"
+      register: neo_cowsay_download
+
+    - name: shell | (cowsay) Ensure neo cowsay unpack directory exists
+      file:
+        path:   "{{ neo_cowsay_dir }}"
+        state:  directory
+
+    - name: shell | (cowsay) Unpack
+      unarchive:
+        src:  "{{ user_dist_dir + '/' + neo_cowsay_archive }}"
+        dest: "{{ neo_cowsay_dir }}"
+        remote_src: yes
+        creates: >-
+          {{ ( force_overwrite or neo_cowsay_download.changed )
+              | ternary(file_does_not_exist, neo_cowsay_dir + '/cowsay')
+          }}
+
+    - name: shell | (cowsay) Install neo cowsay
+      copy:
+        src:  "{{ neo_cowsay_dir + '/' + item }}"
+        dest: "{{ user_local_bin + '/neo-' + item }}"
+        remote_src: yes
+        force: yes
+        mode: 0755
+      loop:
+        - cowsay
+        - cowthink
+
+  when: obtain_cowpowers
+  tags:
+    - cowsay
 
 - block:
     - name: shell | Include common .bashrc
@@ -105,4 +171,5 @@
     - bashrc
     - keychain
     - fuck
+    - cowsay
 
