@@ -75,6 +75,7 @@
         target: install
       when: not ( xmonad_bin_stats.stat.exists and xmobar_bin_stats.stat.exists )
             or  ( xmonad_updated.changed or xmobar_updated.changed )
+            or  force_overwrite
 
   tags:
     - xmonad_bin
