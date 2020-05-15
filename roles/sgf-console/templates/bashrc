@@ -23,6 +23,12 @@ eval $(keychain --gpg2 --agents ssh,gpg --eval {{ (ssh_keys + gpg_keys) | join('
 {% endif %}
 {% endif %}
 
+export GIT_PS1_SHOWDIRTYSTATE='yes'
+export GIT_PS1_SHOWUNTRACKEDFILES='yes'
+export GIT_PS1_SHOWUPSTREAM='verbose'
+export GIT_PS1_SHOWCOLORHINTS='yes'
+export PS1="${PS1%\\\$ }\$(__git_ps1)\\\$ "
+
 {% if obtain_cowpowers %}
 say() {
     cowsay "$@" | lolcat
