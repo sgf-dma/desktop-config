@@ -6,6 +6,52 @@ prependPATH() {
     esac
 }
 
+__prompt_command() {
+    # Save exit code of previous command.
+    local r="$?"
+
+    # Color codes are listed after '\033[' and separated by semicolon. Color
+    # mode specification ends at 'm'. Then, to all following text specified
+    # color mode will be applied until '\033[00m' will be encountered. Below,
+    # first color code specifies text style (bold, underlined, etc) and then
+    # color itself is specified.
+    #
+    # See the full table at
+    # https://stackoverflow.com/questions/4842424/list-of-ansi-color-escape-sequences .
+    #
+    # \[ and \] are not part of a color specification, but special prompt
+    # escapes used for telling bash the exact start and end of non-printable
+    # character sequence. These are needed for bash to be able to calculate
+    # prompt length properly.
+    local Red='\[\033[00;31m\]'
+    local Green='\[\033[00;32m\]'
+    local Yellow='\[\033[00;33m\]'
+    local BBlue='\[\033[01;34m\]'
+    local Purple='\[\033[00;35m\]'
+
+    local End='\[\033[00m\]'
+
+    local head="\${debian_chroot:+(\$debian_chroot)}"
+    local user="${Green}\u${End}"
+    local host="${BBlue}\h${End}"
+    local dir="${Purple}\w${End}"
+    local rcode=''
+
+    # __git_ps1() in PROMPT_COMMAND mode requires to parts of PS1 - before and
+    # after git information - to be passed as arguments.
+    local PS1_pre=''
+    local PS1_post=''
+
+    if [ $r != 0 ]; then
+        rcode="${Red} $r${End}"
+    fi
+    PS1=""
+
+    PS1_pre="$head${user}@${host}:${dir}"
+    PS1_post="${rcode}\\\$ "
+    __git_ps1 "$PS1_pre" "$PS1_post"
+}
+
 export LANG=en_US.utf8
 export LC_CTYPE=ru_RU.utf8
 export LC_COLLATE=ru_RU.utf8
@@ -27,7 +73,9 @@ export GIT_PS1_SHOWDIRTYSTATE='yes'
 export GIT_PS1_SHOWUNTRACKEDFILES='yes'
 export GIT_PS1_SHOWUPSTREAM='auto'
 export GIT_PS1_SHOWCOLORHINTS='yes'
-export PS1="${PS1%\\\$ }\$(__git_ps1)\\\$ "
+export PROMPT_DIRTRIM=3
+
+PROMPT_COMMAND='__prompt_command'
 
 {% if obtain_cowpowers %}
 say() {
