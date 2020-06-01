@@ -43,7 +43,45 @@ __prompt_command() {
     local PS1_post=''
 
     if [ $r != 0 ]; then
-        rcode="${Red} $r${End}"
+        r_s="$(( $r - 128 ))"
+        if [ $r_s -gt 0 ]; then
+            case $r_s in
+                1  ) r_signal="HUP" ;;
+                2  ) r_signal="INT" ;;
+                3  ) r_signal="QUIT" ;;
+                4  ) r_signal="ILL" ;;
+                5  ) r_signal="TRAP" ;;
+                6  ) r_signal="ABRT" ;;
+                7  ) r_signal="BUS" ;;
+                8  ) r_signal="FPE" ;;
+                9  ) r_signal="KILL" ;;
+                10 ) r_signal="USR1" ;;
+                11 ) r_signal="SEGV" ;;
+                12 ) r_signal="USR2" ;;
+                13 ) r_signal="PIPE" ;;
+                14 ) r_signal="ALRM" ;;
+                15 ) r_signal="TERM" ;;
+                16 ) r_signal="STKFLT" ;;
+                17 ) r_signal="CHLD" ;;
+                18 ) r_signal="CONT" ;;
+                19 ) r_signal="STOP" ;;
+                20 ) r_signal="TSTP" ;;
+                21 ) r_signal="TTIN" ;;
+                22 ) r_signal="TTOU" ;;
+                23 ) r_signal="URG" ;;
+                24 ) r_signal="XCPU" ;;
+                25 ) r_signal="XFSZ" ;;
+                26 ) r_signal="VTALRM" ;;
+                27 ) r_signal="PROF" ;;
+                28 ) r_signal="WINCH" ;;
+                29 ) r_signal="IO" ;;
+                30 ) r_signal="PWR" ;;
+                *  ) r_signal='' ;;
+            esac
+        else
+            r_signal=''
+        fi
+        rcode="${Red} $r${r_signal:+ ($r_signal)}${End}"
     fi
     PS1=""
 
