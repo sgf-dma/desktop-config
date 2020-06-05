@@ -81,7 +81,7 @@ __prompt_command() {
         else
             r_signal=''
         fi
-        rcode="${Red} $r${r_signal:+ ($r_signal)}${End}"
+        rcode="${Red} $r${r_signal:+($r_signal)}${End}"
     fi
     PS1=""
 
