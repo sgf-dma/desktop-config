@@ -39,6 +39,12 @@ thefuck_branch: 'master'
 
 # Install cowsay along with several handful aliases.
 obtain_cowpowers: true
+# Default value for sayHi() function.
+default_cowHi: 'НАХУЮ СИНЕМА ПРОДАКШН при поддержке компании Бест-Хостинг представляет..'
+# Default value for sayBye() function.
+default_cowBye: 'На этом мы прощаемся с вами! Подписывайтесь на наш канал, лайкайте и комментируйте.'
+# File, where cow stores the current state of reading phrase file.
+cow_msg_statefile: "{{ ansible_user_dir + '/.cow_msg_state' }}"
 
 # Overwrite files normally left untoched. Set this only _once_ for overwriting
 # previous possible incorrect configuration, because setting this permanently
