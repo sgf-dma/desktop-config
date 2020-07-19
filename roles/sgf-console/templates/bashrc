@@ -116,8 +116,62 @@ export PROMPT_DIRTRIM=3
 PROMPT_COMMAND='__prompt_command'
 
 {% if obtain_cowpowers %}
+# What cow should say. If called with one argument, and file with such name
+# exists, this file will be initialized as phrases file. Then (if some phrase
+# file had been initialized) call _without_ arguments tells the cow to read
+# next phrase block from this file.
+
+# Phrase block (to read at once) may be written on several lines and must be
+# separated from following block (to read another time) by exactly one empty
+# line.  Sequential empty lines are not supported and will be treated as end
+# of file.
+#
+# If called with more, than one argument, or with one argument, which is not
+# an existing file, cow just says so.
 say() {
-    cowsay "$@" | lolcat
+    # File, where to store state.
+    local cow_state_file="{{ cow_msg_statefile }}"
+    # File with phrases to speak.
+    local msg_file=''
+    # Line in phrases file, from where to start.
+    local msg_line=''
+    # Length of current phrase.
+    local msg_len=''
+    # Line, where next phrase starts.
+    local msg_next_line=''
+    # What to say.
+    local cow_says=''
+
+    if [ $# -eq 0 ]; then
+        if [ ! -f "$cow_state_file" ]; then
+            echo "Cow file is not initialized."
+            return 1
+        fi
+        msg_file="$(sed -E -ne'0,/^file=/s/^file=(.*)/\1/p' "$cow_state_file")"
+        msg_line="$(sed -E -ne'0,/^line=/s/^line=(.*)/\1/p' "$cow_state_file")"
+        cow_says="$(sed -ne "$msg_line,/^$/p" "$msg_file")"
+        msg_len="$( echo "$cow_says" | wc -l)"
+        msg_next_line=$(( $msg_line + $msg_len))
+        if [ "x$cow_says" != 'x' ]; then
+            cowsay "$cow_says" | lolcat
+        else
+            echo "End of cow file reached."
+            return 1
+        fi
+        cat > "$cow_state_file" <<EOF
+file=$msg_file
+line=$msg_next_line
+EOF
+    elif [ $# -eq 1 -a -f "$1" ]; then
+        msg_file="$(readlink -e "$1")"
+        cat >"$cow_state_file" <<EOF
+file=$msg_file
+line=1
+EOF
+        echo "Initialized cow to read from '$msg_file'"
+    else
+        cowsay "$@" | lolcat
+    fi
 }
 
 sayHi() {
