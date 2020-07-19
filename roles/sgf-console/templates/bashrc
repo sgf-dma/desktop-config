@@ -121,10 +121,10 @@ say() {
 }
 
 sayHi() {
-    cowsay -w "${@:-НАХУЮ СИНЕМА ПРОДАКШН представляет..}" | lolcat -a
+    cowsay -w "${@:- {{- default_cowHi -}} }" | lolcat -a
 }
 
 sayBye() {
-    neo-cowsay --super "${@:-На этом всё, мы прощаемся с вами! Подписывайтесь на наш канал, лайкайте и комментируйте.}"
+    neo-cowsay --super "${@:- {{- default_cowBye -}} }"
 }
 {% endif %}
