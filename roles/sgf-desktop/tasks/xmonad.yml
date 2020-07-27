@@ -14,10 +14,10 @@
     - 'xmonad_deps'
 
 - name: xmonad | Install xmonad dependencies
-  apt:
+  package:
     name: "{{ xmonad_install_pkgs }}"
     state: present
-  when: xmonad_install_pkgs | length > 0
+  when: internet_available | bool and xmonad_install_pkgs | length > 0
   become: yes
   tags:
     - 'xmonad_deps'
@@ -28,10 +28,13 @@
         url:  'https://get.haskellstack.org/'
         dest: "{{ haskell_stack_installer }}"
         mode: '0750'
+
     - name: xmonad | Run stack installer
       command: "{{ haskell_stack_installer }} -d {{ haskell_stack_bin_path }} -f"
       args:
         creates: "{{ haskell_stack_bin_path + '/stack' }}"
+
+  when: internet_available | bool
   tags:
     - 'xmonad_deps'
 
@@ -52,6 +55,7 @@
           - "{{ xmonad_repo_dir + '/extra-pkgs/xmobar' }}"
       register: xmobar_repo_readlink
       changed_when: false
+
     - name: xmonad | Clone xmobar repository
       git:
         repo: 'https://github.com/jaor/xmobar.git'
@@ -60,10 +64,16 @@
         clone: yes
       register: xmobar_updated
 
+  when: internet_available | bool
+  tags:
+    - xmonad_bin
+
+- block:
     - name: xmonad | Stat binary
       stat:
         path: "{{ xmonad_bin }}"
       register: xmonad_bin_stats
+
     - name: xmonad | Stat xmobar binary
       stat:
         path: "{{ xmobar_bin }}"

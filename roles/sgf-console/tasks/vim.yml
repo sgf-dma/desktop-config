@@ -12,6 +12,7 @@
   get_url:
     url:  'https://tpo.pe/pathogen.vim'
     dest: "{{ vim_dir + '/autoload/pathogen.vim' }}"
+  when: internet_available | bool
 
 # FIXME: `.vimrc` references some plugins, which may not be there..
 - name: vim | Intall common vimrc
@@ -45,4 +46,5 @@
       }}
     clone: yes
   loop: "{{ vim_plugins }}"
+  when: internet_available | bool
 

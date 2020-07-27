@@ -14,10 +14,10 @@
     - 'desktop_deps'
 
 - name: gui | Install desktop dependencies
-  apt:
+  package:
     name: "{{ desktop_install_pkgs }}"
     state: present
-  when: desktop_install_pkgs | length > 0
+  when: internet_available | bool and desktop_install_pkgs | length > 0
   become: yes
   tags:
     - 'desktop_deps'

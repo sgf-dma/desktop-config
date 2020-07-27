@@ -1,11 +1,11 @@
 ---
 
 - name: firefox | Install OS package
-  apt:
+  package:
     name: 'firefox-esr'
     state: present
   become: yes
-  when: ansible_facts.packages['firefox-esr'] is not defined
+  when: internet_available | bool and ansible_facts.packages['firefox-esr'] is not defined
 
 - block:
     # If 'url' is defined by user, i don't use 'version' and 'lang' fields
@@ -130,11 +130,11 @@
 # FIXME: Use `desktop-file-install` for installing desktop files?
 - block:
     - name: firefox | Install desktop file utils
-      apt:
+      package:
         name: 'desktop-file-utils'
         state: present
       become: yes
-      when: ansible_facts.packages['desktop-file-utils'] is not defined
+      when: internet_available | bool and ansible_facts.packages['desktop-file-utils'] is not defined
     - name: firefox | Create directory for user .desktop entries
       file:
         path:   "{{ user_desktop_entries }}"
@@ -253,7 +253,8 @@
         state: present
       become: yes
       when: >-
-        pkgs_mime | intersect(ansible_facts.packages.keys()) != pkgs_mime
+        internet_available | bool
+        and pkgs_mime | intersect(ansible_facts.packages.keys()) != pkgs_mime
     - name: firefox | Create mimeapps.list file, if it doesn't exist
       template:
         force: "{{ force_overwrite }}"

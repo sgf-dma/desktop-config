@@ -57,6 +57,9 @@ force_overwrite: no
 # parent task.
 colors: {}
 
+# Whether internet connection available or not.
+internet_available: true
+
 # Default for _all_ `colors` dictionary keys (overwriting role default value).
 # But particular `colors` key set explicitly in parent task will overwrite
 # this value. This variable used by several roles (e.g. `sgf-console` and

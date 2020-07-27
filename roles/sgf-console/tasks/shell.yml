@@ -45,7 +45,7 @@
         force: yes
         mode: 0644
 
-  when: install_keychain | bool
+  when: install_keychain | bool and internet_available | bool
   tags:
     - keychain
 
@@ -79,7 +79,7 @@
       when: >-
         force_overwrite or thefuck_updated.changed or not thefuck_bin_stats.stat.exists
 
-  when: not dont_fuck_with_me | bool
+  when: not dont_fuck_with_me | bool and internet_available | bool
   tags:
     - fuck
 
@@ -144,7 +144,7 @@
         - cowsay
         - cowthink
 
-  when: obtain_cowpowers
+  when: obtain_cowpowers and internet_available | bool
   tags:
     - cowsay
 

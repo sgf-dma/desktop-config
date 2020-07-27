@@ -29,6 +29,7 @@
         state:  present
         # FIXME: Hardcoded `tmux_plugin_dir` .
         line:   "run '~/.tmux/plugins/tpm/tpm'"
+  when: internet_available | bool
 
 - block:
     - name: tmux | Install solarized colors plugin
@@ -36,7 +37,9 @@
         repo:   'https://github.com/seebi/tmux-colors-solarized'
         clone:  yes
         dest:   "{{ tmux_plugin_dir + '/tmux-colors-solarized' }}"
-    - name: tmux | Install additional colorschemes
+      when: internet_available | bool
+
+    - name: tmux | Copy additional colorschemes
       copy:
         src:    "{{ item }}"
         dest:   "{{ tmux_plugin_dir + '/tmux-colors-solarized' }}"
@@ -44,5 +47,6 @@
         - "tmux-colors/*"
       tags:
         - 'colors_config'
+
   when: colors.tmux != 'disabled'
 

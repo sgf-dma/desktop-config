@@ -33,11 +33,11 @@
 
 - block:
     - name: Install parcellite
-      apt:
+      package:
         name: parcellite
         state: present
       become: yes
-      when: ansible_facts.packages['parcellite'] is not defined
+      when: internet_available | bool and ansible_facts.packages['parcellite'] is not defined
     - name: Install parcellite config
       copy:
         src:    "parcellite/parcelliterc"

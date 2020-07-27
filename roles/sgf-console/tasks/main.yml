@@ -84,7 +84,7 @@
         name: 'git'
         state: present
       become: yes
-      when: ansible_facts.packages['git'] is not defined
+      when: internet_available | bool and ansible_facts.packages['git'] is not defined
     - name: Install git config
       template:
         src:    "gitconfig"
@@ -102,7 +102,7 @@
         name: 'tmux'
         state: present
       become: yes
-      when: ansible_facts.packages['tmux'] is not defined
+      when: internet_available | bool and ansible_facts.packages['tmux'] is not defined
     - name: Install common tmux config
       include_tasks:
         file: tmux.yml
@@ -127,7 +127,7 @@
         name: 'vim'
         state: present
       become: yes
-      when: ansible_facts.packages['vim'] is not defined
+      when: internet_available | bool and ansible_facts.packages['vim'] is not defined
     - name: Configure vim
       include_tasks:
         file: vim.yml
