@@ -21,7 +21,7 @@
 
     - role: sgf-desktop
       vars:
-        xmobar_branch: ca5b802bd4fa134cdbc3e4986d64b5116bcffd68
+        xmobar_branch: e71512b7c961ab379aee98c2f4d65ad4bdd3c5bf
         firefox_default_desktop: 'firefox-esr.desktop'
         firefox_versions:
           - version: '52.9.0esr'
