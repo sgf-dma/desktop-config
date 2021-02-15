@@ -1,0 +1,60 @@
+---
+
+- block:
+    - name: grub | Define grub_menu
+      set_fact:
+        _grub_menus: >-
+          {{ _grub_menus | combine(
+                  { item : grub_menus_all[item] | combine(grub_menus[item]) }
+                )
+          }}
+      loop: "{{ grub_menus.keys() | list }}"
+
+- block:
+    - name: grub | Create directory for 40_custom configs
+      file:
+        path:  "{{ grub_conf_d }}"
+        state: directory
+
+    - name: grub | Copy 40_custom configs
+      template:
+        src:  "{{ item }}"
+        dest: "{{ grub_conf_d + '/' + item | basename }}"
+        force: yes
+      loop: "{{ query('fileglob', 'files/grub/*') }}"
+
+    - name: grub | Generate 40_custom functions
+      template:
+        src:  'grub/functions'
+        dest: "{{ grub_conf_d + '/10_functions' }}"
+        force: yes
+
+    - name:
+      debug:
+        var: _grub_menus
+
+    - name: grub | Generate menuentries
+      template:
+        src:  "{{ item_src }}"
+        dest: "{{ grub_conf_d + '/' + item_dst }}"
+        force: yes
+      vars:
+        item_bn: >-
+          {{ 'menuentry_' + item }}
+        item_src: >-
+          {{ 'templates/grub/' + item_bn }}
+        item_num: >-
+          {{ _grub_menus[item].num }}
+        item_dst: >-
+          {{ item_num + '_' + item_bn }}
+      #{{ ( '10_' if item_bn | regex_search("^[0-9]+_") is none else '' )
+      #      + item_bn }}
+      #loop: "{{ query('fileglob', 'templates/grub/menuentry_*') }}"
+      loop: "{{ _grub_menus.keys() }}"
+
+    - name: grub | Assembly 40_custom
+      assemble:
+        src: "{{ grub_conf_d }}"
+        dest: '/etc/grub.d/40_custom'
+
+  become: yes

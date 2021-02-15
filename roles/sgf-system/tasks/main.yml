@@ -55,3 +55,8 @@
   tags:
     - 'apparmor'
 
+- name: Install grub functions
+  import_tasks: grub.yml
+  tags:
+    - 'grub'
+

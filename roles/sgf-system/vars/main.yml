@@ -28,3 +28,48 @@ default_pdns_rec_config:
 
 pdns_rec_config: >-
   {{ my_pdns_rec_config | default({}) | combine(default_pdns_rec_config) }}
+
+# Directory containing configs, which will be assembled into
+# '/etc/grub.d/40_custom' .
+grub_conf_d: '/etc/grub.d/40_custom.d'
+
+# All:
+# 'desc' - description, which will be used in menuentry name.
+# 'X_drive' - either grub drive specification (with braces, as returned by
+# 'extract_msdos_hd' from 'templates/grub/functions') or name of grub drive
+# from 'grub_drives' dictionary.
+# 'num' - number for sorting. Effectively, this will determine menu position
+# in assembled '40_custom' file.
+#
+# For 'truecrypt_rescue' truecrypt or veracrypt rescue menu:
+# 'rescue_name' - truecrypt rescue disc name _without_ slot index. Full
+# filename should be 'I-{{ rescue_name }}', where I - is numeric slot index.
+# 'rescue_dir' - path to directory, where truecrypt rescue disc images are
+# stored. The path should be on 'rescue_drive' drive.
+#
+# For 'load_os' menu:
+# 'crypt_uuid' - uuid of LUKS encrypted root. If empty, no encryption assumed.
+# 'root_drive' - grub drive, where OS grub was installed. If empty, '$root'
+# will not be changed.
+grub_menus_all:
+  { 'load_os':
+    { 'crypt_uuid' : ''
+    , 'root_drive' : ''
+    , 'num' : 10
+    }
+  , 'windows':
+    { 'desc' : 'Windows 7'
+    , 'win_drive' : 'windows'
+    , 'num' : 20
+    }
+  , 'truecrypt_rescue':
+    { 'desc' : 'Veracrypt Rescue Disk'
+    , 'win_drive' : 'windows'
+    , 'rescue_drive' : '($root)'
+    , 'rescue_dir' : '/etc/keys'
+    , 'rescue_name' : 'VeraCrypt Rescue Disk.iso'
+    , 'num' : 30
+    }
+  }
+
+_grub_menus: []

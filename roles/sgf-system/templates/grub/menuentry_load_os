@@ -1,0 +1,24 @@
+menuentry 'Load OS grub.cfg' {
+        insmod part_msdos
+        insmod mdraid1x
+        insmod lvm
+        insmod cryptodisk
+        insmod luks
+        insmod gcry_rijndael
+        insmod gcry_sha1
+        insmod diskfilter
+        insmod ext2
+
+{% if _grub_menus['load_os'].crypt_uuid != '' %}
+        cryptomount -u {{ _grub_menus['load_os'].crypt_uuid }}
+{% endif %}
+
+{% if _grub_menus['load_os'].root_drive != '' %}
+        set root='{{ _grub_menus['load_os'].root_drive }}'
+{% endif %}
+
+        echo    'Loading OS root grub.cfg ...'
+        read
+        configfile /boot/grub/grub.cfg
+}
+

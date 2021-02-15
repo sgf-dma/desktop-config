@@ -1,0 +1,10 @@
+menuentry '{{ _grub_menus['windows'].desc }}' {
+        insmod part_msdos
+
+        get_{{ _grub_menus['windows'].win_drive }}_drive root
+        if [ "$?" -eq 0 ]; then
+          echo "Chainload {{ _grub_menus['windows'].desc }} system drive from '$root'."
+          chainloader '+1'
+        fi
+}
+
