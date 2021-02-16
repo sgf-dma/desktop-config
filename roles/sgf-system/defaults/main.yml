@@ -21,14 +21,19 @@ tmp_on_tmpfs: yes
 # Overwrite for `pdns_rec_config` .
 my_pdns_rec_config: {}
 
-grub_menus:
-  { 'load_os' :
-      { 'crypt_uuid' : '2ee2542c68ad429785af3482300da27d'
-      , 'root_drive' : '(lvmid/tihzUI-hh3j-wMvd-CE82-oTGg-iscO-fHGEcx/m2Yakg-mWch-cFt4-Mipx-TExf-sfhi-xpLZr2)'
-      }
-  }
+# key - grub drive name, which will be used to generate grub functions for
+# finding this drive and may be used in 'grub_menus' dictionary to refer to
+# this drive.
+# Values:
+# 'uuid' - uuid of this drive.
+grub_drives: {}
 
-grub_drives:
-  { 'windows' : {'uuid' : 'dce80401-5870-49e5-9c75-797723c51fcc'}
-  }
+# key - must be one of keys defined in 'grub_menus_all' (from
+# 'vars/main.yml').
+# Values:
+# all values of corresponding key (from 'grub_menus_all') may be redefined
+# here. To use default values, just define empty dictionary value for that
+# key. Only menuentries corresponding to keys _defined here_ will be
+# generated.
+grub_menus: {}
 

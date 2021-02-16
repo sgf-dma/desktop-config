@@ -1,60 +1,110 @@
 ---
 
 - block:
-    - name: grub | Define grub_menu
+    - name: grub | Define grub_menus
       set_fact:
         _grub_menus: >-
           {{ _grub_menus | combine(
-                  { item : grub_menus_all[item] | combine(grub_menus[item]) }
+                  { item : grub_menus_all[item] | combine(
+                                grub_menus[item]
+                              , { 'src' : 'templates/grub/' + item_bn
+                                , 'dst' : grub_conf_d + '/' + item_num + '_' + item_bn + '.conf'
+                                }
+                              )
+                  }
                 )
           }}
+      vars:
+        item_num: >-
+          {{ grub_menus[item].num | default(grub_menus_all[item].num) }}
+        item_bn: >-
+          {{ 'menuentry_' + item }}
       loop: "{{ grub_menus.keys() | list }}"
+
+    - name: grub | Show grub_menus
+      debug:
+        var: _grub_menus
+
+- block:
+    - name: grub | Find existing 40_custom configs
+      find:
+        paths: "{{ grub_conf_d }}"
+        file_type: file
+        patterns: '*.conf'
+        use_regex: no
+      register: grub_conf_d_files
+
+    - name: grub | Show existing 40_custom configs
+      debug:
+        var: grub_conf_d_files
 
 - block:
     - name: grub | Create directory for 40_custom configs
       file:
         path:  "{{ grub_conf_d }}"
+        mode: 0755
         state: directory
 
     - name: grub | Copy 40_custom configs
-      template:
+      copy:
         src:  "{{ item }}"
-        dest: "{{ grub_conf_d + '/' + item | basename }}"
+        dest: "{{ grub_conf_d + '/' + item | basename + '.conf' }}"
+        mode: 0744
         force: yes
+        backup: yes
+      register: grub_conf_copied_files
       loop: "{{ query('fileglob', 'files/grub/*') }}"
 
     - name: grub | Generate 40_custom functions
       template:
         src:  'grub/functions'
-        dest: "{{ grub_conf_d + '/10_functions' }}"
+        dest: "{{ grub_conf_d + '/10_functions.conf' }}"
+        mode: 0744
         force: yes
-
-    - name:
-      debug:
-        var: _grub_menus
+        backup: yes
+      register: grub_conf_functions_file
 
     - name: grub | Generate menuentries
       template:
-        src:  "{{ item_src }}"
-        dest: "{{ grub_conf_d + '/' + item_dst }}"
+        src:  "{{ item.src }}"
+        dest: "{{ item.dst }}"
+        mode: 0744
         force: yes
+        backup: yes
+      register: grub_conf_generated_files
+      loop: "{{ _grub_menus.values() | list }}"
+
+  become: yes
+
+- block:
+    - name: grub | Define installed files
+      set_fact:
+        installed_files: "{{ copied_files + functions_files + generated_files }}"
       vars:
-        item_bn: >-
-          {{ 'menuentry_' + item }}
-        item_src: >-
-          {{ 'templates/grub/' + item_bn }}
-        item_num: >-
-          {{ _grub_menus[item].num }}
-        item_dst: >-
-          {{ item_num + '_' + item_bn }}
-      #{{ ( '10_' if item_bn | regex_search("^[0-9]+_") is none else '' )
-      #      + item_bn }}
-      #loop: "{{ query('fileglob', 'templates/grub/menuentry_*') }}"
-      loop: "{{ _grub_menus.keys() }}"
+        copied_files: >-
+          {{ grub_conf_copied_files.results | map (attribute='dest') | list }}
+        functions_files: >-
+          {{ [grub_conf_functions_file.dest] }}
+        generated_files: >-
+          {{ grub_conf_generated_files.results | map (attribute='dest') | list }}
+
+    - name: grub | Show installed files
+      debug:
+        var: installed_files
+
+    - name: grub | Remove old config files
+      file:
+        path: "{{ item }}"
+        state: absent
+      loop: "{{ grub_conf_d_files.files | map(attribute='path') | difference(installed_files) }}"
 
     - name: grub | Assembly 40_custom
       assemble:
         src: "{{ grub_conf_d }}"
         dest: '/etc/grub.d/40_custom'
+        regexp: '.*\.conf$'
+        mode: 0744
+        remote_src: yes
+        backup: yes
 
   become: yes
