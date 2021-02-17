@@ -36,6 +36,15 @@
         my_pdns_rec_config:
           network-timeout: 5000
           packetcache-servfail-ttl: 5
+        grub_drives: { 'windows': {'uuid': 'dce80401-5870-49e5-9c75-797723c51fcc'} }
+        grub_menus:
+          { 'load_os':
+              { 'crypt_uuid': '2ee2542c68ad429785af3482300da27d'
+              , 'root_drive': '(lvmid/tihzUI-hh3j-wMvd-CE82-oTGg-iscO-fHGEcx/m2Yakg-mWch-cFt4-Mipx-TExf-sfhi-xpLZr2)'
+              }
+          , 'windows': {}
+          , 'truecrypt_rescue': {}
+          }
       tags:
         - 'system'
 
