@@ -9,16 +9,32 @@ menuentry 'Load OS grub.cfg' {
         insmod diskfilter
         insmod ext2
 
+        set r=0
+
 {% if _grub_menus['load_os'].crypt_uuid != '' %}
         cryptomount -u {{ _grub_menus['load_os'].crypt_uuid }}
+        set r="$?"
 {% endif %}
+
+        if [ "$r" -eq 0 ]; then
 
 {% if _grub_menus['load_os'].root_drive != '' %}
-        set root='{{ _grub_menus['load_os'].root_drive }}'
+            # Grub root specify where to search _pathes_ without drive
+            # specification.
+            set root='{{ _grub_menus['load_os'].root_drive }}'
+            echo "Set 'root' to '$root'."
 {% endif %}
 
-        echo    'Loading OS root grub.cfg ...'
-        read
-        configfile /boot/grub/grub.cfg
+{% if _grub_menus['load_os'].root_prefix != '' %}
+            # Grub prefix specify where to load _modules_ from. Normally, you
+            # shouldn't change it here.
+            set prefix="{{ _grub_menus['load_os'].root_prefix }}"
+            echo "Set 'prefix' to '$prefix'."
+{% endif %}
+
+            echo    'Loading OS root grub.cfg ...'
+            read
+            configfile /boot/grub/grub.cfg
+        fi
 }
 

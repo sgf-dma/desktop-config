@@ -52,11 +52,24 @@ grub_conf_d: '/etc/grub.d/40_custom.d'
 # 'crypt_uuid' - uuid of LUKS encrypted root. If empty, no encryption assumed.
 # 'root_drive' - grub drive, where OS grub was installed. If empty, '$root'
 # will not be changed. Grub variables may be used (in case they're indeed
-# defined somewhere), they'll be substituted intact.
+# defined somewhere), they'll be substituted intact. This value will be
+# assigned to 'root' grub's variable (path where to search for any filename
+# not specifying explicit device name).
+# 'root_prefix' - value to assign to grub's 'prefix' variable. It should
+# contain absolute path of '/boot/grub', directory containing grub modules.
+#
+# NOTE: Normally, i _should not_ change grub prefix ('root_prefix' here),
+# because grub installed to drive, from which system has been started up, may
+# be of _different_ version, than grub (modules) installed to OS boot. That
+# means, normally 'load_os' should change _only_ 'root' variable (by
+# specifying 'root_drive'), so from now all pathes would read from OS boot
+# directory, but _leave intact_ 'prefix' variable, so modules are still loaded
+# from primary boot partition matching running grub version.
 grub_menus_all:
   { 'load_os':
     { 'crypt_uuid' : ''
     , 'root_drive' : ''
+    , 'root_prefix': ''
     , 'num' : 40
     }
   , 'windows':
