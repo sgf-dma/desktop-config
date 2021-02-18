@@ -106,5 +106,7 @@
         mode: 0744
         remote_src: yes
         backup: yes
+      notify:
+        - update_grub
 
   become: yes
