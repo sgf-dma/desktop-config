@@ -1,5 +1,22 @@
 ---
 
+- hosts: localhost
+  gather_facts: true
+  tasks:
+    - name:
+      setup:
+      become: yes
+      delegate_to: localhost
+    - name:
+      debug:
+        var: hostvars[inventory_hostname]
+    - name:
+      assert:
+        that:
+          - 1 == 2
+  tags:
+    - 'grub'
+
 - name: Configure home directory
   hosts: all:localhost
   vars:
