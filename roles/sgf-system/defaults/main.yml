@@ -25,7 +25,12 @@ my_pdns_rec_config: {}
 # finding this drive and may be used in 'grub_menus' dictionary to refer to
 # this drive.
 # Values:
-# 'uuid' - uuid of this drive.
+# 'uuid' - uuid of fs on grub partition for particular drive. This will be
+# used to identify that drive and to install grub into that drive. Implicitly,
+# this requires, that boot (grub) partitions were _not_ in raid (i.e. all fs
+# uuids are different).
+# 'device' - explicit device path.
+# 'no_grub' - do not install grub on this drive.
 grub_drives: {}
 
 # key - must be one of keys defined in 'grub_menus_all' (from

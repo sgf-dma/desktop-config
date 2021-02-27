@@ -1,0 +1,5 @@
+menuentry '{{ _grub_menus['windows'].desc }}' {
+        echo "This grub is booted from ..."
+        read
+}
+

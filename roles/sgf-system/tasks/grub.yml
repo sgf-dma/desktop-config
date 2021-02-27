@@ -25,6 +25,28 @@
       debug:
         var: _grub_menus
 
+    - name: grub | Define grub_drives
+      set_fact:
+        _grub_drives: >-
+          {{ _grub_drives | combine(
+                  { item : { 'device': item_device } | combine(grub_drives[item])
+                  }
+                )
+          }}
+      var:
+        item_device: >-
+      loop: "{{ grub_drives.keys() | list }}"
+      loop: "{{ ansible_device_links.uuids | dict2items }}"
+
+    - name: grub | Show grub_drives
+      debug:
+        var: _grub_drives
+
+- name:
+  assert:
+    that:
+      - 2 == 1
+
 - block:
     - name: grub (40_custom) | Find existing configs
       find:
@@ -110,3 +132,8 @@
         - update_grub
 
   become: yes
+
+- name:
+  debug:
+    var: hostvars
+
