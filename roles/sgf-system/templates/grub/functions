@@ -1,0 +1,151 @@
+### Library.
+# Extract disk from msdos disk name.
+# 1 - msdos disk name.
+# 2 - variable name, where to store result.
+function extract_msdos_hd
+{
+        regexp --set=1:$2 '^(hd.),.*$' "$1"
+        if [ "$?" -gt 0 ]; then
+          echo "Error: extract_msdos_hd: Not an msdos drive name '$1'."
+          read
+          return 1
+        fi
+}
+
+# Boot Truecrypt Rescue Disk.
+# 1 - grub drive (without braces), where Truecrypt encrypted partition located.
+# It'll be mapped to (hd0).
+# 2 - Full path to Truecrypt Rescue Disk (include drive specification).
+function boot_tc_rescue
+{
+        set tc_drive="$1"
+        set tc_iso="$2"
+
+        if [ ! -f "$tc_iso" ]; then
+          echo "Error: boot_tc_rescue: Truecrypt Rescue Disk '$tc_iso' does not exist or not a file."
+          read
+          return 1
+        fi
+
+        echo "Boot Truecrypt Rescue Disk '$tc_iso'.."
+        echo "..with truecrypt drive '$tc_drive'."
+        drivemap -s "($tc_drive)" '(hd0)'
+        if [ "$?" -gt 0 ]; then
+          echo "Error: boot_tc_rescue: Drivemap failed for drive '$tc_drive'."
+          read
+          return 1
+        fi
+
+        echo "Use drivemap:"
+        drivemap
+        read
+        linux16 /boot/memdisk iso
+        initrd16 "$tc_iso"
+}
+
+# Interpret filenames with numbers (e.g. TrueCrypt rescue disk images) as LUKS
+# keyslots. This way i can create some analogy for LUKS keyslots using grub.
+# Args:
+# 1 - full path to directory, where to search (including drive specification).
+# 2 - filename prefix (i.e. basename).
+# 3 - keyslot number separator.
+# 4 - filename suffix (i.e. extension, no implicit dot assumed).
+# 5 - variable, where to set choosed filename.
+# Number is inserted between basename and extension without delimiters. Allowed
+# numbers are 0-7 (the same as for luks).
+function choose_keyslot
+{
+        # Be careful, not use variable named 'prefix', because this is grub
+        # special variable!
+        set dir="$1"
+        set pref="$2"
+        set sep="$3"
+        set suf="$4"
+        set res_var="$5"
+
+        # LUKS supports only 7 keyslots, so i am. 0th keyslot will be used for
+        # file without keyslot index.
+        set no_keyslot="0"
+        set keyslots="1 2 3 4 5 6 7 8"
+
+        set f=''
+        # Prefix and suffix with keyslot index separator _included_.
+        set ks_pref="$pref"
+        set ks_suf="$suf"
+        set i=''
+        set found_keys=''
+
+        set k=''
+        set v=''
+
+        if [ "x$pref" != "x" ]; then
+          set ks_pref="$pref$sep"
+        elif [ "x$suf" != "x" ]; then
+          set ks_suf="$sep$suf"
+        else
+          echo "Filename is empty."
+          return 1
+        fi
+
+        echo "Trying without keyslot (assigned to keyslot $no_keyslot).."
+        set f="$dir/$pref$suf"
+        echo "Trying file '$f'.."
+        if [ -f "$f" ]; then
+          echo "..found."
+          # Assign file without keyslot to some keyslot index.
+          set found_keys="$found_keys $no_keyslot "
+        fi
+
+        for i in $keyslots; do
+          echo "Trying keyslot '$i'."
+          set f="$dir/$ks_pref$i$ks_suf"
+
+          echo "Trying file '$f'.."
+          if [ -f "$f" ]; then
+            echo "..found."
+            set found_keys="$found_keys $i "
+          fi
+        done
+
+        echo "Found keys: $found_keys"
+        echo -n "Choose one: "
+        read k
+        echo
+
+        set v=''
+        regexp -s 1:v " ($k) " "$found_keys"
+        if [ -n "$v" ]; then
+          if [ "$v" = "$no_keyslot" ]; then
+            set f="$dir/$pref$suf"
+          else
+            set f="$dir/$ks_pref$v$ks_suf"
+          fi
+          echo "Selected keyslot '$v', with file '$f'"
+          set $res_var="$f"
+          read
+        else
+          echo "No such key '$k'."
+          read
+          return 1
+        fi
+}
+
+
+### Helper functions.
+# Recognized by name grub drive uuids.
+{% for drv in grub_drives.keys() %}
+set drive_uuid_{{ drv }}='{{ grub_drives[drv].uuid }}'
+{% endfor %}
+
+# Functions for setting a variable to grub drive recognized by name.
+{% for drv in grub_drives.keys() %}
+# 1 - variable name, where to store result.
+function get_{{ drv }}_drive
+{
+        set drv=''
+        search --no-floppy --fs-uuid --set=drv {{ grub_drives[drv].uuid }}
+        extract_msdos_hd "$drv" "$1"
+}
+
+{% endfor %}
+

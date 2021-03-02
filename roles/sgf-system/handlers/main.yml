@@ -17,3 +17,7 @@
     name: apparmor
     state: reloaded
   become: yes
+
+- name: update_grub
+  command: update-grub
+  become: yes

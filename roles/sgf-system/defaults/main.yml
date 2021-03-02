@@ -20,3 +20,20 @@ tmp_on_tmpfs: yes
 
 # Overwrite for `pdns_rec_config` .
 my_pdns_rec_config: {}
+
+# key - grub drive name, which will be used to generate grub functions for
+# finding this drive and may be used in 'grub_menus' dictionary to refer to
+# this drive.
+# Values:
+# 'uuid' - uuid of this drive.
+grub_drives: {}
+
+# key - must be one of keys defined in 'grub_menus_all' (from
+# 'vars/main.yml').
+# Values:
+# all values of corresponding key (from 'grub_menus_all') may be redefined
+# here. To use default values, just define empty dictionary value for that
+# key. Only menuentries corresponding to keys _defined here_ will be
+# generated.
+grub_menus: {}
+

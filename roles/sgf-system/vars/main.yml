@@ -28,3 +28,64 @@ default_pdns_rec_config:
 
 pdns_rec_config: >-
   {{ my_pdns_rec_config | default({}) | combine(default_pdns_rec_config) }}
+
+# Directory containing configs, which will be assembled into
+# '/etc/grub.d/40_custom' .
+grub_conf_d: '/etc/grub.d/40_custom.d'
+
+# All:
+# 'desc' - description, which will be used in menuentry name.
+# 'X_drive' - either grub drive specification (with braces, as returned by
+# 'extract_msdos_hd' from 'templates/grub/functions') or name of grub drive
+# from 'grub_drives' dictionary.
+# 'num' - number for sorting. Effectively, this will determine menu position
+# in assembled '40_custom' file.
+#
+# For 'truecrypt_rescue' truecrypt or veracrypt rescue menu:
+# 'rescue_name' - truecrypt rescue disc name _without_ slot index. Full
+# filename should be 'I-rescue_name', where I - is numeric slot index.  If
+# slots are not used, just 'rescue_name' will also be checked at the end.
+# 'rescue_dir' - path to directory, where truecrypt rescue disc images are
+# stored. The path should be on 'rescue_drive' drive.
+#
+# For 'load_os' menu:
+# 'crypt_uuid' - uuid of LUKS encrypted root. If empty, no encryption assumed.
+# 'root_drive' - grub drive, where OS grub was installed. If empty, '$root'
+# will not be changed. Grub variables may be used (in case they're indeed
+# defined somewhere), they'll be substituted intact. This value will be
+# assigned to 'root' grub's variable (path where to search for any filename
+# not specifying explicit device name).
+# 'root_prefix' - value to assign to grub's 'prefix' variable. It should
+# contain absolute path of '/boot/grub', directory containing grub modules.
+#
+# NOTE: Normally, i _should not_ change grub prefix ('root_prefix' here),
+# because grub installed to drive, from which system has been started up, may
+# be of _different_ version, than grub (modules) installed to OS boot. That
+# means, normally 'load_os' should change _only_ 'root' variable (by
+# specifying 'root_drive'), so from now all pathes would read from OS boot
+# directory, but _leave intact_ 'prefix' variable, so modules are still loaded
+# from primary boot partition matching running grub version.
+grub_menus_all:
+  { 'load_os':
+    { 'crypt_uuid' : ''
+    , 'root_drive' : ''
+    , 'root_prefix': ''
+    , 'num' : 40
+    }
+  , 'windows':
+    { 'desc' : 'Windows 10'
+    , 'win_drive' : 'windows'
+    , 'num' : 41
+    }
+  , 'truecrypt_rescue':
+    { 'desc' : 'Veracrypt Rescue Disk'
+    , 'win_drive' : 'windows'
+    , 'rescue_drive' : '($root)'
+    , 'rescue_dir' : '/etc/keys'
+    , 'rescue_name' : 'VeraCrypt Rescue Disk.iso'
+    , 'num' : 42
+    }
+  }
+
+_grub_menus: []
+

@@ -1,0 +1,20 @@
+menuentry '{{ _grub_menus['truecrypt_rescue'].desc }}' {
+        insmod part_msdos
+
+        # Find windows drive first, because when i activate lvm, other w7 boot
+        # raid device in LVM will have the same UUID as msdos partition. So i
+        # can't use msdos partition to identify drive after LVM is active.
+        set tc_drive=''
+        get_{{ _grub_menus['truecrypt_rescue'].win_drive }}_drive tc_drive
+        if [ "$?" -eq 0 ]; then
+          set tc_iso=''
+          # Assume, that
+          # - Truecrypt Rescue Disk names start with keyslot number.
+          # - `root` is OS root and keys are there.
+          choose_keyslot "{{ _grub_menus['truecrypt_rescue'].rescue_drive + _grub_menus['truecrypt_rescue'].rescue_dir }}" "" "-" "{{ _grub_menus['truecrypt_rescue'].rescue_name }}" "tc_iso"
+          if [ "$?" -eq 0 ]; then
+            boot_tc_rescue "$tc_drive" "$tc_iso"
+          fi
+        fi
+}
+
