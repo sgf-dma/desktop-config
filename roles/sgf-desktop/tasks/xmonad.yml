@@ -55,6 +55,7 @@
           - "{{ xmonad_repo_dir + '/extra-pkgs/xmobar' }}"
       register: xmobar_repo_readlink
       changed_when: false
+      check_mode: false
 
     - name: xmonad | Clone xmobar repository
       git:
