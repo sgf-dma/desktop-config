@@ -62,9 +62,8 @@
     # FIXME: This color setup require further setup vim setup. Particularly, it
     # requires vim solarized plugin to be installed.
     - name: Assemble X resources
-      assemble:
+      ansible.builtin.assemble:
         src:    "{{ user_x_resources }}"
-        force:  yes
         backup: yes
         dest:   "{{ ansible_user_dir }}/.Xresources"
   tags:
