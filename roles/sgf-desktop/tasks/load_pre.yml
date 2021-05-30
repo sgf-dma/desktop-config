@@ -6,7 +6,7 @@
   set_fact:
     colors: >
       {{ {item.key : all_colors | default(item.value)} | combine(colors) }}
-  with_dict: "{{ desktop_colors }}"
+  loop: "{{ desktop_colors | dict2items }}"
 
 - name: load_pre | Loaded desktop colors are..
   debug:

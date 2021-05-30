@@ -6,7 +6,7 @@
   set_fact:
     colors: >
       {{ {item.key : all_colors | default(item.value)} | combine(colors) }}
-  with_dict: "{{ console_colors }}"
+  loop: "{{ console_colors | dict2items }}"
 
 - name: load_pre | Loaded console colors are..
   debug:
