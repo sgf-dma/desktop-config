@@ -175,10 +175,10 @@ EOF
 }
 
 sayHi() {
-    cowsay -w "${@:- {{- default_cowHi -}} }" | lolcat -a
+    cowsay -w "${@:- {{- cow_Hi -}} }" | lolcat -a
 }
 
 sayBye() {
-    neo-cowsay --super "${@:- {{- default_cowBye -}} }"
+    neo-cowsay --super "${@:- {{- cow_Bye -}} }"
 }
 {% endif %}
