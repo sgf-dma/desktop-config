@@ -2,29 +2,29 @@
 # tasks file for sgf-tmux
 
 - name: Load pre_tasks
-  import_tasks: load_pre.yml
+  ansible.builtin.import_tasks: load_pre.yml
   tags:
     - 'always'
 
 - block:
     - name: shell | Ensure user local path exists
-      file:
+      ansible.builtin.file:
         path: "{{ user_local_path }}"
         state: directory
 
     - name: shell | Stat user local bin
-      stat:
+      ansible.builtin.stat:
         path: "{{ user_local_bin }}"
       register: user_local_bin_stats
 
     - name: shell | Stat user bin
-      stat:
+      ansible.builtin.stat:
         path: "{{ user_bin }}"
       register: user_bin_stats
 
     - block:
         - name: shell | Remove ~/.local/bin symlink to ~/bin
-          file:
+          ansible.builtin.file:
             path: "{{ user_local_bin }}"
             state: absent
           when: >-
@@ -33,7 +33,7 @@
             and user_local_bin_stats.stat.lnk_source == ansible_user_dir + '/bin'
 
         - name: shell | Move ~/bin, if exists, to ~/.local/bin
-          command:
+          ansible.builtin.command:
             argv:
               - mv
               - '-T'
@@ -45,14 +45,14 @@
           when: user_bin_stats.stat.isdir is defined and user_bin_stats.stat.isdir
 
         - name: shell | Ensure user local bin exists
-          file:
+          ansible.builtin.file:
             path: "{{ user_local_path + '/bin' }}"
             force: no
             follow: no
             state: directory
 
         - name: shell | Ensure, that ~/bin was not symlink to wrong target
-          assert:
+          ansible.builtin.assert:
             that:
               - not user_bin_stats.stat.exists
                 or  user_bin_stats.stat.exists
@@ -63,14 +63,14 @@
             msg: "It seems, that ~/bin is already a symlink, but not to ~/.local/bin"
 
         - name: shell | Create ~/bin as symlink to ~/.local/bin
-          file:
+          ansible.builtin.file:
             path: "{{ user_bin }}"
             follow: yes
             state: link
             src:  "{{ user_local_bin }}"
 
     - name: shell | Ensure user man1 directory exists
-      file:
+      ansible.builtin.file:
         path: "{{ user_man1_path }}"
         state: directory
 
@@ -80,13 +80,14 @@
 
 - block:
     - name: Install git
-      package:
+      ansible.builtin.package:
         name: 'git'
         state: present
       become: yes
       when: _internet_available and ansible_facts.packages['git'] is not defined
+
     - name: Install git config
-      template:
+      ansible.builtin.template:
         src:    "gitconfig"
         force:  yes
         backup: yes
@@ -98,13 +99,14 @@
 
 - block:
     - name: Install tmux
-      package:
+      ansible.builtin.package:
         name: 'tmux'
         state: present
       become: yes
       when: _internet_available and ansible_facts.packages['tmux'] is not defined
+
     - name: Install common tmux config
-      include_tasks:
+      ansible.builtin.include_tasks:
         file: tmux.yml
         apply:
           tags:
@@ -117,19 +119,20 @@
 
 - block:
     - name: Configure bashrc
-      import_tasks: shell.yml
+      ansible.builtin.import_tasks: shell.yml
   tags:
     - 'shell'
 
 - block:
     - name: Install vim
-      package:
+      ansible.builtin.package:
         name: 'vim'
         state: present
       become: yes
       when: _internet_available and ansible_facts.packages['vim'] is not defined
+
     - name: Configure vim
-      include_tasks:
+      ansible.builtin.include_tasks:
         file: vim.yml
         apply:
           tags:

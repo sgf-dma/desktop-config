@@ -2,19 +2,20 @@
 
 - block:
     - name: gui | Define desktop dependencies
-      set_fact:
+      ansible.builtin.set_fact:
         desktop_install_pkgs: "{{ desktop_install_pkgs + [item] }}"
       when: ansible_facts.packages[item] is not defined
       loop: "{{ desktop_required_pkgs }}"
+
     - name: gui | Show desktop dependencies to be installed
-      debug:
+      ansible.builtin.debug:
         var: desktop_install_pkgs
   tags:
     - 'load'
     - 'desktop_deps'
 
 - name: gui | Install desktop dependencies
-  package:
+  ansible.builtin.package:
     name: "{{ desktop_install_pkgs }}"
     state: present
   when: _internet_available and desktop_install_pkgs | length > 0

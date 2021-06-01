@@ -3,7 +3,7 @@
 # TODO: Ansible option for preserving old `-option`-s or resetting them (now).
 
 - name: xkb | Create user xkb dir
-  file: 
+  ansible.builtin.file:
     path:  "{{ user_xkb_dir + item }}"
     state: directory
   loop:
@@ -15,19 +15,19 @@
 # copied it and patched. On the other hand, i can't just copy it again, because
 # then play will always have `changed` status.
 - name: xkb | Copy current evdev rules
-  copy:
+  ansible.builtin.copy:
     src:    "/usr/share/X11/xkb/rules/evdev"
     force:  no
     dest:   "{{ user_xkb_rules }}"
 
 - name: xkb | Copy current evdev rules list
-  copy:
+  ansible.builtin.copy:
     src:    "/usr/share/X11/xkb/rules/evdev.lst"
     force:  no
     dest:   "{{ user_xkb_rules + '.lst' }}"
 
 - name: xkb | Add rules
-  blockinfile:
+  ansible.builtin.blockinfile:
     path:   "{{ user_xkb_rules }}"
     backup: yes
     insertafter: EOF
@@ -40,7 +40,7 @@
       ctrl_shift_to_group1            = +ctrl_shift_to_group1
 
 - name: xkb | Install custom symbols
-  copy:
+  ansible.builtin.copy:
     src:    "{{ item }}"
     force:  yes
     dest:   "{{ user_xkb_dir }}/symbols"
@@ -48,7 +48,7 @@
     - xkb/symbols/*
 
 - name: xkb | Install custom types
-  copy:
+  ansible.builtin.copy:
     src:    "{{ item }}"
     force:  yes
     dest:   "{{ user_xkb_dir }}/types"
@@ -56,7 +56,7 @@
     - xkb/types/*
 
 - name: xkb | Install xkb script
-  template:
+  ansible.builtin.template:
     src:    "xkb.sh"
     force:  yes
     backup: yes

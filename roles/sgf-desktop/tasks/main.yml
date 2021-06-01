@@ -2,22 +2,22 @@
 
 - block:
     - name: Load pre_tasks
-      import_tasks: load_pre.yml
+      ansible.builtin.import_tasks: load_pre.yml
 
     - name: Load
-      import_tasks: load.yml
+      ansible.builtin.import_tasks: load.yml
   tags:
     - 'always'
 
 - name: Create user dist directory exists
-  file:
+  ansible.builtin.file:
     path: "{{ user_dist_dir }}"
     state: directory
   tags:
     - 'always'
 
 - name: Configure xkb layout
-  include_tasks:
+  ansible.builtin.include_tasks:
     file: xkb.yml
     apply:
       tags:
@@ -27,19 +27,19 @@
     - 'xkb'
 
 - name: Install IM config
-  import_tasks: im.yml
+  ansible.builtin.import_tasks: im.yml
   tags:
     - 'im'
 
 - block:
     - name: Install parcellite
-      package:
+      ansible.builtin.package:
         name: parcellite
         state: present
       become: yes
       when: _internet_available and ansible_facts.packages['parcellite'] is not defined
     - name: Install parcellite config
-      copy:
+      ansible.builtin.copy:
         src:    "parcellite/parcelliterc"
         force:  yes
         backup: yes
@@ -49,11 +49,11 @@
 
 - block:
     - name: Create X resources directory
-      file:
+      ansible.builtin.file:
         state:  directory
         dest:   "{{ user_x_resources }}"
     - name: Install X resources
-      template:
+      ansible.builtin.template:
         src:    "{{ item }}"
         dest:   "{{ user_x_resources + '/' + item | basename }}"
         force:  yes
@@ -71,24 +71,24 @@
     - 'colors_config'
 
 - name: Install xmonad
-  import_tasks: xmonad.yml
+  ansible.builtin.import_tasks: xmonad.yml
   tags:
     - 'xmonad'
     - 'gui'
 
 - name: Install desktop packages
-  import_tasks: gui.yml
+  ansible.builtin.import_tasks: gui.yml
   tags:
     - 'gui'
 
 - block:
     - name: Firefox fixes
-      import_tasks: firefox.yml
+      ansible.builtin.import_tasks: firefox.yml
   tags:
     - 'firefox'
 
 - name: Install anki
-  import_tasks: anki.yml
+  ansible.builtin.import_tasks: anki.yml
   when: ansible_distribution_major_version | int == 9
   tags:
     - 'anki'

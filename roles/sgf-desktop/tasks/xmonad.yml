@@ -2,19 +2,20 @@
 
 - block:
     - name: xmonad | Define dependencies
-      set_fact:
+      ansible.builtin.set_fact:
         xmonad_install_pkgs: "{{ xmonad_install_pkgs + [item] }}"
       when: ansible_facts.packages[item] is not defined
       loop: "{{ xmonad_required_pkgs }}"
+
     - name: xmonad | Show xmonad dependencies to be installed
-      debug:
+      ansible.builtin.debug:
         var: xmonad_install_pkgs
   tags:
     - 'load'
     - 'xmonad_deps'
 
 - name: xmonad | Install xmonad dependencies
-  package:
+  ansible.builtin.package:
     name: "{{ xmonad_install_pkgs }}"
     state: present
   when: _internet_available and xmonad_install_pkgs | length > 0
@@ -24,13 +25,13 @@
 
 - block:
     - name: xmonad | Get stack installer
-      get_url:
+      ansible.builtin.get_url:
         url:  'https://get.haskellstack.org/'
         dest: "{{ haskell_stack_installer }}"
         mode: '0750'
 
     - name: xmonad | Run stack installer
-      command: "{{ haskell_stack_installer }} -d {{ haskell_stack_bin_path }} -f"
+      ansible.builtin.command: "{{ haskell_stack_installer }} -d {{ haskell_stack_bin_path }} -f"
       args:
         creates: "{{ haskell_stack_bin_path + '/stack' }}"
 
@@ -40,7 +41,7 @@
 
 - block:
     - name: xmonad | Clone repository
-      git:
+      ansible.builtin.git:
         repo: 'https://github.com/sgf-dma/sgf-xmonad-config.git'
         dest: "{{ xmonad_repo_dir }}"
         version: "{{ xmonad_branch }}"
@@ -48,7 +49,7 @@
       register: xmonad_updated
 
     - name: xmonad | Determine xmobar repo path
-      command:
+      ansible.builtin.command:
         argv:
           - /bin/readlink
           - '-f'
@@ -58,7 +59,7 @@
       check_mode: false
 
     - name: xmonad | Clone xmobar repository
-      git:
+      ansible.builtin.git:
         repo: 'https://github.com/jaor/xmobar.git'
         dest: "{{ xmobar_repo_readlink.stdout }}"
         version: "{{ xmobar_branch }}"
@@ -71,17 +72,17 @@
 
 - block:
     - name: xmonad | Stat binary
-      stat:
+      ansible.builtin.stat:
         path: "{{ xmonad_bin }}"
       register: xmonad_bin_stats
 
     - name: xmonad | Stat xmobar binary
-      stat:
+      ansible.builtin.stat:
         path: "{{ xmobar_bin }}"
       register: xmobar_bin_stats
 
     - name: xmonad | Build
-      make:
+      community.general.make:
         chdir: "{{ xmonad_repo_dir }}"
         target: install
       when: not ( xmonad_bin_stats.stat.exists and xmobar_bin_stats.stat.exists )
@@ -95,13 +96,13 @@
     # User's Xsession.d normally is created by xmonad Makefile, but just to be
     # sure..
     - name: xmonad | Create user's Xsession.d directory
-      file:
+      ansible.builtin.file:
         path:   "{{ user_xsession_dir }}"
         mode:   0755
         state:  directory
 
     - name: xmonad | Add user's bin to PATH in Xsession
-      copy:
+      ansible.builtin.copy:
         src:    "{{ item }}"
         force:  yes
         backup: yes

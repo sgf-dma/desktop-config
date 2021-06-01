@@ -22,7 +22,7 @@
           }}
 
     - name:
-      debug:
+      ansible.builtin.debug:
         var: python_apt_status
 
     - name: Install python-apt package
