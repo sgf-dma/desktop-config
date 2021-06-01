@@ -22,7 +22,7 @@
     apply:
       tags:
         - 'xkb'
-  when: xkb_mods
+  when: _xkb_mods
   tags:
     - 'xkb'
 
@@ -37,7 +37,7 @@
         name: parcellite
         state: present
       become: yes
-      when: internet_available | bool and ansible_facts.packages['parcellite'] is not defined
+      when: _internet_available and ansible_facts.packages['parcellite'] is not defined
     - name: Install parcellite config
       copy:
         src:    "parcellite/parcelliterc"

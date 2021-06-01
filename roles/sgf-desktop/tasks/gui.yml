@@ -17,7 +17,7 @@
   package:
     name: "{{ desktop_install_pkgs }}"
     state: present
-  when: internet_available | bool and desktop_install_pkgs | length > 0
+  when: _internet_available and desktop_install_pkgs | length > 0
   become: yes
   tags:
     - 'desktop_deps'

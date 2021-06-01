@@ -17,7 +17,7 @@
   package:
     name: "{{ xmonad_install_pkgs }}"
     state: present
-  when: internet_available | bool and xmonad_install_pkgs | length > 0
+  when: _internet_available and xmonad_install_pkgs | length > 0
   become: yes
   tags:
     - 'xmonad_deps'
@@ -34,7 +34,7 @@
       args:
         creates: "{{ haskell_stack_bin_path + '/stack' }}"
 
-  when: internet_available | bool
+  when: _internet_available
   tags:
     - 'xmonad_deps'
 
@@ -65,7 +65,7 @@
         clone: yes
       register: xmobar_updated
 
-  when: internet_available | bool
+  when: _internet_available
   tags:
     - xmonad_bin
 
@@ -86,7 +86,7 @@
         target: install
       when: not ( xmonad_bin_stats.stat.exists and xmobar_bin_stats.stat.exists )
             or  ( xmonad_updated.changed or xmobar_updated.changed )
-            or  force_overwrite
+            or  _force_overwrite
 
   tags:
     - xmonad_bin

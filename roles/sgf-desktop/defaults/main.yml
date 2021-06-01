@@ -66,6 +66,9 @@ firefox_versions: []
 # will result in _always changed_ status of playbook run.
 force_overwrite: no
 
+# Whether internet connection available or not.
+internet_available: true
+
 # This dictionary is used by several roles (e.g. `sgf-console` and
 # `sgf-desktop`). This role initializes only part of its keys from
 # `desktop_colors` dictionary. To overwrite particular keys, set them in
