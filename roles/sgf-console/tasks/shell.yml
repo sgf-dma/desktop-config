@@ -27,7 +27,7 @@
         chdir: "{{ keychain_repo_dir }}"
         target: all
       when: >-
-        force_overwrite or keychain_updated.changed or not keychain_bin_stats.stat.exists
+        _force_overwrite or keychain_updated.changed or not keychain_bin_stats.stat.exists
 
     - name: shell | Install keychain bin
       copy:
@@ -45,7 +45,7 @@
         force: yes
         mode: 0644
 
-  when: keychain_enable | bool and internet_available | bool
+  when: _keychain_enable and _internet_available
   tags:
     - keychain
 
@@ -77,9 +77,9 @@
         executable: pip3
         chdir: "{{ thefuck_repo_dir }}"
       when: >-
-        force_overwrite or thefuck_updated.changed or not thefuck_bin_stats.stat.exists
+        _force_overwrite or thefuck_updated.changed or not thefuck_bin_stats.stat.exists
 
-  when: not dont_fuck_with_me | bool and internet_available | bool
+  when: not _dont_fuck_with_me and _internet_available
   tags:
     - fuck
 
@@ -115,7 +115,7 @@
       get_url:
         url:    "{{ neo_cowsay_url }}"
         dest:   "{{ user_dist_dir + '/' + neo_cowsay_archive }}"
-        force:  "{{ force_overwrite or neo_cowsay_assets_download.changed }}"
+        force:  "{{ _force_overwrite or neo_cowsay_assets_download.changed }}"
       register: neo_cowsay_download
 
     - name: shell | (cowsay) Ensure neo cowsay unpack directory exists
@@ -129,7 +129,7 @@
         dest: "{{ neo_cowsay_dir }}"
         remote_src: yes
         creates: >-
-          {{ ( force_overwrite or neo_cowsay_download.changed )
+          {{ ( _force_overwrite or neo_cowsay_download.changed )
               | ternary(file_does_not_exist, neo_cowsay_dir + '/cowsay')
           }}
 
@@ -144,7 +144,7 @@
         - cowsay
         - cowthink
 
-  when: obtain_cowpowers and internet_available | bool
+  when: _obtain_cowpowers and _internet_available
   tags:
     - cowsay
 
