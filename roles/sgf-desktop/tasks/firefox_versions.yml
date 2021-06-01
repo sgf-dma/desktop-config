@@ -24,6 +24,7 @@
         dest: "{{ user_dist_dir + '/' + cur_firefox.archive }}"
         force:  "{{ _force_overwrite }}"
       register: cur_firefox_download
+      when: _internet_available
     - name: firefox_versions | Unpack
       unarchive:
         src:      "{{ user_dist_dir + '/' + cur_firefox.archive }}"
