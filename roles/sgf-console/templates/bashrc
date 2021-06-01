@@ -99,7 +99,7 @@ umask 027
 export MANPATH="$HOME/.local/share/man:"
 eval $(thefuck --alias)
 eval $(thefuck --alias FUCK)
-{% if keychain_enable | bool %}
+{% if _keychain_enable %}
 {% if keychain_gpg_keys | length == 0 %}
 eval $(keychain --agents ssh --eval {{ keychain_ssh_keys | join(' ') }} )
 {% else %}
@@ -115,7 +115,7 @@ export PROMPT_DIRTRIM=2
 
 PROMPT_COMMAND='__prompt_command'
 
-{% if obtain_cowpowers %}
+{% if _obtain_cowpowers %}
 # What cow should say. If called with one argument, and file with such name
 # exists, this file will be initialized as phrases file. Then (if some phrase
 # file had been initialized) call _without_ arguments tells the cow to read
