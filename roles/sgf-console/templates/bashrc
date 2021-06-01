@@ -99,11 +99,11 @@ umask 027
 export MANPATH="$HOME/.local/share/man:"
 eval $(thefuck --alias)
 eval $(thefuck --alias FUCK)
-{% if install_keychain | bool %}
-{% if gpg_keys | length == 0 %}
-eval $(keychain --agents ssh --eval {{ ssh_keys | join(' ') }} )
+{% if keychain_enable | bool %}
+{% if keychain_gpg_keys | length == 0 %}
+eval $(keychain --agents ssh --eval {{ keychain_ssh_keys | join(' ') }} )
 {% else %}
-eval $(keychain --gpg2 --agents ssh,gpg --eval {{ (ssh_keys + gpg_keys) | join(' ') }} )
+eval $(keychain --gpg2 --agents ssh,gpg --eval {{ (keychain_ssh_keys + keychain_gpg_keys) | join(' ') }} )
 {% endif %}
 {% endif %}
 
