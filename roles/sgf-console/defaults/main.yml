@@ -15,14 +15,14 @@ vim_plugins:
 vim_disable_arrow_keys: true
 
 # Whether to install keychain or not.
-install_keychain: true
+keychain_enable: true
 # Repository, where to clone keychain.
 keychain_repo_dir: "{{ user_dist_dir + '/keychain' }}"
 # Branch to use.
 keychain_branch: 'master'
 
 # List of ssh keys to load into keychain.
-ssh_keys:
+keychain_ssh_keys:
   - 'id_rsa'
 
 # List of gpg keys to load into keychain. Note, that if this list left empty,
@@ -30,7 +30,7 @@ ssh_keys:
 # do not need (ignore, in fact) GPG_AGENT_INFO environment variable at all
 # (which keychain tries to set). Thus, on recent enough gpg it may be better
 # to leave this list empty.
-gpg_keys: []
+keychain_gpg_keys: []
 
 # Whether to install fuck ('false' - "do fuck with me" - means install).
 dont_fuck_with_me: false
