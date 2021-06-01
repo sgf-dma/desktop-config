@@ -51,14 +51,14 @@ cow_msg_statefile: "{{ ansible_user_dir + '/.cow_msg_state' }}"
 # will result in _always changed_ status of playbook run.
 force_overwrite: no
 
+# Whether internet connection available or not.
+internet_available: true
+
 # This dictionary is used by several roles (e.g. `sgf-console` and
 # `sgf-desktop`). This role initializes only part of its keys from
 # `console_colors` dictionary. To overwrite particular keys, set them in
 # parent task.
 colors: {}
-
-# Whether internet connection available or not.
-internet_available: true
 
 # Default for _all_ `colors` dictionary keys (overwriting role default value).
 # But particular `colors` key set explicitly in parent task will overwrite

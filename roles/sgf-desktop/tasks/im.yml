@@ -12,7 +12,7 @@
         state: present
       become: yes
       when: install_im_pkgs | length > 0
-  when: internet_available | bool
+  when: _internet_available
 
 - block:
     - name: im | Install config

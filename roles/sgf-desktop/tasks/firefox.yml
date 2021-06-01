@@ -5,7 +5,7 @@
     name: 'firefox-esr'
     state: present
   become: yes
-  when: internet_available | bool and ansible_facts.packages['firefox-esr'] is not defined
+  when: _internet_available and ansible_facts.packages['firefox-esr'] is not defined
 
 - block:
     # If 'url' is defined by user, i don't use 'version' and 'lang' fields
@@ -134,7 +134,7 @@
         name: 'desktop-file-utils'
         state: present
       become: yes
-      when: internet_available | bool and ansible_facts.packages['desktop-file-utils'] is not defined
+      when: _internet_available and ansible_facts.packages['desktop-file-utils'] is not defined
     - name: firefox | Create directory for user .desktop entries
       file:
         path:   "{{ user_desktop_entries }}"
@@ -145,7 +145,7 @@
         src:    "{{ item.sys_path }}"
         dest:   "{{ item.user_path }}"
         mode:   0644
-        force:  "{{ force_overwrite }}"
+        force:  "{{ _force_overwrite }}"
         backup: yes
         remote_src: yes
       when: item.sys_exists
@@ -189,7 +189,7 @@
     - 'firefox_profile_hardcode'
 
 # Note:
-# -`force_overwrite` will trigger changed status of profile hardcoding
+# -`_force_overwrite` will trigger changed status of profile hardcoding
 # task (above) and, thus, will trigger this task too.
 # - i assume, that hardcoding is run for all desktop files copied to local
 # user directory, thus it's enough to check hardcoding task changed
@@ -197,7 +197,7 @@
 - name: firefox | Update user's mime info cache
   command: update-desktop-database "{{ user_desktop_entries }}"
   when: >-
-    force_overwrite
+    _force_overwrite
     or (  firefox_desktop_changed is defined
           and firefox_desktop_changed.results
                 | selectattr('changed', 'equalto', true) | list
@@ -253,11 +253,10 @@
         state: present
       become: yes
       when: >-
-        internet_available | bool
-        and pkgs_mime | intersect(ansible_facts.packages.keys()) != pkgs_mime
+        _internet_available and pkgs_mime | intersect(ansible_facts.packages.keys()) != pkgs_mime
     - name: firefox | Create mimeapps.list file, if it doesn't exist
       template:
-        force: "{{ force_overwrite }}"
+        force: "{{ _force_overwrite }}"
         backup: yes
         src: 'firefox/mimeapps.list'
         dest: "{{ item }}"

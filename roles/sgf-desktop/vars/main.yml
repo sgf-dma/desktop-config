@@ -1,5 +1,15 @@
 ---
-# vars file for sgf-desktop
+
+# Convert default boolean values to bool. When default variable value
+# specified on cmd with '-e' option, it's type will be string, not bool. And,
+# hence, both 'false' and 'true' will be true (as bool), because string is not
+# null.  And i need to convert them to bool explicitly either when i use them,
+# or here.
+_xkb_mods: "{{ xkb_mods | bool }}"
+_xkb_clear_options: "{{ xkb_clear_options | bool }}"
+_im_enabled: "{{ im_enabled | bool }}"
+_internet_available: "{{ internet_available | bool }}"
+_force_overwrite: "{{ force_overwrite | bool }}"
 
 xmonad_bin: "{{ ansible_user_dir + '/bin/xmonad' }}"
 xmobar_bin: "{{ ansible_user_dir + '/bin/xmobar' }}"

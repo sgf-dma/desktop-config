@@ -22,7 +22,7 @@
       get_url:
         url:  "{{ cur_firefox.url }}"
         dest: "{{ user_dist_dir + '/' + cur_firefox.archive }}"
-        force:  "{{ force_overwrite }}"
+        force:  "{{ _force_overwrite }}"
       register: cur_firefox_download
     - name: firefox_versions | Unpack
       unarchive:
@@ -30,7 +30,7 @@
         dest:     "{{ cur_firefox.dir }}"
         remote_src: yes
         creates: >-
-          {{ ( force_overwrite or cur_firefox_download.changed )
+          {{ ( _force_overwrite or cur_firefox_download.changed )
               | ternary(file_does_not_exist, cur_firefox.bin)
           }}
     - name: firefox_versions | Create symlink to firefox binary
