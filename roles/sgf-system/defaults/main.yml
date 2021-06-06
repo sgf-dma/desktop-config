@@ -8,9 +8,14 @@
 # Alternatively, i may overwrite guessed value below.
 disable_wol: "{{ _sys_notebook | ternary(true, false) }}"
 
-# To force some options on particular interface, i may overwrite guessed
-# values. For now, this is useful only for forcing disabling wake on lan on
-# some interfaces.
+# Define options dictionary for particular interfaces (overwriting guessed
+# values). Also, if i want to create link file for virtual interface (like
+# bridge), which will be filtered out oterhwise, i may define it here with
+# emtpy dictionary.
+#
+# Dictionary key - interface name.
+# Dictionary values - interface options. For now only 'disable_wol' is
+# supported.
 interface_links: {}
 
 # Address of DNS forwarder. Usually, this should be dnscrypt proxy.
