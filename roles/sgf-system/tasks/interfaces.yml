@@ -1,6 +1,12 @@
 ---
 
 - block:
+    - name: interfaces | Stat interface files
+      stat:
+        path: "{{ '/sys/class/net/' + item }}"
+      loop: "{{ ansible_facts['interfaces'] }}"
+      register: interfaces_stats
+
     # Wireless interfaces may have generated mac address different from real
     # hardware mac. I need to use real hardware macaddress in link files to
     # match.
@@ -9,12 +15,21 @@
         path: "{{ '/sys/class/net/' + item + '/phy80211/macaddress' }}"
       register: macaddress_stats
       loop: "{{ ansible_facts['interfaces'] }}"
+
     - name: interfaces | Obtain physical macaddresses
       slurp:
         src: "{{ item.stat.path }}"
       register: phy_macaddress_content
       when: item.stat.exists
       loop: "{{ macaddress_stats.results }}"
+
+    # Define interface link configs.
+    #
+    # Filter out:
+    # - interfaces without mac address
+    # - virtual interfaces (loopback, bridges, etc), unless they're defined
+    # explicitly in 'interface_links'. See
+    # https://stackoverflow.com/questions/55880443/how-to-get-a-list-of-physical-network-interfaces-with-ansible .
     - name: interfaces | Define
       set_fact:
         _interface_links: >
@@ -28,7 +43,15 @@
               ] + _interface_links
           }}
       when: ansible_facts[item.0]['macaddress'] is defined
-      loop: "{{ ansible_facts['interfaces'] | zip(phy_macaddress_content.results) | list }}"
+            and (    item.2.stat.lnk_target | regex_search('/virtual/') is none
+                  or interface_links[item.0] is defined
+                )
+      loop: >-
+        {{ ansible_facts['interfaces']
+            | zip(phy_macaddress_content.results, interfaces_stats.results)
+            | list
+        }}
+
     - name: interfaces | Show
       debug:
         var: _interface_links
