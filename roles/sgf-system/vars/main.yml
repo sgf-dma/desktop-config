@@ -89,3 +89,4 @@ grub_menus_all:
 
 _grub_menus: []
 
+interface_link_files: {}

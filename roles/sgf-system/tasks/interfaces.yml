@@ -1,28 +1,97 @@
 ---
 
 - block:
+    # In fact, on Debian 11 i may find permanent mac address in 'permaddr'
+    # key of 'ip addr show' output, but for older version, 'ethtool' seems the
+    # only way to find permanent mac addresses of ethernet interfaces.
+    - name: interfaces | Install ethtool
+      ansible.builtin.package:
+        name: 'ethtool'
+        state: present
+      become: yes
+      when: ansible_facts.packages['ethtool'] | length == 0
+
+    - name: interfaces | Gather 'ethtool -P' output for all interfaces
+      command: "/sbin/ethtool -P {{ item }}"
+      register: ethtool_p_stdout
+      changed_when: false
+      check_mode: false
+      loop: "{{ ansible_facts['interfaces'] }}"
+
+    - name:
+      debug:
+        var: ethtool_p_stdout
+
+    # There should be single stdout line, but just in case i join them..
+    - name: interfaces | Parse ethtool output
+      ansible.netcommon.cli_parse:
+        text: >-
+          {% for s in ethtool_p_stdout.results -%}
+            {{ s.item }} {{ s.stdout_lines | join (' ') }}
+          {% endfor %}
+        #'
+        parser:
+          name: ansible.netcommon.native
+          template_path: "{{ role_path + '/templates/parse_ethtool.yaml' }}"
+        set_fact: phy_macaddresses
+
+    - name:
+      debug:
+        var: phy_macaddresses
+
+# Alternatively, i may determine permanent mac address of wireless interfaces
+# from sysfs. But, it seems, this method work only for wireless interfaces..
+#
+#- block:
+#    # Wireless interfaces may have generated mac address different from real
+#    # hardware mac. I need to use real hardware macaddress in link files to
+#    # match.
+#    - name: interfaces | Stat wireless phy80211 macaddress file
+#      stat:
+#        path: "{{ '/sys/class/net/' + item + '/phy80211/macaddress' }}"
+#      register: macaddress_stats
+#      loop: "{{ ansible_facts['interfaces'] }}"
+#
+#    - name: interfaces | Obtain physical macaddresses for wireless interfaces
+#      slurp:
+#        src: "{{ item.stat.path }}"
+#      register: phy_macaddress_content
+#      when: item.stat.exists
+#      loop: "{{ macaddress_stats.results }}"
+
+- block:
+    # This will be used later for filtering out virtual network interfaces.
     - name: interfaces | Stat interface files
       stat:
         path: "{{ '/sys/class/net/' + item }}"
       loop: "{{ ansible_facts['interfaces'] }}"
       register: interfaces_stats
 
-    # Wireless interfaces may have generated mac address different from real
-    # hardware mac. I need to use real hardware macaddress in link files to
-    # match.
-    - name: interfaces | Stat wireless phy80211 macaddress file
-      stat:
-        path: "{{ '/sys/class/net/' + item + '/phy80211/macaddress' }}"
-      register: macaddress_stats
-      loop: "{{ ansible_facts['interfaces'] }}"
+- block:
+    - name: interfaces | Find all link files
+      find:
+        file_type: file
+        follow: no
+        path: '/etc/systemd/network'
+        patterns: ['*.link']
+      register: interface_link_files_found
 
-    - name: interfaces | Obtain physical macaddresses
-      slurp:
-        src: "{{ item.stat.path }}"
-      register: phy_macaddress_content
-      when: item.stat.exists
-      loop: "{{ macaddress_stats.results }}"
+    - name: interfaces | Search for MacAddress in Match section of link files
+      set_fact:
+        interface_link_files: >-
+          {{ interface_link_files
+                | combine({ item_mac : {'file': item.path} })
+          }}
+      vars:
+        item_mac: >-
+          {{ lookup('ini', 'MACAddress section=Match file=' + item.path) }}
+      loop: "{{ interface_link_files_found.files }}"
 
+    - name: interfaces | Show interface link files found
+      debug:
+        var: interface_link_files
+
+- block:
     # Define interface link configs.
     #
     # Filter out:
@@ -34,25 +103,45 @@
       set_fact:
         _interface_links: >
           {{  [ { 'name'        : item.0
-                , 'file'        : '/etc/systemd/network/50-' + item.0 + '.link'
+                , 'file'        : item_file
+                , 'file_type'   : item_file_type
+                , 'symlink_src' : item_file_src if item_file_type == 'link' else omit
                 , 'disable_wol' : disable_wol
                                   and ( item.0[0:2] == 'en' or item.0[0:3] == 'eth' )
-                , 'phy_macaddress' : item.1.content | default('') | b64decode | trim
-                      | default(ansible_facts[item.0]['macaddress'], true)
+                , 'phy_macaddress' : item_mac
                 } | combine(interface_links[item.0] | default({}))
               ] + _interface_links
           }}
-      when: ansible_facts[item.0]['macaddress'] is defined
-            and (    item.2.stat.lnk_target | regex_search('/virtual/') is none
+      when: phy_macaddresses[item.0] is defined
+            and (    item.1.stat.lnk_target | regex_search('/virtual/') is none
                   or interface_links[item.0] is defined
                 )
+      vars:
+        item_mac: >-
+          {{ phy_macaddresses[item.0] }}
+        # Item file may be either a file or symlink to another file.
+        item_file: >-
+          {{ '/etc/systemd/network/50-' + item.0 + '.link' }}
+        # Link target for item file symlink. If interface link file already
+        # exists and its name differs from dervied name, i'll create file with
+        # derived filename as symlink to already existing file.
+        item_file_src: >-
+          {{ interface_link_files[item_mac].file
+              if    interface_link_files[item_mac] is defined
+                and interface_link_files[item_mac].file != item_file
+              else ''
+          }}
+        item_file_type: >-
+          {{ 'file' if item_file_src == '' else 'link' }}
       loop: >-
         {{ ansible_facts['interfaces']
-            | zip(phy_macaddress_content.results, interfaces_stats.results)
+            | zip(interfaces_stats.results)
             | list
         }}
+      loop_control:
+        label: "{{ item.0 }}"
 
-    - name: interfaces | Show
+    - name: interfaces | Show interface link files
       debug:
         var: _interface_links
 
@@ -72,23 +161,58 @@
       when: ansible_distribution == "Debian"
             and (   ansible_distribution_major_version | int > 9
                 or  ansible_distribution_major_version | int < 11 )
+      notify:
+        - reload udevadm
 
-    # Template expects variable `interface` containing interface name.
-    - name: interfaces | Generate link files based on default.link
-      template:
-        src:  'interface.link'
+- block:
+    # Default link file may contain something in 'Match' section (like
+    # 'OriginalName=*') and i may want to delete it first and then add match
+    # against physical mac address. But, on the other hand, it's simpler to
+    # just leave it as is: since this is default link file whatever match it
+    # contain, it will be of "match anything" kind. So i may not bother with
+    # deleting it and just add my own.
+    - name: interfaces | Copy default link files or..
+      copy:
+        src:  '/lib/systemd/network/99-default.link'
         dest: "{{ item.file }}"
         force: no
-        mode:   0644
-        owner:  'root'
-        group:  'root'
-      vars:
-        interface: "{{ item }}"
+        mode:  0644
+        owner: 'root'
+        group: 'root'
       loop: "{{ _interface_links }}"
-      become: yes
+      when: item.file_type == 'file'
+
+    - name: interfaces | .. or create symlinks to existing interface link files
+      file:
+        src:  "{{ item.symlink_src }}"
+        dest: "{{ item.file }}"
+        state: link
+        force: no
+        mode:  0644
+        owner: 'root'
+        group: 'root'
+      loop: "{{ _interface_links }}"
+      when: item.file_type == 'link'
       notify:
         - reload systemd
 
+    - name: interfaces | Add MAC address to Match section
+      community.general.ini_file:
+        path: "{{ item.file }}"
+        section: 'Match'
+        option: 'MACAddress'
+        value:  "{{ item.phy_macaddress }}"
+        state: present
+        no_extra_spaces: yes
+        create: no
+        backup: yes
+      loop: "{{ _interface_links }}"
+      notify:
+        - reload systemd
+
+  become: yes
+
+- block:
     - name: interfaces | Disable wake on lan
       lineinfile:
         dest: "{{ item.file }}"

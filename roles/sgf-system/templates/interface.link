@@ -1,9 +1,0 @@
-[Match]
-{# `interface` is usually a loop variable, so multiple link files for each
-   interface are generated from this single template -#}
-MACAddress={{ interface.phy_macaddress }}
-
-{# Included template file /must/ be in role directory. This is restriction of
-  jinja2. See https://github.com/ansible/ansible/issues/7106 .
-  So i use a symlink pointing to default OS location. #}
-{% include '99-default.link' %}
