@@ -5,6 +5,45 @@
     msg: "User in integration is {{ lookup('ini', '.* re=yes section=Link file=/etc/systemd/network/50-enp3s0.link') }}"
 
 - block:
+    # In fact, on Debian 11 i may find permanent mac address in 'permaddr'
+    # key of 'ip addr show' output, but for older version, 'ethtool' seems the
+    # only way to find permanent mac addresses of ethernet interfaces.
+    - name: interfaces | Install ethtool
+      ansible.builtin.package:
+        name: 'ethtool'
+        state: present
+      become: yes
+      when: ansible_facts.packages['ethtool'] | length == 0
+
+    - name: interfaces | Gather 'ethtool -P' output for all interfaces
+      command: "/sbin/ethtool -P {{ item }}"
+      register: ethtool_p_stdout
+      changed_when: false
+      check_mode: false
+      loop: "{{ ansible_facts['interfaces'] }}"
+
+    - name: interfaces | Parse ethtool output
+      ansible.netcommon.cli_parse:
+        text: >-
+          {% for s in ethtool_p_stdout.results -%}
+            {{ s.item }} {{ s.stdout_lines | join (' ') }}
+          {% endfor %}
+        #'
+        parser:
+          name: ansible.netcommon.native
+          template_path: "{{ role_path + '/templates/parse_ethtool.yaml' }}"
+        set_fact: phy_macaddresses
+
+    - name:
+      debug:
+        var: phy_macaddresses
+
+    - name:
+      assert:
+        that:
+          - 1 == 2
+
+- block:
     - name: interfaces | Stat interface files
       stat:
         path: "{{ '/sys/class/net/' + item }}"
@@ -20,7 +59,7 @@
       register: macaddress_stats
       loop: "{{ ansible_facts['interfaces'] }}"
 
-    - name: interfaces | Obtain physical macaddresses
+    - name: interfaces | Obtain physical macaddresses for wireless interfaces
       slurp:
         src: "{{ item.stat.path }}"
       register: phy_macaddress_content
