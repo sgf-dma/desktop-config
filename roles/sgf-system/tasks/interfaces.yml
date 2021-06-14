@@ -1,5 +1,9 @@
 ---
 
+- name:
+  debug:
+    msg: "User in integration is {{ lookup('ini', '.* re=yes section=Link file=/etc/systemd/network/50-enp3s0.link') }}"
+
 - block:
     - name: interfaces | Stat interface files
       stat:
@@ -37,10 +41,15 @@
                 , 'file'        : '/etc/systemd/network/50-' + item.0 + '.link'
                 , 'disable_wol' : disable_wol
                                   and ( item.0[0:2] == 'en' or item.0[0:3] == 'eth' )
-                , 'phy_macaddress' : item.1.content | default('') | b64decode | trim
-                      | default(ansible_facts[item.0]['macaddress'], true)
+                , 'phy_macaddress' : item_phy_macaddress
                 } | combine(interface_links[item.0] | default({}))
               ] + _interface_links
+          }}
+      vars:
+        item_phy_macaddress: >-
+          {{ item.1.content | b64decode | trim
+                if item.1.content is defined
+                else ansible_facts[item.0]['macaddress']
           }}
       when: ansible_facts[item.0]['macaddress'] is defined
             and (    item.2.stat.lnk_target | regex_search('/virtual/') is none
@@ -55,6 +64,29 @@
     - name: interfaces | Show
       debug:
         var: _interface_links
+
+- block:
+    - name: interfaces | Stat existing link files
+      ansible.builtin.find:
+        paths:
+          - "/etc/systemd/network"
+        patterns:
+          - "*.link"
+      register: interface_link_files_found
+
+    - name: interfaces
+      debug:
+        msg: >-
+          {{ lookup('ini', 'MACAddress section=Match file=' + item.path) }}
+      loop: "{{ interface_link_files_found.files }}"
+      loop_control:
+        label: "{{ item.path }}"
+
+- name:
+  assert:
+    that:
+      - 1 == 2
+
 
 - block:
     # To disable `mac` naming policy and random mac address for interfaces
