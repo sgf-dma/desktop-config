@@ -1,0 +1,4 @@
+- example: 'ethtool -P enp3s0'
+  getval: '^(?P<name>\S+) Permanent address: (?P<permaddr>[0-9a-f:]+)$'
+  result:
+    "{{ name }}": "{{ permaddr }}"
