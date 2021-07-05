@@ -1,9 +1,5 @@
 ---
 
-- name:
-  debug:
-    msg: "User in integration is {{ lookup('ini', '.* re=yes section=Link file=/etc/systemd/network/50-enp3s0.link') }}"
-
 - block:
     # In fact, on Debian 11 i may find permanent mac address in 'permaddr'
     # key of 'ip addr show' output, but for older version, 'ethtool' seems the
@@ -80,19 +76,6 @@
         patterns: ['*.link']
       register: interface_link_files_found
 
-    - name:
-      debug:
-        var: interface_link_files_found
-
-    - name: interfaces | Search for MacAddress in Match section of link files
-      debug:
-        msg: >-
-          {{ { item_mac : item.path } }}
-      vars:
-        item_mac: >-
-          {{ lookup('ini', 'MACAddress section=Match file=' + item.path) }}
-      loop: "{{ interface_link_files_found.files }}"
-
     - name: interfaces | Search for MacAddress in Match section of link files
       set_fact:
         interface_link_files: >-
@@ -104,7 +87,7 @@
           {{ lookup('ini', 'MACAddress section=Match file=' + item.path) }}
       loop: "{{ interface_link_files_found.files }}"
 
-    - name:
+    - name: interfaces | Show interface link files found
       debug:
         var: interface_link_files
 
@@ -122,7 +105,7 @@
           {{  [ { 'name'        : item.0
                 , 'file'        : item_file
                 , 'file_type'   : item_file_type
-                , 'symlink_file' : item_file_default if item_file_type == 'link' else omit
+                , 'symlink_src' : item_file_src if item_file_type == 'link' else omit
                 , 'disable_wol' : disable_wol
                                   and ( item.0[0:2] == 'en' or item.0[0:3] == 'eth' )
                 , 'phy_macaddress' : item_mac
@@ -136,15 +119,20 @@
       vars:
         item_mac: >-
           {{ phy_macaddresses[item.0] }}
-        item_file_default: >-
-          {{ '/etc/systemd/network/50-' + item.0 + '.link' }}
+        # Item file may be either a file or symlink to another file.
         item_file: >-
+          {{ '/etc/systemd/network/50-' + item.0 + '.link' }}
+        # Link target for item file symlink. If interface link file already
+        # exists and its name differs from dervied name, i'll create file with
+        # derived filename as symlink to already existing file.
+        item_file_src: >-
           {{ interface_link_files[item_mac].file
-              if interface_link_files[item_mac] is defined
-              else item_file_default
+              if    interface_link_files[item_mac] is defined
+                and interface_link_files[item_mac].file != item_file
+              else ''
           }}
         item_file_type: >-
-          {{ 'file' if item_file == item_file_default else 'link' }}
+          {{ 'file' if item_file_src == '' else 'link' }}
       loop: >-
         {{ ansible_facts['interfaces']
             | zip(interfaces_stats.results)
@@ -183,9 +171,9 @@
         src:  'interface.link'
         dest: "{{ item.file }}"
         force: no
-        mode:   0644
-        owner:  'root'
-        group:  'root'
+        mode:  0644
+        owner: 'root'
+        group: 'root'
       vars:
         interface: "{{ item }}"
       loop: "{{ _interface_links }}"
@@ -195,13 +183,13 @@
 
     - name: interfaces | Create symlinks to existing interface link files
       file:
-        src:  "{{ item.file }}"
-        dest: "{{ item.symlink_file }}"
+        src:  "{{ item.symlink_src }}"
+        dest: "{{ item.file }}"
         state: link
         force: no
-        mode:   0644
-        owner:  'root'
-        group:  'root'
+        mode:  0644
+        owner: 'root'
+        group: 'root'
       loop: "{{ _interface_links }}"
       when: item.file_type == 'link'
       notify:
