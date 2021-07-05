@@ -6,6 +6,10 @@
     daemon-reload: yes
   become: yes
 
+- name: reload udevadm
+  command: udevadm control -R
+  become: yes
+
 - name: restart NetworkManager
   service:
     name: NetworkManager

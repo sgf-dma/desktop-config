@@ -64,17 +64,25 @@
 #      loop: "{{ macaddress_stats.results }}"
 
 - block:
+    # This will be used later for filtering out virtual network interfaces.
+    - name: interfaces | Stat interface files
+      stat:
+        path: "{{ '/sys/class/net/' + item }}"
+      loop: "{{ ansible_facts['interfaces'] }}"
+      register: interfaces_stats
+
+- block:
     - name: interfaces | Find all link files
       find:
         file_type: file
         follow: no
         path: '/etc/systemd/network'
         patterns: ['*.link']
-      register: existing_link_files
+      register: interface_link_files_found
 
     - name:
       debug:
-        var: existing_link_files
+        var: interface_link_files_found
 
     - name: interfaces | Search for MacAddress in Match section of link files
       debug:
@@ -83,28 +91,24 @@
       vars:
         item_mac: >-
           {{ lookup('ini', 'MACAddress section=Match file=' + item.path) }}
-      loop: "{{ existing_link_files.files }}"
+      loop: "{{ interface_link_files_found.files }}"
 
     - name: interfaces | Search for MacAddress in Match section of link files
       set_fact:
-        existing_link_file_matches: >-
-          {{ existing_link_file_matches | combine({item_mac : {'file': item.path} }) }}
+        interface_link_files: >-
+          {{ interface_link_files
+                | combine({ item_mac : {'file': item.path} })
+          }}
       vars:
         item_mac: >-
           {{ lookup('ini', 'MACAddress section=Match file=' + item.path) }}
-      loop: "{{ existing_link_files.files }}"
+      loop: "{{ interface_link_files_found.files }}"
 
     - name:
       debug:
-        var: existing_link_file_matches
+        var: interface_link_files
 
 - block:
-    - name: interfaces | Stat interface files
-      stat:
-        path: "{{ '/sys/class/net/' + item }}"
-      loop: "{{ ansible_facts['interfaces'] }}"
-      register: interfaces_stats
-
     # Define interface link configs.
     #
     # Filter out:
@@ -116,7 +120,9 @@
       set_fact:
         _interface_links: >
           {{  [ { 'name'        : item.0
-                , 'file'        : 
+                , 'file'        : item_file
+                , 'file_type'   : item_file_type
+                , 'symlink_file' : item_file_default if item_file_type == 'link' else omit
                 , 'disable_wol' : disable_wol
                                   and ( item.0[0:2] == 'en' or item.0[0:3] == 'eth' )
                 , 'phy_macaddress' : item_mac
@@ -130,11 +136,15 @@
       vars:
         item_mac: >-
           {{ phy_macaddresses[item.0] }}
+        item_file_default: >-
+          {{ '/etc/systemd/network/50-' + item.0 + '.link' }}
         item_file: >-
-          {{ existing_link_file_matches[item_mac].file
-              if existing_link_file_matches[item_mac] is defined
-              else '/etc/systemd/network/50-' + item.0 + '.link'
+          {{ interface_link_files[item_mac].file
+              if interface_link_files[item_mac] is defined
+              else item_file_default
           }}
+        item_file_type: >-
+          {{ 'file' if item_file == item_file_default else 'link' }}
       loop: >-
         {{ ansible_facts['interfaces']
             | zip(interfaces_stats.results)
@@ -143,37 +153,9 @@
       loop_control:
         label: "{{ item.0 }}"
 
-    - name: interfaces | Show
+    - name: interfaces | Show interface link files
       debug:
         var: _interface_links
-
-    - name:
-      assert:
-        that:
-          - 1 == 2
-
-- block:
-    - name: interfaces | Stat existing link files
-      ansible.builtin.find:
-        paths:
-          - "/etc/systemd/network"
-        patterns:
-          - "*.link"
-      register: interface_link_files_found
-
-    - name: interfaces
-      debug:
-        msg: >-
-          {{ lookup('ini', 'MACAddress section=Match file=' + item.path) }}
-      loop: "{{ interface_link_files_found.files }}"
-      loop_control:
-        label: "{{ item.path }}"
-
-- name:
-  assert:
-    that:
-      - 1 == 2
-
 
 - block:
     # To disable `mac` naming policy and random mac address for interfaces
@@ -191,7 +173,10 @@
       when: ansible_distribution == "Debian"
             and (   ansible_distribution_major_version | int > 9
                 or  ansible_distribution_major_version | int < 11 )
+      notify:
+        - reload udevadm
 
+- block:
     # Template expects variable `interface` containing interface name.
     - name: interfaces | Generate link files based on default.link
       template:
@@ -204,10 +189,27 @@
       vars:
         interface: "{{ item }}"
       loop: "{{ _interface_links }}"
-      become: yes
+      when: item.file_type == 'file'
       notify:
         - reload systemd
 
+    - name: interfaces | Create symlinks to existing interface link files
+      file:
+        src:  "{{ item.file }}"
+        dest: "{{ item.symlink_file }}"
+        state: link
+        force: no
+        mode:   0644
+        owner:  'root'
+        group:  'root'
+      loop: "{{ _interface_links }}"
+      when: item.file_type == 'link'
+      notify:
+        - reload systemd
+
+  become: yes
+
+- block:
     - name: interfaces | Disable wake on lan
       lineinfile:
         dest: "{{ item.file }}"
