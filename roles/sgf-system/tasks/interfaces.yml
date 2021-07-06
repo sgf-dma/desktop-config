@@ -165,6 +165,12 @@
         - reload udevadm
 
 - block:
+    # Default link file may contain something in 'Match' section (like
+    # 'OriginalName=*') and i may want to delete it first and then add match
+    # against physical mac address. But, on the other hand, it's simpler to
+    # just leave it as is: since this is default link file whatever match it
+    # contain, it will be of "match anything" kind. So i may not bother with
+    # deleting it and just add my own.
     - name: interfaces | Copy default link files or..
       copy:
         src:  '/lib/systemd/network/99-default.link'
