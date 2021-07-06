@@ -1,6 +1,0 @@
-[Match]
-{# `interface` is usually a loop variable, so multiple link files for each
-   interface are generated from this single template -#}
-MACAddress={{ ansible_facts[interface]['macaddress'] }}
-[Link]
-WakeOnLan=off

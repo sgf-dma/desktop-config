@@ -165,23 +165,18 @@
         - reload udevadm
 
 - block:
-    # Template expects variable `interface` containing interface name.
-    - name: interfaces | Generate link files based on default.link
-      template:
-        src:  'interface.link'
+    - name: interfaces | Copy default link files or..
+      copy:
+        src:  '/lib/systemd/network/99-default.link'
         dest: "{{ item.file }}"
         force: no
         mode:  0644
         owner: 'root'
         group: 'root'
-      vars:
-        interface: "{{ item }}"
       loop: "{{ _interface_links }}"
       when: item.file_type == 'file'
-      notify:
-        - reload systemd
 
-    - name: interfaces | Create symlinks to existing interface link files
+    - name: interfaces | .. or create symlinks to existing interface link files
       file:
         src:  "{{ item.symlink_src }}"
         dest: "{{ item.file }}"
@@ -192,6 +187,20 @@
         group: 'root'
       loop: "{{ _interface_links }}"
       when: item.file_type == 'link'
+      notify:
+        - reload systemd
+
+    - name: interfaces | Add MAC address to Match section
+      community.general.ini_file:
+        path: "{{ item.file }}"
+        section: 'Match'
+        option: 'MACAddress'
+        value:  "{{ item.phy_macaddress }}"
+        state: present
+        no_extra_spaces: yes
+        create: no
+        backup: yes
+      loop: "{{ _interface_links }}"
       notify:
         - reload systemd
 
