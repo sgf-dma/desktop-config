@@ -14,20 +14,15 @@
         selection: 'install'
       check_mode: true
       register: python_apt_status
-      vars:
-        python_apt: >-
-          {{ 'python3-apt'
-                if ansible_python_interpreter | regex_search('/python3') != ''
-                else 'python-apt'
-          }}
 
-    - name:
+    - name: Show python-apt info
       ansible.builtin.debug:
-        var: python_apt_status
+        msg: >-
+          {{ "Package '" + python_apt + "' has dpkg status " + python_apt_status | string }}
 
     - name: Install python-apt package
       ansible.builtin.apt:
-        name: python-apt
+        name: "{{ python_apt }}"
         state: present
       when: python_apt_status.changed
       become: yes
