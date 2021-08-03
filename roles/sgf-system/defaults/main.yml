@@ -1,21 +1,24 @@
 ---
 # defaults file for roles/sgf-system
 
-# If PC is notebook, i usually want to disable wake on lan, because it'll
+# If PC is notebook, i usually want to disable wake on lan, because it may
 # drain battery even in hibernate. This is global setting, which will be
 # applied _only_ to ethernet interfaces. Ethernet interfaces are correctly
 # recognized _only_, if they use new naming scheme (starting with `en`).
-# Alternatively, i may overwrite guessed value below.
+# Alternatively, i may overwrite guessed value below in per-interface config
+# dictionary.
 disable_wol: "{{ _sys_notebook | ternary(true, false) }}"
 
-# Define options dictionary for particular interfaces (overwriting guessed
-# values). Also, if i want to create link file for virtual interface (like
-# bridge), which will be filtered out oterhwise, i may define it here with
-# empty dictionary.
+# Interface links config dictionary. Note, that interfaces defined here will
+# be ignored during search for ethernet interfaces for disabling wol (see
+# 'disable_wol' variable). Thus, if you want to disable wol for explicitly
+# defined interface, write it explicitly in dict values.
 #
-# Dictionary key - interface name.
-# Dictionary values - interface options. For now only 'disable_wol' is
-# supported.
+# Dictionary key - interface physical (persistent) mac address.
+# Dictionary values:
+# 'name' - (optional) new name for interface.
+# 'macaddresspolicy' - (optional) value for 'MACAddressPolicy'.
+# 'disable_wol' - (optional) value for 'WakeOnLan'.
 interface_links: {}
 
 # Address of DNS forwarder. Usually, this should be dnscrypt proxy.
@@ -41,4 +44,9 @@ grub_drives: {}
 # key. Only menuentries corresponding to keys _defined here_ will be
 # generated.
 grub_menus: {}
+
+# Overwrite files normally left untoched. Set this only _once_ for overwriting
+# previous possible incorrect configuration, because setting this permanently
+# will result in _always changed_ status of playbook run.
+force_overwrite: no
 

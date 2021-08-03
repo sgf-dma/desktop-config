@@ -1,0 +1,6 @@
+[Match]
+MACAddress={{ item.phy_mac }}
+
+[Link]
+Name={{ item.name }}
+MACAddressPolicy={{ item.macaddresspolicy }}

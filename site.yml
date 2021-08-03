@@ -45,6 +45,14 @@
           , 'windows': {}
           , 'truecrypt_rescue': {}
           }
+        interface_links:
+          { '84:16:f9:19:2c:34' :
+              { 'name': 'tplink2'
+              , 'macaddresspolicy': 'random'
+              }
+          , '84:16:f9:12:8f:a9' :
+              { 'name' : 'tplink1' }
+          }
       tags:
         - 'system'
 
