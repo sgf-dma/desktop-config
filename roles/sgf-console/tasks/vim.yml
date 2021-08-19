@@ -1,7 +1,7 @@
 ---
 
 - name: vim | Create directories
-  file:
+  ansible.builtin.file:
     path:   "{{ vim_dir + item }}"
     state:  directory
   loop:
@@ -9,14 +9,14 @@
     - '/bundle'
 
 - name: vim | Install pathogen
-  get_url:
+  ansible.builtin.get_url:
     url:  'https://tpo.pe/pathogen.vim'
     dest: "{{ vim_dir + '/autoload/pathogen.vim' }}"
   when: _internet_available
 
 # FIXME: `.vimrc` references some plugins, which may not be there..
 - name: vim | Intall common vimrc
-  copy:
+  ansible.builtin.copy:
     src:    "{{ item }}"
     force:  yes
     backup: yes
@@ -27,7 +27,7 @@
     - 'vim_config'
 
 - name: vim | Intall main vimrc
-  template:
+  ansible.builtin.template:
     src:    "vim/vimrc"
     force:  yes
     backup: yes
@@ -37,7 +37,7 @@
     - 'colors_config'
 
 - name: vim | Checkout plugins
-  git:
+  ansible.builtin.git:
     repo: "{{ item.repo }}"
     # Note, yaml block chomping indicator to remove trailing newline.
     dest: >-

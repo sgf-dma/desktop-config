@@ -2,7 +2,7 @@
 
 - block:
     - name: shell | Clone keychain repository
-      git:
+      ansible.builtin.git:
         repo: 'https://github.com/funtoo/keychain.git'
         dest: "{{ keychain_repo_dir }}"
         version: "{{ keychain_branch }}"
@@ -10,12 +10,12 @@
       register: keychain_updated
 
     - name: shell | Stat keychain binary
-      stat:
+      ansible.builtin.stat:
         path: "{{ keychain_bin }}"
       register: keychain_bin_stats
 
     - name: shell | Install keychain dependencies
-      package:
+      ansible.builtin.package:
         name: "{{ keychain_deps }}"
         state: present
       become: yes
@@ -23,14 +23,14 @@
         ansible_facts.packages.keys() | intersect(keychain_deps) | length != keychain_deps | length
 
     - name: shell | Build keychain
-      make:
+      community.general.make:
         chdir: "{{ keychain_repo_dir }}"
         target: all
       when: >-
         _force_overwrite or keychain_updated.changed or not keychain_bin_stats.stat.exists
 
     - name: shell | Install keychain bin
-      copy:
+      ansible.builtin.copy:
         src:  "{{ keychain_repo_dir + '/keychain' }}"
         dest: "{{ keychain_bin }}"
         remote_src: yes
@@ -38,7 +38,7 @@
         mode: 0755
 
     - name: shell | Install keychain man
-      copy:
+      ansible.builtin.copy:
         src:  "{{ keychain_repo_dir + '/keychain.1' }}"
         dest: "{{ user_man1_path + '/keychain.1' }}"
         remote_src: yes
@@ -51,7 +51,7 @@
 
 - block:
     - name: shell | Clone thefuck repository
-      git:
+      ansible.builtin.git:
         repo: 'https://github.com/nvbn/thefuck.git'
         dest: "{{ thefuck_repo_dir }}"
         version: "{{ thefuck_branch }}"
@@ -59,7 +59,7 @@
       register: thefuck_updated
 
     - name: shell | Install thefuck dependencies
-      package:
+      ansible.builtin.package:
         name: "{{ thefuck_deps }}"
         state: present
       become: yes
@@ -67,12 +67,12 @@
         ansible_facts.packages.keys() | intersect(thefuck_deps) | length != thefuck_deps | length
 
     - name: shell | Stat thefuck binary
-      stat:
+      ansible.builtin.stat:
         path: "{{ thefuck_bin }}"
       register: thefuck_bin_stats
 
     - name: shell | Install thefuck
-      pip:
+      ansible.builtin.pip:
         name: thefuck
         executable: pip3
         chdir: "{{ thefuck_repo_dir }}"
@@ -85,7 +85,7 @@
 
 - block:
     - name: shell | (cowsay) Install cowsay and lolcat
-      package:
+      ansible.builtin.package:
         name: "{{ cowsay_deps }}"
       become: yes
       when: >-
@@ -93,38 +93,38 @@
 
     # Based on https://stackoverflow.com/questions/24987542/is-there-a-link-to-github-for-downloading-a-file-in-the-latest-release-of-a-repo .
     - name: shell | (cowsay) Download neo-cowsay assets list
-      get_url:
+      ansible.builtin.get_url:
         url:  "{{ neo_cowsay_assets_url }}"
         dest: "{{ neo_cowsay_assets_json }}"
         force: yes
       register: neo_cowsay_assets_download
 
     - name: shell | (cowsay) Load neo-cowsay assets
-      include_vars:
+      ansible.builtin.include_vars:
         file: "{{ neo_cowsay_assets_json }}"
         name: neo_cowsay_assets
 
     - name: shell | (cowsay) Determine proper asset link
-      set_fact:
+      ansible.builtin.set_fact:
         neo_cowsay_url:     "{{ item | json_query('browser_download_url') }}"
         neo_cowsay_archive: "{{ item | json_query('name') }}"
       when: item | json_query('name') | regex_search('(linux).*(x86_64)', ignorecase=True)
       loop: "{{ neo_cowsay_assets.assets }}"
 
     - name: shell | (cowsay) Download neo cowsay
-      get_url:
+      ansible.builtin.get_url:
         url:    "{{ neo_cowsay_url }}"
         dest:   "{{ user_dist_dir + '/' + neo_cowsay_archive }}"
         force:  "{{ _force_overwrite or neo_cowsay_assets_download.changed }}"
       register: neo_cowsay_download
 
     - name: shell | (cowsay) Ensure neo cowsay unpack directory exists
-      file:
+      ansible.builtin.file:
         path:   "{{ neo_cowsay_dir }}"
         state:  directory
 
     - name: shell | (cowsay) Unpack
-      unarchive:
+      ansible.builtin.unarchive:
         src:  "{{ user_dist_dir + '/' + neo_cowsay_archive }}"
         dest: "{{ neo_cowsay_dir }}"
         remote_src: yes
@@ -134,7 +134,7 @@
           }}
 
     - name: shell | (cowsay) Install neo cowsay
-      copy:
+      ansible.builtin.copy:
         src:  "{{ neo_cowsay_dir + '/' + item }}"
         dest: "{{ user_local_bin + '/neo-' + item }}"
         remote_src: yes
@@ -150,7 +150,7 @@
 
 - block:
     - name: shell | Include common .bashrc
-      blockinfile:
+      ansible.builtin.blockinfile:
         path:   "{{ ansible_user_dir + '/.bashrc' }}"
         backup: yes
         marker: '# {mark} desktop-config ANSIBLE MANAGED BLOCK'
@@ -161,7 +161,7 @@
             . ~/.bashrc-common
 
     - name: shell | Install common bashrc
-      template:
+      ansible.builtin.template:
         src:    'bashrc'
         force:  yes
         backup: yes
