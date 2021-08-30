@@ -12,14 +12,14 @@
       when: ansible_facts.packages['ethtool'] | length == 0
 
     - name: interfaces | Gather 'ethtool -P' output for all interfaces
-      command: "/sbin/ethtool -P {{ item }}"
+      ansible.builtin.command: "/sbin/ethtool -P {{ item }}"
       register: ethtool_p_stdout
       changed_when: false
       check_mode: false
       loop: "{{ ansible_facts['interfaces'] }}"
 
     - name:
-      debug:
+      ansible.builtin.debug:
         var: ethtool_p_stdout
 
     # There should be single stdout line, but just in case i join them..
@@ -36,16 +36,16 @@
         set_fact: phy_macs_by_name
 
     - name: interfaces | .. and also define mac to interface name dictionary
-      set_fact:
+      ansible.builtin.set_fact:
         phy_macs_by_mac: >-
           {{ dict(phy_macs_by_name.values() | zip(phy_macs_by_name.keys())) }}
 
     - name: interfaces | Show interface name to physical mac dictionary
-      debug:
+      ansible.builtin.debug:
         var: phy_macs_by_name
 
     - name: interfaces | Show physical mac to interfaces name dictionary
-      debug:
+      ansible.builtin.debug:
         var: phy_macs_by_mac
 
 # Alternatively, i may determine permanent mac address of wireless interfaces
@@ -56,13 +56,13 @@
 #    # hardware mac. I need to use real hardware macaddress in link files to
 #    # match.
 #    - name: interfaces | Stat wireless phy80211 macaddress file
-#      stat:
+#      ansible.builtin.stat:
 #        path: "{{ '/sys/class/net/' + item + '/phy80211/macaddress' }}"
 #      register: macaddress_stats
 #      loop: "{{ ansible_facts['interfaces'] }}"
 #
 #    - name: interfaces | Obtain physical macaddresses for wireless interfaces
-#      slurp:
+#      ansible.builtin.slurp:
 #        src: "{{ item.stat.path }}"
 #      register: phy_macaddress_content
 #      when: item.stat.exists
@@ -71,14 +71,14 @@
 - block:
     # This will be used later for filtering out virtual network interfaces.
     - name: interfaces | Stat interface files
-      stat:
+      ansible.builtin.stat:
         path: "{{ '/sys/class/net/' + item }}"
       loop: "{{ ansible_facts['interfaces'] }}"
       register: interfaces_stats
 
 - block:
     - name: interfaces | Find existing link files
-      find:
+      ansible.builtin.find:
         file_type: file
         follow: no
         path: '/etc/systemd/network'
@@ -86,7 +86,7 @@
       register: interface_link_files_found
 
     - name: interfaces | Search for MacAddress in Match section of link files
-      set_fact:
+      ansible.builtin.set_fact:
         interface_link_files: >-
           {{ interface_link_files
                 | combine({ item_mac : {'file': item.path} })
@@ -100,12 +100,12 @@
       loop: "{{ interface_link_files_found.files }}"
 
     - name: interfaces | Show interface link files found
-      debug:
+      ansible.builtin.debug:
         var: interface_link_files
 
 - block:
     - name: interfaces | Define user defined interfaces
-      set_fact:
+      ansible.builtin.set_fact:
         _interface_links: >
           {{  { item_mac :
                   { 'name'     : item_name
@@ -183,7 +183,7 @@
     # either use named_link template here or hardcode mac address in copy of
     # default link file as was before.
     - name: interfaces | Define existing ethernet interfaces with disabled WOL
-      set_fact:
+      ansible.builtin.set_fact:
         _interface_links: >
           {{  { item_mac :
                   { 'name'    : item_name
@@ -231,7 +231,7 @@
         label: "{{ item.0 }}"
 
     - name: interfaces | Show interface link files
-      debug:
+      ansible.builtin.debug:
         var: _interface_links
 
 - block:
@@ -241,7 +241,7 @@
     # (see `TEST` in above rules file for other ways to avoid). After that
     # link files will apply.
     - name: interfaces | Disable udev rule forcing mac naming policy for usb
-      file:
+      ansible.builtin.file:
         src:  '/lib/systemd/network/99-default.link'
         path: '/etc/systemd/network/99-default.link'
         state: link
@@ -258,7 +258,7 @@
     # will create new file instead of overwriting file pointed by symlink.
     # This is probably wrong..
     - name: interfaces | Create link files from template or..
-      template:
+      ansible.builtin.template:
         src:  "{{ item.file_template }}"
         dest: "{{ item.file }}"
         force: "{{ _force_overwrite }}"
@@ -272,7 +272,7 @@
         - reload systemd
 
     - name: interfaces | .. or copy link files from source or..
-      copy:
+      ansible.builtin.copy:
         src:  "{{ item.file_src }}"
         dest: "{{ item.file }}"
         force: "{{ _force_overwrite }}"
@@ -288,7 +288,7 @@
 
     # FIXME: Install symlinks with next number after real files (e.g. 51-).
     - name: interfaces | .. or create symlinks to existing interface link files
-      file:
+      ansible.builtin.file:
         src:  "{{ item.file_src }}"
         dest: "{{ item.file }}"
         state: link
@@ -331,7 +331,7 @@
 
 - block:
     - name: interfaces | Disable wake on lan
-      lineinfile:
+      ansible.builtin.lineinfile:
         dest: "{{ item.file }}"
         backup: yes
         line: 'WakeOnLan=off'
@@ -345,7 +345,7 @@
         - reload systemd
 
     - name: interfaces | Remove disabled wake on lan for others
-      lineinfile:
+      ansible.builtin.lineinfile:
         dest: "{{ item.file }}"
         backup: yes
         regexp: "(^#+|^)WakeOnLan=.*$"
@@ -358,7 +358,7 @@
 
 - block:
     - name: interfaces | Copy NetworkManager configs
-      copy:
+      ansible.builtin.copy:
         src: "{{ item }}"
         dest: '/etc/NetworkManager/conf.d'
       become: yes

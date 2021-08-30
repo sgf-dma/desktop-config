@@ -2,7 +2,7 @@
 
 # In buster apparmor is enabled by default for thunderbird.
 - name: apparmor | Allow thunderbird to run firefox from user's home
-  template:
+  ansible.builtin.template:
     src:    'apparmor/usr.bin.thunderbird'
     dest:   '/etc/apparmor.d/local/usr.bin.thunderbird'
     force:  yes
