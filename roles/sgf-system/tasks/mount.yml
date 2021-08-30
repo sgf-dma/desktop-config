@@ -1,0 +1,34 @@
+---
+
+- block:
+    # I may mount tmp with 'noexec', but then to make ansible git module (and
+    # probably others) work i need to set 'TMPDIR" for corresponding tasks
+    # (or for entire play) to the location of executable tmp. I may use
+    # ansible 'environment' keyword for this. See 
+    # https://stackoverflow.com/questions/59153949/set-tmpdir-globally-in-ansible-to-use-docker-with-noexec-flag-on-tmp
+    # .
+    #
+    # Though, does such setting makes sense at all, if i still have exec tmp,
+    # but just in other place?
+    - name: Mount tmpfs on /tmp
+      ansible.builtin.mount:
+        path:   /tmp
+        src:    tmpfs
+        fstype: tmpfs
+        opts:   relatime,nodev,nosuid
+        backup: yes
+        state:  present
+      notify:
+        - reload systemd
+
+    - name: Delete "Remount /tmp with exec before apt-get run" script
+      ansible.builtin.file:
+        #src:    "files/apt/06exec-tmp"
+        path:   "/etc/apt/apt.conf.d/06exec-tmp"
+        #owner:  root
+        #group:  root
+        #mode:   '0644'
+        state:  absent
+
+  become: yes
+

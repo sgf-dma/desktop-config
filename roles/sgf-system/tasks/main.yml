@@ -24,28 +24,8 @@
   tags:
     - 'pdns_recursor'
 
-- block:
-    - name: Mount tmpfs on /tmp
-      mount:
-        path:   /tmp
-        src:    tmpfs
-        fstype: tmpfs
-        opts:   relatime,nodev,nosuid
-        backup: yes
-        state:  present
-      notify:
-        - reload systemd
-
-    - name: Delete "Remount /tmp with exec before apt-get run" script
-      file:
-        #src:    "files/apt/06exec-tmp"
-        path:   "/etc/apt/apt.conf.d/06exec-tmp"
-        #owner:  root
-        #group:  root
-        #mode:   '0644'
-        state:  absent
-
-  become: yes
+- name: Setup mounts
+  import_tasks: mount.yml
   when: tmp_on_tmpfs
   tags:
     - 'mount'
