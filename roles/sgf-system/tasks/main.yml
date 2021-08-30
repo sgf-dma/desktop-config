@@ -22,7 +22,7 @@
 
   become: yes
   tags:
-    - 'pdns_recursor'
+    - dns
 
 - name: Setup mounts
   ansible.builtin.import_tasks: mount.yml
