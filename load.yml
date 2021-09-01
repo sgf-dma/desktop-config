@@ -1,8 +1,30 @@
 
 - block:
-    - name: Merge console colors
+    - name: load | Group by user
+      ansible.builtin.group_by:
+        key: "{{ ansible_facts['user_id'] }}"
+      changed_when: false
+
+    - name: load | Group by hostname
+      ansible.builtin.group_by:
+        key: "{{ ansible_facts['hostname'] }}"
+      changed_when: false
+
+    - name: load | Group by user at specific host
+      ansible.builtin.group_by:
+        key: "{{ ansible_facts['user_id'] + '_' + ansible_facts['hostname'] }}"
+        parents:
+          - "{{ ansible_facts['user_id'] }}"
+          - "{{ ansible_facts['hostname'] }}"
+      changed_when: false
+
+  tags:
+    - groups
+
+- block:
+    - name: load | Merge console colors
       import_tasks: roles/sgf-console/tasks/load_pre.yml
-    - name: Merge desktop colors
+    - name: load | Merge desktop colors
       import_tasks: roles/sgf-desktop/tasks/load_pre.yml
   tags:
     - 'colors'
