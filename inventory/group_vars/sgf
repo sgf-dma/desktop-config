@@ -1,0 +1,20 @@
+---
+
+git_email: sgf.dma@gmail.com
+git_name: sgf
+
+enable_tmux: true
+enable_vim: true
+enable_keychain: true
+dont_fuck_with_me: true
+obtain_cowpowers: true
+
+vim_disable_arrow_keys: true
+
+xmobar_branch: e71512b7c961ab379aee98c2f4d65ad4bdd3c5bf
+firefox_default_desktop: 'firefox-esr.desktop'
+firefox_versions:
+  - version: '52.9.0esr'
+    profile: 'default-52esr'
+    comment: 'Firefox 52 ESR'
+  - version: 'latest'
