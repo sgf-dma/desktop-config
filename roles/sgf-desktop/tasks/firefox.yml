@@ -1,11 +1,11 @@
 ---
 
 - name: firefox | Install OS package
-  package:
+  ansible.builtin.package:
     name: 'firefox-esr'
     state: present
   become: yes
-  when: internet_available | bool and ansible_facts.packages['firefox-esr'] is not defined
+  when: _internet_available and ansible_facts.packages['firefox-esr'] is not defined
 
 - block:
     # If 'url' is defined by user, i don't use 'version' and 'lang' fields
@@ -30,7 +30,7 @@
     # install several firefox versions simultaneously, but each version may be
     # of one language only).
     - name: firefox | Define firefox versions
-      set_fact:
+      ansible.builtin.set_fact:
         _firefox_versions: >-
           {{ _firefox_versions + 
               [ def_item | combine(item,
@@ -85,7 +85,7 @@
       loop: "{{ firefox_versions }}"
 
     - name: huy
-      debug:
+      ansible.builtin.debug:
         var: _firefox_versions
   tags:
     - firefox_install
@@ -93,17 +93,17 @@
 
 - block:
     - name: firefox | Stat system .desktop files
-      stat:
+      ansible.builtin.stat:
         path: "{{ system_desktop_entries + '/' + item }}"
       loop: "{{ firefox_desktop_names }}"
       register: system_firefox_desktop_files_stats
     - name: firefox | Stat user .desktop files
-      stat:
+      ansible.builtin.stat:
         path: "{{ user_desktop_entries + '/' + item }}"
       loop: "{{ firefox_desktop_names }}"
       register: user_firefox_desktop_files_stats
     - name: firefox | Define desktop files
-      set_fact:
+      ansible.builtin.set_fact:
         firefox_desktop_files: >
           {{ firefox_desktop_files +
               [ { 'name': item.0.item
@@ -121,7 +121,7 @@
             | list
         }}
     - name: firefox | Show .desktop files
-      debug:
+      ansible.builtin.debug:
         var: firefox_desktop_files
   tags:
     - 'load'
@@ -130,22 +130,22 @@
 # FIXME: Use `desktop-file-install` for installing desktop files?
 - block:
     - name: firefox | Install desktop file utils
-      package:
+      ansible.builtin.package:
         name: 'desktop-file-utils'
         state: present
       become: yes
-      when: internet_available | bool and ansible_facts.packages['desktop-file-utils'] is not defined
+      when: _internet_available and ansible_facts.packages['desktop-file-utils'] is not defined
     - name: firefox | Create directory for user .desktop entries
-      file:
+      ansible.builtin.file:
         path:   "{{ user_desktop_entries }}"
         mode:   0755
         state:  directory
     - name: firefox | Copy system .desktop files
-      copy:
+      ansible.builtin.copy:
         src:    "{{ item.sys_path }}"
         dest:   "{{ item.user_path }}"
         mode:   0644
-        force:  "{{ force_overwrite }}"
+        force:  "{{ _force_overwrite }}"
         backup: yes
         remote_src: yes
       when: item.sys_exists
@@ -154,7 +154,7 @@
     # Because `backrefs` is used in this task, if regexp does not match, file
     # will be left unmodified.
     - name: firefox | Hardcode profile name in .desktop files
-      lineinfile:
+      ansible.builtin.lineinfile:
         dest:   "{{ item.user_path }}"
         backup: "{{ item.user_exists }}"
         #          {{ not firefox_default_copied.results
@@ -175,7 +175,7 @@
       # I probably, shouldn't disable any .desktop entries. It's better to
       # hardcode profile name to all of them.
   #    - name: firefox | Hide iceweasel .desktop entry
-  #      lineinfile:
+  #      ansible.builtin.lineinfile:
   #        dest:   "{{ user_desktop_entries + '/iceweasel.desktop' }}"
   #        backup: >-
   #          {{ not firefox_default_copied.results
@@ -189,15 +189,15 @@
     - 'firefox_profile_hardcode'
 
 # Note:
-# -`force_overwrite` will trigger changed status of profile hardcoding
+# -`_force_overwrite` will trigger changed status of profile hardcoding
 # task (above) and, thus, will trigger this task too.
 # - i assume, that hardcoding is run for all desktop files copied to local
 # user directory, thus it's enough to check hardcoding task changed
 # status.
 - name: firefox | Update user's mime info cache
-  command: update-desktop-database "{{ user_desktop_entries }}"
+  ansible.builtin.command: update-desktop-database "{{ user_desktop_entries }}"
   when: >-
-    force_overwrite
+    _force_overwrite
     or (  firefox_desktop_changed is defined
           and firefox_desktop_changed.results
                 | selectattr('changed', 'equalto', true) | list
@@ -215,17 +215,17 @@
 # to disable auto-start.
 - block:
     - name: firefox | Create profile directory
-      file:
+      ansible.builtin.file:
         path: "{{ firefox_profile_dir }}"
         mode:   0755
         state: 'directory'
     - name: firefox | Create empty profiles.ini, if it doesn't exist
-      copy:
+      ansible.builtin.copy:
         src:  "{{ 'files/firefox/' + firefox_profiles_ini | basename }}"
         dest: "{{ firefox_profiles_ini }}"
         force: no
     - name: firefox | Disable profile auto start for now
-      lineinfile:
+      ansible.builtin.lineinfile:
         dest:   "{{ firefox_profiles_ini }}"
         backup: yes
         line:   'StartWithLastProfile=0'
@@ -235,7 +235,7 @@
     - 'firefox_profile_noauto'
 
 - name: Install specific firefox versions
-  include_tasks:
+  ansible.builtin.include_tasks:
     file: firefox_versions.yml
     apply:
       tags:
@@ -248,16 +248,15 @@
 
 - block:
     - name: firefox | Install mime utils
-      package:
+      ansible.builtin.package:
         name: "{{ pkgs_mime }}"
         state: present
       become: yes
       when: >-
-        internet_available | bool
-        and pkgs_mime | intersect(ansible_facts.packages.keys()) != pkgs_mime
+        _internet_available and pkgs_mime | intersect(ansible_facts.packages.keys()) != pkgs_mime
     - name: firefox | Create mimeapps.list file, if it doesn't exist
-      template:
-        force: "{{ force_overwrite }}"
+      ansible.builtin.template:
+        force: "{{ _force_overwrite }}"
         backup: yes
         src: 'firefox/mimeapps.list'
         dest: "{{ item }}"
@@ -270,14 +269,14 @@
     # is a semicolon separated list (and `gvfs-mime` adds semicolon always,
     # even if there's only one item in the list).
     - name: firefox | Set default for http handler
-      lineinfile:
+      ansible.builtin.lineinfile:
         insertafter: 'Default Applications'
         regexp: '(^#+|^)x-scheme-handler/http=[^;]+$'
         line: "x-scheme-handler/http={{ firefox_default_desktop }}"
         path: "{{ item }}"
       loop: "{{ mimeapps_list_files }}"
     - name: firefox | Set default for https handler
-      lineinfile:
+      ansible.builtin.lineinfile:
         insertafter: 'Default Applications'
         regexp: '(^#+|^)x-scheme-handler/https=[^;]+$'
         line: "x-scheme-handler/https={{ firefox_default_desktop }}"

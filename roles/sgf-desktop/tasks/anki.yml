@@ -3,22 +3,22 @@
 # role from this?
 - block:
     - name: anki | Download
-      get_url:
+      ansible.builtin.get_url:
         url:  "{{ anki_url }}"
         dest: "{{ user_opt_dir + '/anki.tar.bz2' }}"
-        force:  "{{ force_overwrite }}"
+        force:  "{{ _force_overwrite }}"
       register: anki_download
     - name: anki | Unpack
-      unarchive:
+      ansible.builtin.unarchive:
         src:      "{{ user_opt_dir + '/anki.tar.bz2' }}"
         remote_src: yes
         dest:     "{{ anki_unpack_dir }}"
         creates: >-
-          {{ ( force_overwrite or anki_download.changed )
+          {{ ( _force_overwrite or anki_download.changed )
               | ternary('/nonexistent-H5T6f', anki_bin)
           }}
     - name: anki | Copy wrapper script to ~/bin
-      copy:
+      ansible.builtin.copy:
         src:    "anki/anki"
         force:  yes
         mode:   0755
@@ -31,7 +31,7 @@
     # previous and edited versions of a file). So, here `regexp` matches
     # _only_ original version of file (i.e. one, which i need to edit).
     - name: anki | Write correct path to desktop entry.
-      lineinfile:
+      ansible.builtin.lineinfile:
         dest:   "{{ anki_desktop }}"
         backup: yes
         line:   >
@@ -43,7 +43,7 @@
         backrefs: yes
         state:  present
     - name: anki | Copy desktop entry
-      copy:
+      ansible.builtin.copy:
         src:    "{{ anki_desktop }}"
         remote_src: yes
         dest:   "{{ user_desktop_entries + '/anki.desktop' }}"
@@ -53,19 +53,19 @@
 # FIXME: Make this into role too?
 - block:
     - name: anki | Define dependencies
-      set_fact:
+      ansible.builtin.set_fact:
         anki_install_pkgs: "{{ anki_install_pkgs + [item] }}"
       when: ansible_facts.packages[item] is not defined
       loop: "{{ anki_required_pkgs }}"
     - name: anki | Show desktop dependencies to be installed
-      debug:
+      ansible.builtin.debug:
         var: anki_install_pkgs
   tags:
     - 'load'
     - 'anki_deps'
 
 - name: anki | Install dependencies
-  apt:
+  ansible.builtin.apt:
     name: "{{ anki_install_pkgs }}"
     state: present
   when: anki_install_pkgs | length > 0

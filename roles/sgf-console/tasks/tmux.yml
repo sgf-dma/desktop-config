@@ -1,7 +1,7 @@
 ---
 
 - name: tmux | Install common config
-  template:
+  ansible.builtin.template:
     src:    "tmux-common.conf"
     force:  yes
     backup: yes
@@ -10,37 +10,37 @@
     - 'colors_config'
 
 - name: tmux | Install main config
-  copy:
+  ansible.builtin.copy:
     src:    "files/tmux.conf"
     force:  no
     dest:   "{{ tmux_conf }}"
 
 - block:
     - name: tmux | Install tpm
-      git:
+      ansible.builtin.git:
         repo:   'https://github.com/tmux-plugins/tpm'
         clone:  yes
         dest:   "{{ tmux_plugin_dir + '/tpm' }}"
     - name: tmux | Add tpm run to tmux.conf
-      lineinfile:
+      ansible.builtin.lineinfile:
         dest:   "{{ tmux_conf }}"
         insertafter: EOF
         backup: yes
         state:  present
         # FIXME: Hardcoded `tmux_plugin_dir` .
         line:   "run '~/.tmux/plugins/tpm/tpm'"
-  when: internet_available | bool
+  when: _internet_available
 
 - block:
     - name: tmux | Install solarized colors plugin
-      git:
+      ansible.builtin.git:
         repo:   'https://github.com/seebi/tmux-colors-solarized'
         clone:  yes
         dest:   "{{ tmux_plugin_dir + '/tmux-colors-solarized' }}"
-      when: internet_available | bool
+      when: _internet_available
 
     - name: tmux | Copy additional colorschemes
-      copy:
+      ansible.builtin.copy:
         src:    "{{ item }}"
         dest:   "{{ tmux_plugin_dir + '/tmux-colors-solarized' }}"
       with_fileglob:

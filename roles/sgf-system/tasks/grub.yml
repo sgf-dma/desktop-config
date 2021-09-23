@@ -2,7 +2,7 @@
 
 - block:
     - name: grub | Define grub_menus
-      set_fact:
+      ansible.builtin.set_fact:
         _grub_menus: >-
           {{ _grub_menus | combine(
                   { item : grub_menus_all[item] | combine(
@@ -22,12 +22,12 @@
       loop: "{{ grub_menus.keys() | list }}"
 
     - name: grub | Show grub_menus
-      debug:
+      ansible.builtin.debug:
         var: _grub_menus
 
 - block:
     - name: grub (40_custom) | Find existing configs
-      find:
+      ansible.builtin.find:
         paths: "{{ grub_conf_d }}"
         file_type: file
         patterns: '*.conf'
@@ -35,18 +35,18 @@
       register: grub_conf_d_files
 
     - name: grub (40_custom) | Show existing configs
-      debug:
+      ansible.builtin.debug:
         var: grub_conf_d_files
 
 - block:
     - name: grub (40_custom) | Create configs directory
-      file:
+      ansible.builtin.file:
         path:  "{{ grub_conf_d }}"
         mode: 0755
         state: directory
 
     - name: grub (40_custom) | Copy configs
-      copy:
+      ansible.builtin.copy:
         src:  "{{ item }}"
         dest: "{{ grub_conf_d + '/' + item | basename + '.conf' }}"
         mode: 0744
@@ -56,7 +56,7 @@
       loop: "{{ query('fileglob', 'files/grub/*') }}"
 
     - name: grub (40_custom) | Generate functions
-      template:
+      ansible.builtin.template:
         src:  'grub/functions'
         dest: "{{ grub_conf_d + '/10_functions.conf' }}"
         mode: 0744
@@ -65,7 +65,7 @@
       register: grub_conf_functions_file
 
     - name: grub (40_custom) | Generate configs and menuentries
-      template:
+      ansible.builtin.template:
         src:  "{{ item.src }}"
         dest: "{{ item.dst }}"
         mode: 0744
@@ -78,7 +78,7 @@
 
 - block:
     - name: grub (40_custom) | Define installed configs
-      set_fact:
+      ansible.builtin.set_fact:
         installed_files: "{{ copied_files + functions_files + generated_files }}"
       vars:
         copied_files: >-
@@ -89,17 +89,17 @@
           {{ grub_conf_generated_files.results | map (attribute='dest') | list }}
 
     - name: grub (40_custom) | Show installed configs
-      debug:
+      ansible.builtin.debug:
         var: installed_files
 
     - name: grub (40_custom) | Remove old configs
-      file:
+      ansible.builtin.file:
         path: "{{ item }}"
         state: absent
       loop: "{{ grub_conf_d_files.files | map(attribute='path') | difference(installed_files) }}"
 
     - name: grub | Assembly 40_custom
-      assemble:
+      ansible.builtin.assemble:
         src: "{{ grub_conf_d }}"
         dest: '/etc/grub.d/40_custom'
         regexp: '.*\.conf$'

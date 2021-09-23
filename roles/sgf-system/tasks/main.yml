@@ -2,13 +2,13 @@
 # tasks file for roles/sgf-system
 
 - name: Set up network interfaces
-  import_tasks: interfaces.yml
+  ansible.builtin.import_tasks: interfaces.yml
   tags:
     - 'network'
 
 - block:
   - name: Copy RPZ for recursor
-    copy:
+    ansible.builtin.copy:
       src: 'rpz.db'
       dest: "{{ rpz_dest }}"
       mode: 0644
@@ -16,47 +16,27 @@
     notify: restart PowerDNS Recursor
 
   - name: Set RPZ permissions
-    file:
+    ansible.builtin.file:
       path: "{{ rpz_dest }}"
       mode: 0644
 
   become: yes
   tags:
-    - 'pdns_recursor'
+    - dns
 
-- block:
-    - name: Mount tmpfs on /tmp
-      mount:
-        path:   /tmp
-        src:    tmpfs
-        fstype: tmpfs
-        opts:   relatime,nodev,nosuid
-        backup: yes
-        state:  present
-      notify:
-        - reload systemd
-
-    - name: Delete "Remount /tmp with exec before apt-get run" script
-      file:
-        #src:    "files/apt/06exec-tmp"
-        path:   "/etc/apt/apt.conf.d/06exec-tmp"
-        #owner:  root
-        #group:  root
-        #mode:   '0644'
-        state:  absent
-
-  become: yes
+- name: Setup mounts
+  ansible.builtin.import_tasks: mount.yml
   when: tmp_on_tmpfs
   tags:
     - 'mount'
 
 - name: Configure apparmor
-  import_tasks: apparmor.yml
+  ansible.builtin.import_tasks: apparmor.yml
   tags:
     - 'apparmor'
 
 - name: Install grub functions
-  import_tasks: grub.yml
+  ansible.builtin.import_tasks: grub.yml
   tags:
     - 'grub'
 

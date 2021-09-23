@@ -15,14 +15,14 @@ vim_plugins:
 vim_disable_arrow_keys: true
 
 # Whether to install keychain or not.
-install_keychain: true
+keychain_enable: true
 # Repository, where to clone keychain.
 keychain_repo_dir: "{{ user_dist_dir + '/keychain' }}"
 # Branch to use.
 keychain_branch: 'master'
 
 # List of ssh keys to load into keychain.
-ssh_keys:
+keychain_ssh_keys:
   - 'id_rsa'
 
 # List of gpg keys to load into keychain. Note, that if this list left empty,
@@ -30,7 +30,7 @@ ssh_keys:
 # do not need (ignore, in fact) GPG_AGENT_INFO environment variable at all
 # (which keychain tries to set). Thus, on recent enough gpg it may be better
 # to leave this list empty.
-gpg_keys: []
+keychain_gpg_keys: []
 
 # Whether to install fuck ('false' - "do fuck with me" - means install).
 dont_fuck_with_me: false
@@ -40,9 +40,9 @@ thefuck_branch: 'master'
 # Install cowsay along with several handful aliases.
 obtain_cowpowers: true
 # Default value for sayHi() function.
-default_cowHi: 'НАХУЮ СИНЕМА ПРОДАКШН при поддержке компании Бест-Хостинг представляет..'
+cow_Hi: 'НАХУЮ СИНЕМА ПРОДАКШН при поддержке компании Бест-Хостинг представляет..'
 # Default value for sayBye() function.
-default_cowBye: 'На этом мы прощаемся с вами! Подписывайтесь на наш канал, лайкайте и комментируйте.'
+cow_Bye: 'На этом мы прощаемся с вами! Подписывайтесь на наш канал, лайкайте и комментируйте.'
 # File, where cow stores the current state of reading phrase file.
 cow_msg_statefile: "{{ ansible_user_dir + '/.cow_msg_state' }}"
 
@@ -51,14 +51,14 @@ cow_msg_statefile: "{{ ansible_user_dir + '/.cow_msg_state' }}"
 # will result in _always changed_ status of playbook run.
 force_overwrite: no
 
+# Whether internet connection available or not.
+internet_available: true
+
 # This dictionary is used by several roles (e.g. `sgf-console` and
 # `sgf-desktop`). This role initializes only part of its keys from
 # `console_colors` dictionary. To overwrite particular keys, set them in
 # parent task.
 colors: {}
-
-# Whether internet connection available or not.
-internet_available: true
 
 # Default for _all_ `colors` dictionary keys (overwriting role default value).
 # But particular `colors` key set explicitly in parent task will overwrite

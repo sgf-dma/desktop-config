@@ -1,2 +1,8 @@
 ---
-# vars file for roles/sgf-apt
+
+python_apt: >-
+  {{ 'python3-apt'
+        if ansible_python.version.major | int == 3
+        else 'python-apt'
+  }}
+

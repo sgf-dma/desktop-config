@@ -36,7 +36,7 @@ let g:table_mode_corner_corner='+'
 let g:table_mode_header_fillchar='='
 let g:vim_markdown_no_extensions_in_markdown = 1
 
-{% if vim_disable_arrow_keys %}
+{% if _vim_disable_arrow_keys %}
 noremap <Up> <nop>
 noremap <Down> <nop>
 noremap <Left> <nop>

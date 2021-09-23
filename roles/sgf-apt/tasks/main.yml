@@ -8,23 +8,29 @@
 # to `/etc/sudoers`.
 - block:
     # `python-apt` required for `apt` and `package_facts` ansible modules.
-    - name: Check required python-apt package
-      apt:
-        name: 'python-apt'
-        state: present
-      ignore_errors: yes
-      register: apt_status
+    - name:
+      ansible.builtin.dpkg_selections:
+        name: "{{ python_apt }}"
+        selection: 'install'
+      check_mode: true
+      register: python_apt_status
+
+    - name: Show python-apt info
+      ansible.builtin.debug:
+        msg: >-
+          {{ "Package '" + python_apt + "' has dpkg status " + python_apt_status | string }}
+
     - name: Install python-apt package
-      apt:
-        name: python-apt
+      ansible.builtin.apt:
+        name: "{{ python_apt }}"
         state: present
-      when: apt_status.failed
+      when: python_apt_status.changed
       become: yes
 
     - name: Obtain package status
-      package_facts:
-        manager: apt
+      ansible.builtin.package_facts:
       no_log: true
+
   tags:
     - 'apt'
 

@@ -2,7 +2,7 @@
 
 - block:
     - name: firefox_versions | Report version
-      debug:
+      ansible.builtin.debug:
         msg: >-
           {{ "Installing firefox " +
                 (   "named '" + cur_firefox.name + "'"
@@ -14,38 +14,39 @@
                 )
           }}
     - name: firefox_versions | Create install directory
-      file:
+      ansible.builtin.file:
         path:   "{{ cur_firefox.dir }}"
         mode:   0755
         state:  directory
     - name: firefox_versions | Download
-      get_url:
+      ansible.builtin.get_url:
         url:  "{{ cur_firefox.url }}"
         dest: "{{ user_dist_dir + '/' + cur_firefox.archive }}"
-        force:  "{{ force_overwrite }}"
+        force:  "{{ _force_overwrite }}"
       register: cur_firefox_download
+      when: _internet_available
     - name: firefox_versions | Unpack
-      unarchive:
+      ansible.builtin.unarchive:
         src:      "{{ user_dist_dir + '/' + cur_firefox.archive }}"
         dest:     "{{ cur_firefox.dir }}"
         remote_src: yes
         creates: >-
-          {{ ( force_overwrite or cur_firefox_download.changed )
+          {{ ( _force_overwrite or cur_firefox_download.changed )
               | ternary(file_does_not_exist, cur_firefox.bin)
           }}
     - name: firefox_versions | Create symlink to firefox binary
-      file:
+      ansible.builtin.file:
         path:   "{{ ansible_user_dir + '/bin/' + cur_firefox.desktop | splitext | first }}"
         state:  link
         src:    "{{ cur_firefox.bin }}"
     - name: firefox_versions | Copy desktop entry
-      template:
+      ansible.builtin.template:
         src:    'firefox/firefox.desktop'
         dest:   "{{ user_desktop_entries + '/' + cur_firefox.desktop }}"
         force:  yes
         backup: yes
       register: cur_firefox_desktop_changed
     - name: firefox_versions | Update user's mime info cache
-      command: update-desktop-database "{{ user_desktop_entries }}"
+      ansible.builtin.command: update-desktop-database "{{ user_desktop_entries }}"
       when: cur_firefox_desktop_changed.changed
 

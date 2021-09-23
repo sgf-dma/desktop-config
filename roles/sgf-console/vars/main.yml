@@ -1,5 +1,19 @@
 ---
 
+# Convert default boolean values to bool. When default variable value
+# specified on cmd with '-e' option, it's type will be string, not bool. And,
+# hence, both 'false' and 'true' will be true (as bool), because string is not
+# null.  And i need to convert them to bool explicitly either when i use them,
+# or here.
+_tmux_enable: "{{ tmux_enable | bool }}"
+_vim_enable: "{{ vim_enable | bool }}"
+_vim_disable_arrow_keys: "{{ vim_disable_arrow_keys | bool }}"
+_keychain_enable: "{{ keychain_enable | bool }}"
+_dont_fuck_with_me: "{{ dont_fuck_with_me | bool }}"
+_obtain_cowpowers: "{{ obtain_cowpowers | bool }}"
+_force_overwrite: "{{ force_overwrite | bool }}"
+_internet_available: "{{ internet_available | bool }}"
+
 vim_dir:  "{{ ansible_user_dir + '/.vim' }}"
 vim_package_dir:  "{{ vim_dir + '/bundle' }}"
 

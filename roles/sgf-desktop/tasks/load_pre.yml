@@ -3,12 +3,12 @@
 # This tasks may be used as pre-tasks in main play.
 
 - name: load_pre | Merge desktop colors
-  set_fact:
+  ansible.builtin.set_fact:
     colors: >
       {{ {item.key : all_colors | default(item.value)} | combine(colors) }}
-  with_dict: "{{ desktop_colors }}"
+  loop: "{{ desktop_colors | dict2items }}"
 
 - name: load_pre | Loaded desktop colors are..
-  debug:
+  ansible.builtin.debug:
     var: colors
 
