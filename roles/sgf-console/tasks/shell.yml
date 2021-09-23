@@ -167,6 +167,21 @@
         backup: yes
         dest:   "{{ ansible_user_dir + '/.bashrc-common' }}"
 
+    - name: shell | Check for clear_console call in bash_logout
+      ansible.builtin.lineinfile:
+        path:   "{{ ansible_user_dir + '/.bash_logout' }}"
+        regexp: "/clear_console"
+        state: absent
+      check_mode: yes
+      changed_when: false
+      register: clear_console
+
+    - name: shell | Create empty bash_logout file, if it calls clear_console
+      template:
+        src: 'bash_logout'
+        dest: "{{ ansible_user_dir + '/.bash_logout' }}"
+        backup: yes
+
   tags:
     - bashrc
     - keychain
