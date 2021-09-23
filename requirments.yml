@@ -1,4 +1,4 @@
 
-- src: https://github.com/best-hosting/pdns_recursor-ansible.git
-  version: fix-check-mode
+- src: https://github.com/PowerDNS/pdns_recursor-ansible.git
+  version: master
 
