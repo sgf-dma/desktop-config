@@ -8,7 +8,7 @@ user_xkb_rules: "{{ user_xkb_dir + 'rules/evdev.sgf' }}"
 
 user_x_resources: "{{ ansible_user_dir + '/.Xresources.d' }}"
 
-im_enabled: true
+enable_im: false
 
 xmonad_branch: master
 xmobar_branch: master

@@ -7,7 +7,8 @@
 # or here.
 _xkb_mods: "{{ xkb_mods | bool }}"
 _xkb_clear_options: "{{ xkb_clear_options | bool }}"
-_im_enabled: "{{ im_enabled | bool }}"
+_enable_im: "{{ enable_im | bool }}"
+
 _internet_available: "{{ internet_available | bool }}"
 _force_overwrite: "{{ force_overwrite | bool }}"
 
