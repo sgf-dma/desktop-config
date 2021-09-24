@@ -11,6 +11,7 @@ tmux_plugins_enable: true
 tmux_prefix: 'C-b'
 tmux_prefix_key: "{{ tmux_prefix }}"
 
+vim_plugins_enable: true
 vim_plugins:
   - repo: 'https://github.com/altercation/vim-colors-solarized.git'
   - repo: 'https://github.com/tpope/vim-fugitive.git'
@@ -18,7 +19,7 @@ vim_plugins:
   - repo: 'https://github.com/tpope/vim-sensible.git'
   - repo: 'https://github.com/dhruvasagar/vim-table-mode.git'
 
-vim_disable_arrow_keys: true
+vim_disable_arrow_keys: false
 
 # Repository, where to clone keychain.
 keychain_repo_dir: "{{ user_dist_dir + '/keychain' }}"

@@ -1,18 +1,35 @@
 ---
 
-- name: vim | Create directories
-  ansible.builtin.file:
-    path:   "{{ vim_dir + item }}"
-    state:  directory
-  loop:
-    - '/autoload'
-    - '/bundle'
+- block:
+    - name: vim | Create directories
+      ansible.builtin.file:
+        path:   "{{ vim_dir + item }}"
+        state:  directory
+      loop:
+        - '/autoload'
+        - '/bundle'
 
-- name: vim | Install pathogen
-  ansible.builtin.get_url:
-    url:  'https://tpo.pe/pathogen.vim'
-    dest: "{{ vim_dir + '/autoload/pathogen.vim' }}"
-  when: _internet_available
+  when: _vim_plugins_enable
+
+- block:
+    - name: vim | Install pathogen
+      ansible.builtin.get_url:
+        url:  'https://tpo.pe/pathogen.vim'
+        dest: "{{ vim_dir + '/autoload/pathogen.vim' }}"
+      when: _internet_available
+
+    - name: vim | Checkout plugins
+      ansible.builtin.git:
+        repo: "{{ item.repo }}"
+        # Note, yaml block chomping indicator to remove trailing newline.
+        dest: >-
+          {{ vim_package_dir + '/'
+              + item.dest | default(item.repo | basename | splitext | first)
+          }}
+        clone: yes
+      loop: "{{ vim_plugins }}"
+
+  when: _vim_plugins_enable and _internet_available
 
 # FIXME: `.vimrc` references some plugins, which may not be there..
 - name: vim | Intall common vimrc
@@ -35,16 +52,4 @@
   tags:
     - 'vim_config'
     - 'colors_config'
-
-- name: vim | Checkout plugins
-  ansible.builtin.git:
-    repo: "{{ item.repo }}"
-    # Note, yaml block chomping indicator to remove trailing newline.
-    dest: >-
-      {{ vim_package_dir + '/'
-          + item.dest | default(item.repo | basename | splitext | first)
-      }}
-    clone: yes
-  loop: "{{ vim_plugins }}"
-  when: _internet_available
 

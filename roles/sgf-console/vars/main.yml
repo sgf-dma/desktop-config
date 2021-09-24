@@ -7,12 +7,15 @@
 # or here.
 _enable_tmux: "{{ enable_tmux | bool }}"
 _enable_vim: "{{ enable_vim | bool }}"
-_vim_disable_arrow_keys: "{{ vim_disable_arrow_keys | bool }}"
 _enable_keychain: "{{ enable_keychain | bool }}"
 _dont_fuck_with_me: "{{ dont_fuck_with_me | bool }}"
 _obtain_cowpowers: "{{ obtain_cowpowers | bool }}"
+
 _force_overwrite: "{{ force_overwrite | bool }}"
 _internet_available: "{{ internet_available | bool }}"
+
+_vim_disable_arrow_keys: "{{ vim_disable_arrow_keys | bool }}"
+_vim_plugins_enable: "{{ vim_plugins_enable | bool }}"
 
 vim_dir:  "{{ ansible_user_dir + '/.vim' }}"
 vim_package_dir:  "{{ vim_dir + '/bundle' }}"
