@@ -31,8 +31,7 @@
 
   when: _vim_plugins_enable and _internet_available
 
-# FIXME: `.vimrc` references some plugins, which may not be there..
-- name: vim | Intall common vimrc
+- name: vim | Copy vim config files
   ansible.builtin.copy:
     src:    "{{ item }}"
     force:  yes
@@ -43,12 +42,14 @@
   tags:
     - 'vim_config'
 
-- name: vim | Intall main vimrc
+- name: vim | Generate vim configs
   ansible.builtin.template:
-    src:    "vim/vimrc"
+    src:    "{{ item }}"
     force:  yes
     backup: yes
-    dest:   "{{ ansible_user_dir + '/.vimrc' }}"
+    dest:   "{{ ansible_user_dir + '/.' + item | basename }}"
+  with_fileglob:
+    - "vim/*"
   tags:
     - 'vim_config'
     - 'colors_config'
