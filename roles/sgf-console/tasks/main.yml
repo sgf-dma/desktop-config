@@ -112,7 +112,7 @@
           tags:
             - 'tmux'
             - 'colors'
-  when: _tmux_enable
+  when: _enable_tmux
   tags:
     - 'tmux'
     - 'colors'
@@ -138,7 +138,7 @@
           tags:
             - 'vim'
             - 'colors'
-  when: _vim_enable
+  when: _enable_vim
   tags:
     - 'vim'
     - 'colors'

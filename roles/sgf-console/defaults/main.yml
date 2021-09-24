@@ -1,11 +1,16 @@
 ---
 
-tmux_enable: true
+# Enable different programs.
+enable_tmux: true
+enable_vim: true
+enable_keychain: true
+dont_fuck_with_me: false
+obtain_cowpowers: false
+
 tmux_plugins_enable: true
 tmux_prefix: 'C-b'
 tmux_prefix_key: "{{ tmux_prefix }}"
 
-vim_enable: true
 vim_plugins:
   - repo: 'https://github.com/altercation/vim-colors-solarized.git'
   - repo: 'https://github.com/tpope/vim-fugitive.git'
@@ -15,8 +20,6 @@ vim_plugins:
 
 vim_disable_arrow_keys: true
 
-# Whether to install keychain or not.
-keychain_enable: true
 # Repository, where to clone keychain.
 keychain_repo_dir: "{{ user_dist_dir + '/keychain' }}"
 # Branch to use.
@@ -38,8 +41,6 @@ dont_fuck_with_me: false
 thefuck_repo_dir: "{{ user_dist_dir + '/thefuck' }}"
 thefuck_branch: 'master'
 
-# Install cowsay along with several handful aliases.
-obtain_cowpowers: true
 # Default value for sayHi() function.
 cow_Hi: 'НАХУЮ СИНЕМА ПРОДАКШН при поддержке компании Бест-Хостинг представляет..'
 # Default value for sayBye() function.

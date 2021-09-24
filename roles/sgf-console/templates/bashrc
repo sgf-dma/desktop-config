@@ -99,7 +99,7 @@ umask 027
 export MANPATH="$HOME/.local/share/man:"
 eval $(thefuck --alias)
 eval $(thefuck --alias FUCK)
-{% if _keychain_enable %}
+{% if _enable_keychain %}
 {% if keychain_gpg_keys | length == 0 %}
 eval $(keychain --agents ssh --eval {{ keychain_ssh_keys | join(' ') }} )
 {% else %}

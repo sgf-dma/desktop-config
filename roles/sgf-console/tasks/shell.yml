@@ -45,7 +45,7 @@
         force: yes
         mode: 0644
 
-  when: _keychain_enable and _internet_available
+  when: _enable_keychain and _internet_available
   tags:
     - keychain
 
