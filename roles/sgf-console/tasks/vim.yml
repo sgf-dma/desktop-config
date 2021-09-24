@@ -31,6 +31,7 @@
 
   when: _vim_plugins_enable and _internet_available
 
+# FIXME: `.vimrc` references some plugins, which may not be there..
 - name: vim | Copy vim config files
   ansible.builtin.copy:
     src:    "{{ item }}"

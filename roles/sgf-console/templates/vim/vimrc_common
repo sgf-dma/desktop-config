@@ -33,9 +33,12 @@ set shiftwidth=4
 set softtabstop=4
 set expandtab
 
+" FIXME: Reference variable from sgf-desktop.
+{% if enable_im %}
 set keymap=russian-jcukenwin
 set iminsert=0
 set imsearch=-1
+{% endif %}
 
 " }}}
 " Mappings {{{
