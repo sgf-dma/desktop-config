@@ -2,4 +2,4 @@
 # For more details, please see /etc/apparmor.d/local/README.
 
 # Allow to open links in all firefox versions installed in user's home.
-owner @{HOME}/opt/firefox-*/firefox/firefox Pux,
+owner @{HOME}/opt/firefox-*/firefox/firefox PUx,
