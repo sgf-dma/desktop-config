@@ -89,6 +89,11 @@ grub_menus_all:
 
 _grub_menus: []
 
+_grml_update_rescueboot_url: "https://raw.githubusercontent.com/grml/grml-rescueboot/master/update-grml-rescueboot"
+_grml_update_rescueboot: '/usr/sbin/update-grml-rescueboot'
+
 interface_link_files: {}
+
+file_does_not_exist: '/nonexistent-H5T6f'
 
 _force_overwrite: "{{ force_overwrite | bool }}"

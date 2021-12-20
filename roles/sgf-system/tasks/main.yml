@@ -40,3 +40,8 @@
   tags:
     - 'grub'
 
+- name: Install grml
+  ansible.builtin.import_tasks: grml.yml
+  tags:
+    - 'grml'
+

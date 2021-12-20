@@ -1,0 +1,47 @@
+
+- block:
+    # 'debian-keyring' is required for 'update-grml-rescueboot' script.
+    - name: grml | Install grml rescueboot
+      ansible.builtin.package:
+        name:
+          - 'grml-rescueboot'
+          - 'debian-keyring'
+        state: present
+
+    - block:
+        - name: grml | Define user's update-grml-rescueboot script
+          set_fact:
+            _grml_update_rescueboot: >-
+              {{ ansible_user_dir + '/bin/' + 'update-grml-rescueboot' }}
+
+        - name: grml | Download update-grml-rescueboot script, if missed
+          ansible.builtin.get_url:
+            url: "{{ _grml_update_rescueboot_url }}"
+            dest: "{{ _grml_update_rescueboot }}"
+            mode: '755'
+            force: "{{ _force_overwrite }}"
+
+      when: ansible_distribution == "Debian" and ansible_distribution_major_version | int < 10
+
+    - name: grml | Patch grml grub config
+      ansible.posix.patch:
+        src: "grml/42_grml.patch"
+        dest: '/etc/grub.d/42_grml'
+        remote_src: false
+        backup: false
+        state: present
+      notify: update_grub
+
+    # 'update-grml-rescueboot' script runs 'update-grml' by itself, so no need
+    # to notify it.
+    - name: grml | Download grml iso
+      ansible.builtin.command:
+        cmd: "{{ _grml_update_rescueboot }} {{ '-f' if _force_overwrite is true }} -t {{ grml_iso }}"
+        creates: >-
+          {{ '/boot/grml/grml64-' + grml_iso + '_*.iso'
+              if not _force_overwrite
+              else file_does_not_exist
+          }}
+
+  become: yes
+  when: grml_iso != 'none'

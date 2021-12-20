@@ -36,6 +36,12 @@ my_pdns_rec_config: {}
 # 'uuid' - uuid of this drive.
 grub_drives: {}
 
+# Whether to download grml rescueboot iso.
+# 'none' - do not install and download grml rescueboot is.
+# 'small' - download 'small' grml iso.
+# 'full' - download 'full' grml iso.
+grml_iso: 'small'
+
 # key - must be one of keys defined in 'grub_menus_all' (from
 # 'vars/main.yml').
 # Values:
