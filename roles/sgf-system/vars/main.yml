@@ -89,7 +89,8 @@ grub_menus_all:
 
 _grub_menus: []
 
-_grml_update_rescueboot_url: "https://raw.githubusercontent.com/grml/grml-rescueboot/master/update-grml-rescueboot"
+  #_grml_update_rescueboot_url: "https://raw.githubusercontent.com/grml/grml-rescueboot/master/update-grml-rescueboot"
+_grml_update_rescueboot_url: "https://raw.githubusercontent.com/best-hosting/grml-rescueboot/fix-getopts/update-grml-rescueboot"
 _grml_update_rescueboot: '/usr/sbin/update-grml-rescueboot'
 
 interface_link_files: {}
