@@ -27,7 +27,6 @@
         firefox_default_desktop: 'firefox-latest.desktop'
         firefox_system_profile: 'default-esr'
         xkb_clear_options: false
-        im_enabled: false
         firefox_versions:
           - version: '52.9.0esr'
             profile: 'default-52esr'
