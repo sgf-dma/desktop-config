@@ -11,6 +11,8 @@ obtain_cowpowers: true
 
 vim_disable_arrow_keys: true
 
+_enable_im: true
+
 xmobar_branch: e71512b7c961ab379aee98c2f4d65ad4bdd3c5bf
 firefox_default_desktop: 'firefox-esr.desktop'
 firefox_versions:
