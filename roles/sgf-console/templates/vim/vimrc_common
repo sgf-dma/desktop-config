@@ -174,8 +174,8 @@ augroup ft_haskell
 
     " Syntax.
     autocmd FileType haskell :iabbrev <buffer> casee case of<c-o>F 
-    autocmd FileType haskell :iabbrev <buffer> \ \ -><c-o>T\
-    autocmd FileType haskell :iabbrev <buffer> (\ (\->)<c-o>F-
+    " autocmd FileType haskell :iabbrev <buffer> \ \-><c-o>T\
+    " autocmd FileType haskell :iabbrev <buffer> (\ (\->)<c-o>F-
 augroup END
 
 augroup ft_sh
