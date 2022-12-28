@@ -64,9 +64,25 @@ nnoremap <leader><C-U> viwUe
 " }}}
 " Quoting and braces. {{{
 
-nnoremap <leader>" viw<esc>a"<esc>hbi"<esc>lel
-nnoremap <leader>' viw<esc>a'<esc>hbi'<esc>lel
-nnoremap <leader>` viw<esc>a`<esc>hbi`<esc>lel
+" Using 'lel' to return to the end of a word enclosed by some marks is
+" unstable: it will work differently on single-letter and multi-letter words.
+" Because 'e' on single-letter word will move to the end of next word (i'm
+" already at the end of current one), but 'e' in the middle of multi-letter
+" word will move to its end. Thus, its more reliable to rely on 'viw'. I may
+" either reselect word using 'viw' and then use 'e' to move to the end of next
+" word (which will be mark): 'lviw<esc>e' or use saved previous selection
+" location, but in that case i need to properly count shift (depending on the
+" number of marks i've added).
+"
+" Also, i should not use 'e' as last movement, because 'e' may jump through
+" following non-letter characters, which were in the string previously, like
+" commas or braces.
+nnoremap <leader>" viw<esc>a"<esc>bi"<esc>`>el
+nnoremap <leader>' viw<esc>a'<esc>bi'<esc>`>el
+nnoremap <leader>` viw<esc>a`<esc>bi`<esc>`>el
+nnoremap <leader>( viw<esc>a)<esc>bi(<esc>`>el
+nnoremap <leader>[ viw<esc>a]<esc>bi[<esc>`>el
+
 " First add final quote, because adding leading quote will change the last
 " selected character position from what is remembered by `> , when selection
 " was on single line, and does not change, when selection was multi-line. That
@@ -76,7 +92,8 @@ nnoremap <leader>` viw<esc>a`<esc>hbi`<esc>lel
 vnoremap <leader>" <esc>`>a"<esc>`<i"<esc>`>f"
 vnoremap <leader>' <esc>`>a'<esc>`<i'<esc>`>f'
 vnoremap <leader>` <esc>`>a`<esc>`<i`<esc>`>f`
-vnoremap <leader>( <esc>`>a)<esc>`<i(<esc>`>f"
+vnoremap <leader>( <esc>`>a)<esc>`<i(<esc>`>f)
+vnoremap <leader>[ <esc>`>a]<esc>`<i[<esc>`>f]
 
 " }}}
 " Operator movements.  {{{
@@ -188,6 +205,15 @@ augroup ft_md
     autocmd FileType markdown onoremap <buffer> ih :<c-u>execute "normal! ?^\\(-\\\|=\\)\\1\\+\r:nohlsearch\rkvg_"<cr>
     " Around this section heading.
     autocmd FileType markdown onoremap <buffer> ah :<c-u>execute "normal! ?^\\(-\\\|=\\)\\1\\+\r:nohlsearch\rg_vk0"<cr>
+
+    autocmd FileType markdown nnoremap <buffer> <leader>_ viw<esc>a_<esc>bi_<esc>`>el
+    autocmd FileType markdown nnoremap <buffer> <leader>* viw<esc>a**<esc>2bi**<esc>lviw<esc>e
+    autocmd FileType markdown nnoremap <buffer> <leader>~ viw<esc>a~~<esc>2bi~~<esc>lviw<esc>e
+
+    autocmd FileType markdown vnoremap <buffer> <leader>_ <esc>`>a_<esc>`<i_<esc>`>f_
+    autocmd FileType markdown vnoremap <buffer> <leader>* <esc>`>a**<esc>`<i**<esc>`>2f*
+    autocmd FileType markdown vnoremap <buffer> <leader>~ <esc>`>a~~<esc>`<i~~<esc>`>2f~
+
 augroup END
 
 " }}}
