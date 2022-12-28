@@ -38,7 +38,6 @@ keychain_ssh_keys:
 keychain_gpg_keys: []
 
 # Whether to install fuck ('false' - "do fuck with me" - means install).
-dont_fuck_with_me: false
 thefuck_repo_dir: "{{ user_dist_dir + '/thefuck' }}"
 thefuck_branch: 'master'
 
