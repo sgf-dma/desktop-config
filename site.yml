@@ -47,7 +47,8 @@
           }
         interface_links:
           { '00:c0:ca:b0:62:de' : {'name': 'alfaAcm1'}
-          , '84:16:f9:12:8f:a9' : {'name' : 'tplink1'}
+          , '84:16:f9:12:8f:a9' : {'name' : 'tplink722n'}
+          , '9c:a2:f4:85:b5:3f' : {'name' : 'tplink821n'}
           , '0c:5b:8f:27:9a:64' : {'name' : 'huawei'}
           }
       tags:
