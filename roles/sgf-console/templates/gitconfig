@@ -6,3 +6,8 @@
 [core]
         excludesfile = ~/.gitignore
 	precomposeunicode = true
+	quotePath = false
+[init]
+	defaultBranch = master
+[pull]
+	rebase = true
