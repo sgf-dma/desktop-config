@@ -24,7 +24,7 @@
 
     # There should be single stdout line, but just in case i join them..
     - name: interfaces | Parse ethtool output into interface name to mac dictionary ..
-      ansible.netcommon.cli_parse:
+      ansible.utils.cli_parse:
         text: >-
           {% for s in ethtool_p_stdout.results -%}
             {{ s.item }} {{ s.stdout_lines | join (' ') }}

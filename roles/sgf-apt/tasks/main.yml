@@ -30,7 +30,7 @@
     - name: Obtain package status
       ansible.builtin.package_facts:
       no_log: true
-
+      check_mode: false
   tags:
     - 'apt'
 
